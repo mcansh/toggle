@@ -11,23 +11,26 @@ generator client {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  username  String   @unique
-  Team      Team?    @relation(fields: [teamId], references: [id])
-  teamId    String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  username     String   @unique
+  Team         Team?    @relation(fields: [teamId], references: [id])
+  teamId       String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  createdFlags Flag[]   @relation(name: "createdByUser")
+  updatedFlags Flag[]   @relation(name: "lastUpdatedByUser")
 }
 
 model Team {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  members   User[]
-  flags     Flag[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String           @id @default(cuid())
+  name            String           @unique
+  members         User[]
+  flags           Flag[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  featureChannels FeatureChannel[]
 }
 
 enum FlagType {
@@ -37,6 +40,7 @@ enum FlagType {
 }
 
 model Flag {
+  // Normal flag properties
   id        String   @id @default(cuid())
   feature   String   @unique
   type      FlagType
@@ -44,7 +48,31 @@ model Flag {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // relate a flag to it's creator
+  createdBy User   @relation(name: "createdByUser", fields: [userId], references: [id])
+  userId    String
+
+  // relate a flag to the last person who updated it
+  lastUpdatedBy     User   @relation(name: "lastUpdatedByUser", fields: [lastUpdatedByUser], references: [id])
+  lastUpdatedByUser String
+
+
+  // relate a flag to a team
   Team   Team?   @relation(fields: [teamId], references: [id])
   teamId String?
+
+  // make flags unique per team
+  FeatureChannel   FeatureChannel? @relation(fields: [featureChannelId], references: [id])
+  featureChannelId String?
   @@unique([feature, teamId], name: "UniqueFlagNamePerTeam")
+}
+
+model FeatureChannel {
+  id        String   @id @default(cuid())
+  name      String
+  flags     Flag[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Team      Team?    @relation(fields: [teamId], references: [id])
+  teamId    String?
 }

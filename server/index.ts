@@ -10,12 +10,10 @@ import RateLimitRedis from "rate-limit-redis";
 import dotenv from "dotenv-safe";
 import { PrismaClient } from "@prisma/client";
 
-import { FlagType } from "@prisma/client";
-
-function parseFeatureValue(type: FlagType, value: string) {
-  return type === "Boolean"
+function parseFeatureValue(type: string, value: string) {
+  return type === "boolean"
     ? JSON.parse(value)
-    : type === "Int"
+    : type === "number"
     ? Number(value)
     : value;
 }
@@ -41,11 +39,16 @@ const limiter = rateLimit({
   store: new RateLimitRedis({ client }),
 });
 
+const testLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // limit each IP to 100 requests per windowMs
+  store: new RateLimitRedis({ client }),
+});
+
 const registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 5,
   store: new RateLimitRedis({ client }),
-  message: `Too many accounts created from this IP, please try again after an hour`,
 });
 
 const app = express();
@@ -81,21 +84,49 @@ app.use((request, response, next) => {
 
 const prisma = new PrismaClient();
 
-app.all("/api/flags", async (req, res) => {
-  const authToken = req.headers.authorization ?? "ckjlug9m80000nqist5jrjbk9";
-  // if (!authToken) return res.status(401).json({});
-  const flags = await prisma.flag.findMany({
+app.get("/api/flags", testLimiter, async (_req, res) => {
+  const websiteFlags = await prisma.featureChannel.findUnique({
     where: {
-      Team: { members: { some: { id: authToken } } },
+      id: "ckjndxrkg0021m7iso0db33ml",
+    },
+    select: {
+      flags: true,
     },
   });
 
-  const parsedFlags = flags.map((flag) => ({
-    ...flag,
-    value: parseFeatureValue(flag.type, flag.value),
-  }));
+  const websiteFlagsObject =
+    websiteFlags?.flags.reduce((acc: { [key: string]: any }, cur) => {
+      return {
+        ...acc,
+        [cur.feature]: parseFeatureValue(cur.type, cur.value),
+      };
+    }, {}) ?? {};
 
-  return res.json({ flags: parsedFlags });
+  if (websiteFlagsObject.EnablePublicAPI !== true) {
+    return res.status(415).send({
+      message: "our api isn't quite ready for you yet",
+    });
+  }
+
+  const flags = await prisma.flag.findMany({
+    where: {
+      teamId: "ckjnab6t20006raiszrzenw5t",
+    },
+    select: {
+      value: true,
+      feature: true,
+      type: true,
+    },
+  });
+
+  const flagObject = flags.reduce((acc: { [key: string]: any }, cur) => {
+    return {
+      ...acc,
+      [cur.feature]: parseFeatureValue(cur.type, cur.value),
+    };
+  }, {});
+
+  return res.json({ flags: flagObject });
 });
 
 app.all(

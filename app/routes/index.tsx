@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Form, usePendingFormSubmit, useRouteData } from "@remix-run/react";
-import { Flag } from "@prisma/client";
+import { Flag, FlagType } from "@prisma/client";
 import { Action, Loader, parseFormBody, redirect } from "@remix-run/data";
 import { toPascalCase } from "../utils/pascal-case";
 import { RemixContext } from "../context";
@@ -53,19 +53,30 @@ function Index() {
 
       <Form action="/" method="post">
         <fieldset disabled={!!pendingForm}>
-          <input type="text" name="featureName" placeholder="Name of feature" />
+          <input
+            type="text"
+            name="featureName"
+            placeholder="Name of feature"
+            onBlur={(event) => {
+              if (event.currentTarget.value.includes(" ")) {
+                event.currentTarget.value = toPascalCase(
+                  event.currentTarget.value
+                );
+              }
+            }}
+          />
           <div>
             <label>
               <span>Boolean (true/false)</span>
-              <input type="radio" name="featureType" value="Boolean" />
+              <input type="radio" name="featureType" value="boolean" />
             </label>
             <label>
               <span>String</span>
-              <input type="radio" name="featureType" value="String" />
+              <input type="radio" name="featureType" value="string" />
             </label>
             <label>
               <span>Number</span>
-              <input type="radio" name="featureType" value="Int" />
+              <input type="radio" name="featureType" value="number" />
             </label>
           </div>
           <input
@@ -122,7 +133,7 @@ const action: Action = async ({ request, session, context }) => {
     }
 
     const featureName = body.get("featureName") as string;
-    const featureType = body.get("featureType") as "Boolean" | "String" | "Int";
+    const featureType = body.get("featureType") as FlagType;
     const featureValue = body.get("featureValue") as string;
 
     if (teamId) {
@@ -131,6 +142,16 @@ const action: Action = async ({ request, session, context }) => {
           feature: toPascalCase(featureName),
           type: featureType,
           value: featureValue,
+          createdBy: {
+            connect: {
+              id: userId,
+            },
+          },
+          lastUpdatedBy: {
+            connect: {
+              id: userId,
+            },
+          },
           Team: {
             connect: {
               id: teamId,
@@ -144,6 +165,16 @@ const action: Action = async ({ request, session, context }) => {
           feature: toPascalCase(featureName),
           type: featureType,
           value: featureValue,
+          createdBy: {
+            connect: {
+              id: userId,
+            },
+          },
+          lastUpdatedBy: {
+            connect: {
+              id: userId,
+            },
+          },
           Team: {
             create: {
               name: `${user.username}'s new team`,
