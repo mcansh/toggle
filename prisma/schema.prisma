@@ -11,19 +11,23 @@ generator client {
 }
 
 model User {
-  id       String  @id @default(cuid())
-  name     String
-  email    String  @unique
-  username String  @unique
-  Team     Team?   @relation(fields: [teamId], references: [id])
-  teamId   String?
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  username  String   @unique
+  Team      Team?    @relation(fields: [teamId], references: [id])
+  teamId    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Team {
-  id      String @id @default(cuid())
-  name    String @unique
-  members User[]
-  flags   Flag[]
+  id        String   @id @default(cuid())
+  name      String   @unique
+  members   User[]
+  flags     Flag[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum FlagType {
@@ -33,11 +37,12 @@ enum FlagType {
 }
 
 model Flag {
-  id      String   @id @default(cuid())
-  feature String   @unique
-  type    FlagType
-  value   String
-
+  id        String   @id @default(cuid())
+  feature   String   @unique
+  type      FlagType
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   Team   Team?   @relation(fields: [teamId], references: [id])
   teamId String?
