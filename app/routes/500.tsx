@@ -1,8 +1,8 @@
-export function meta() {
+function meta() {
   return { title: "Shoot..." };
 }
 
-export default function FiveHundred() {
+function FiveHundred() {
   console.error("Check your server terminal output");
 
   return (
@@ -11,3 +11,6 @@ export default function FiveHundred() {
     </div>
   );
 }
+
+export default FiveHundred;
+export { meta };

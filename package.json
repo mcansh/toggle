@@ -6,9 +6,11 @@
   "scripts": {
     "postinstall": "tsc -b",
     "build:css": "postcss styles --base styles --dir app/ --env production",
+    "prebuild": "npm run clean",
     "build": "npm run build:css && remix build && tsc -b",
-    "dev": "concurrently \"postcss styles --base styles --dir app/ -w\" \"remix run\" \"tsc -b -w --preserveWatchOutput\" \"cross-env NODE_ENV=development nodemon -w app -w build -w data-build -e js,jsx,ts,tsx,md,mdx server-build/index.js\"",
-    "start": "node server-build/index.js"
+    "dev": "concurrently \"postcss styles --base styles --dir app/ -w\" \"remix run\" \"tsc -b -w --preserveWatchOutput\" \"cross-env NODE_ENV=development nodemon -w app -w build -w server -e js,jsx,ts,tsx,md,mdx server-build/index.js\"",
+    "start": "node server-build/index.js",
+    "clean": "del .cache build server-build public/build"
   },
   "repository": {
     "type": "git",
@@ -22,11 +24,11 @@
   "homepage": "https://github.com/mcansh/remix-feature-flags#readme",
   "dependencies": {
     "@prisma/client": "2.14.0",
-    "@remix-run/cli": "0.8.3",
-    "@remix-run/core": "0.8.3",
-    "@remix-run/data": "0.8.3",
-    "@remix-run/express": "0.8.3",
-    "@remix-run/react": "0.8.3",
+    "@remix-run/cli": "0.9.0-pre.2",
+    "@remix-run/core": "0.9.0-pre.2",
+    "@remix-run/data": "0.9.0-pre.2",
+    "@remix-run/express": "0.9.0-pre.2",
+    "@remix-run/react": "0.9.0-pre.2",
     "connect-redis": "5.0.0",
     "dotenv-safe": "8.2.0",
     "express": "4.17.1",
@@ -54,6 +56,7 @@
     "autoprefixer": "10.2.0",
     "concurrently": "5.3.0",
     "cross-env": "7.0.3",
+    "del-cli": "3.0.1",
     "nodemon": "2.0.7",
     "postcss": "8.2.2",
     "postcss-cli": "8.3.1",
