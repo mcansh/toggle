@@ -1,10 +1,9 @@
 import { Action, Loader, parseFormBody, redirect } from "@remix-run/data";
-import { PrismaClient } from "@prisma/client";
 import { toPascalCase } from "../pascal-case";
+import { RemixContext } from "../context";
 
-const prisma = new PrismaClient();
-
-let loader: Loader = async ({ session }) => {
+let loader: Loader = async ({ session, context }) => {
+  const { prisma } = context as RemixContext;
   const userId = session.get("userId");
 
   if (!userId) return redirect("/login");
@@ -14,7 +13,8 @@ let loader: Loader = async ({ session }) => {
   return { flags };
 };
 
-const action: Action = async ({ request, session }) => {
+const action: Action = async ({ request, session, context }) => {
+  const { prisma } = context as RemixContext;
   const userId = session.get("userId");
   const teamId = session.get("teamId");
 

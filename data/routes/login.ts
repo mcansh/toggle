@@ -1,10 +1,9 @@
 import { Action, Loader, parseFormBody, redirect } from "@remix-run/data";
-import { PrismaClient } from "@prisma/client";
 import { genCSRF } from "../csrf";
+import { RemixContext } from "../context";
 
-const prisma = new PrismaClient();
-
-export let loader: Loader = ({ session }) => {
+export let loader: Loader = ({ session, context }) => {
+  const { prisma } = context as RemixContext;
   if (session.get("userId")) {
     return redirect("/");
   }
@@ -14,7 +13,8 @@ export let loader: Loader = ({ session }) => {
   return { csrf };
 };
 
-export let action: Action = async ({ session, request }) => {
+export let action: Action = async ({ session, request, context }) => {
+  const { prisma } = context as RemixContext;
   const body = await parseFormBody(request);
 
   const email = body.get("email") as string;

@@ -8,6 +8,17 @@ import redisConnect from "connect-redis";
 import rateLimit from "express-rate-limit";
 import RateLimitRedis from "rate-limit-redis";
 import dotenv from "dotenv-safe";
+import { PrismaClient } from "@prisma/client";
+
+import { FlagType } from "@prisma/client";
+
+function parseFeatureValue(type: FlagType, value: string) {
+  return type === "Boolean"
+    ? JSON.parse(value)
+    : type === "Int"
+    ? Number(value)
+    : value;
+}
 
 dotenv.config({
   path: path.join(__dirname, "../.env"),
@@ -70,10 +81,31 @@ app.use((request, response, next) => {
   return next();
 });
 
+const prisma = new PrismaClient();
+
+app.all("/api/flags", async (req, res) => {
+  const authToken = req.headers.authorization ?? "ckjlug9m80000nqist5jrjbk9";
+  // if (!authToken) return res.status(401).json({});
+  const flags = await prisma.flag.findMany({
+    where: {
+      Team: { members: { some: { id: authToken } } },
+    },
+  });
+
+  const parsedFlags = flags.map((flag) => ({
+    ...flag,
+    value: parseFeatureValue(flag.type, flag.value),
+  }));
+
+  return res.json({ flags: parsedFlags });
+});
+
 app.all(
   "*",
   createRequestHandler({
-    getLoadContext() {},
+    getLoadContext() {
+      return { prisma };
+    },
   })
 );
 
