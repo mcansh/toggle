@@ -2,7 +2,7 @@ import * as React from "react";
 import { Form, usePendingFormSubmit, useRouteData } from "@remix-run/react";
 import { Flag } from "@prisma/client";
 import { Action, Loader, parseFormBody, redirect } from "@remix-run/data";
-import { toPascalCase } from "../pascal-case";
+import { toPascalCase } from "../utils/pascal-case";
 import { RemixContext } from "../context";
 
 function meta() {
