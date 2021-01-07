@@ -27,9 +27,9 @@ model Team {
 }
 
 enum FlagType {
-  String
-  Boolean
-  Int
+  string
+  boolean
+  number
 }
 
 model Flag {
