@@ -56,7 +56,7 @@ app.use(
   session({
     secret: "r3mixR0x",
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     store: new RedisStore({ client }),
     rolling: true,
     unset: "destroy",
@@ -70,8 +70,6 @@ app.use(
 );
 
 app.use((request, response, next) => {
-  console.log(request.method);
-
   if (request.method === "POST") {
     if (request.url === "/register") {
       return registerLimiter(request, response, next);
