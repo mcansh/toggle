@@ -1,0 +1,45 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id       String  @id @default(cuid())
+  name     String
+  email    String  @unique
+  username String  @unique
+  Team     Team?   @relation(fields: [teamId], references: [id])
+  teamId   String?
+}
+
+model Team {
+  id      String @id @default(cuid())
+  name    String @unique
+  members User[]
+  flags   Flag[]
+}
+
+enum FlagType {
+  String
+  Boolean
+  Int
+}
+
+model Flag {
+  id      String   @id @default(cuid())
+  feature String   @unique
+  type    FlagType
+  value   String
+
+
+  Team   Team?   @relation(fields: [teamId], references: [id])
+  teamId String?
+  @@unique(feature, name: "FlagPerTeam")
+}

@@ -1,0 +1,11 @@
+node_modules
+.ds_store
+
+# various build directories
+.cache
+/build
+/data-build
+/server-build
+/public/build
+
+.env

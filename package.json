@@ -1,0 +1,58 @@
+{
+  "name": "@mcansh/feature-flags",
+  "version": "1.0.0",
+  "description": "a feature flag platform",
+  "main": "remix.config.js",
+  "scripts": {
+    "postinstall": "tsc -b",
+    "build": "remix build && tsc -b",
+    "dev:typescript": "tsc -b -w --preserveWatchOutput",
+    "dev": "concurrently \"remix run\" \"tsc -b -w --preserveWatchOutput\" \"cross-env NODE_ENV=development nodemon -w app -w build -w data-build -e js,jsx,ts,tsx,md,mdx server-build/index.js\"",
+    "start": "node server-build/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mcansh/remix-feature-flags.git"
+  },
+  "author": "Logan McAnsh <logan@mcan.sh> (https://mcan.sh/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mcansh/remix-feature-flags/issues"
+  },
+  "homepage": "https://github.com/mcansh/remix-feature-flags#readme",
+  "dependencies": {
+    "@prisma/client": "2.14.0",
+    "@remix-run/cli": "0.8.3",
+    "@remix-run/core": "0.8.3",
+    "@remix-run/data": "0.8.3",
+    "@remix-run/express": "0.8.3",
+    "@remix-run/react": "0.8.3",
+    "connect-redis": "5.0.0",
+    "dotenv-safe": "8.2.0",
+    "express": "4.17.1",
+    "express-rate-limit": "5.2.3",
+    "express-session": "1.17.1",
+    "ioredis": "4.19.4",
+    "rate-limit-redis": "2.0.0",
+    "react": "17.0.1",
+    "react-dom": "17.0.1",
+    "react-router": "6.0.0-beta.0",
+    "react-router-dom": "6.0.0-beta.0"
+  },
+  "devDependencies": {
+    "@prisma/cli": "2.14.0",
+    "@types/connect-redis": "0.0.16",
+    "@types/dotenv-safe": "8.1.1",
+    "@types/express": "4.17.9",
+    "@types/express-rate-limit": "5.1.0",
+    "@types/express-session": "1.17.3",
+    "@types/node": "14.14.20",
+    "@types/rate-limit-redis": "1.7.1",
+    "@types/react": "17.0.0",
+    "@types/react-dom": "17.0.0",
+    "concurrently": "5.3.0",
+    "cross-env": "7.0.3",
+    "nodemon": "2.0.7",
+    "typescript": "4.1.3"
+  }
+}
