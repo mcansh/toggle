@@ -7,7 +7,7 @@ import {
 } from "@remix-run/react";
 import { Action, Loader, parseFormBody, redirect } from "@remix-run/data";
 import { RemixContext } from "../context";
-import { genCSRF } from "../csrf";
+import { genCSRF } from "../utils/csrf";
 
 function meta() {
   return {

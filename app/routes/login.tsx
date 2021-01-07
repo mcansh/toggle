@@ -6,7 +6,7 @@ import {
   useRouteData,
 } from "@remix-run/react";
 import { Action, Loader, parseFormBody, redirect } from "@remix-run/data";
-import { genCSRF } from "../csrf";
+import { genCSRF } from "../utils/csrf";
 import { RemixContext } from "../context";
 
 function meta() {
