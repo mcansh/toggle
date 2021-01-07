@@ -49,6 +49,7 @@ const registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 5,
   store: new RateLimitRedis({ client }),
+  message: `Too many accounts created from this IP, please try again after an hour`,
 });
 
 const app = express();
