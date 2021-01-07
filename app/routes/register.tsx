@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Form, usePendingFormSubmit } from "@remix-run/react";
+import { Form, Link, usePendingFormSubmit } from "@remix-run/react";
 
 export function meta() {
   return {
@@ -8,56 +8,57 @@ export function meta() {
   };
 }
 
-const inputStyles: React.CSSProperties = {
-  borderRadius: "0.25rem",
-  appearance: "none",
-  border: "2px solid black",
-  marginBottom: "0.25rem",
-  fontSize: "1rem",
-  padding: "4px 10px",
-};
-
 export default function Register() {
   const pendingForm = usePendingFormSubmit();
   return (
-    <div>
+    <div className="m-4">
+      <h1 className="mb-4 text-3xl font-medium text-center">
+        Welcome to Feature Flags!
+      </h1>
       <Form method="post" action="/register">
-        <fieldset
-          disabled={!!pendingForm}
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            margin: 0,
-            padding: 0,
-            border: "none",
-          }}
-        >
+        <fieldset disabled={!!pendingForm} className="flex flex-col space-y-4">
           <input
             type="text"
             autoComplete="name"
             placeholder="name"
             name="name"
-            style={inputStyles}
+            className="border-2 rounded"
           />
           <input
             type="email"
             autoComplete="email"
             placeholder="email"
             name="email"
-            style={inputStyles}
+            className="border-2 rounded"
           />
           <input
             type="text"
             autoComplete="username"
             placeholder="username"
             name="username"
-            style={inputStyles}
+            className="border-2 rounded"
           />
-          <button type="submit" style={{ fontSize: "1rem" }}>
+          <button
+            type="submit"
+            className="py-1 font-medium leading-loose text-white uppercase transition duration-150 bg-pink-500 rounded-full shadow-lg hover:bg-pink-800 focus:bg-pink-800"
+          >
             Register
           </button>
         </fieldset>
       </Form>
+
+      <div className="mt-4">
+        <h2>
+          Already have an account yet? Awesome, you can{" "}
+          <Link
+            className="text-blue-500 transition duration-150 hover:text-blue-800 focus:text-blue-800 ease"
+            to="/login"
+          >
+            log in
+          </Link>{" "}
+          here
+        </h2>
+      </div>
     </div>
   );
 }

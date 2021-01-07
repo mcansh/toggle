@@ -5,9 +5,9 @@
   "main": "remix.config.js",
   "scripts": {
     "postinstall": "tsc -b",
-    "build": "remix build && tsc -b",
-    "dev:typescript": "tsc -b -w --preserveWatchOutput",
-    "dev": "concurrently \"remix run\" \"tsc -b -w --preserveWatchOutput\" \"cross-env NODE_ENV=development nodemon -w app -w build -w data-build -e js,jsx,ts,tsx,md,mdx server-build/index.js\"",
+    "build:css": "postcss styles --base styles --dir app/ --env production",
+    "build": "npm run build:css && remix build && tsc -b",
+    "dev": "concurrently \"postcss styles --base styles --dir app/ -w\" \"remix run\" \"tsc -b -w --preserveWatchOutput\" \"cross-env NODE_ENV=development nodemon -w app -w build -w data-build -e js,jsx,ts,tsx,md,mdx server-build/index.js\"",
     "start": "node server-build/index.js"
   },
   "repository": {
@@ -41,6 +41,7 @@
   },
   "devDependencies": {
     "@prisma/cli": "2.14.0",
+    "@tailwindcss/forms": "0.2.1",
     "@types/connect-redis": "0.0.16",
     "@types/dotenv-safe": "8.1.1",
     "@types/express": "4.17.9",
@@ -50,9 +51,13 @@
     "@types/rate-limit-redis": "1.7.1",
     "@types/react": "17.0.0",
     "@types/react-dom": "17.0.0",
+    "autoprefixer": "10.2.0",
     "concurrently": "5.3.0",
     "cross-env": "7.0.3",
     "nodemon": "2.0.7",
+    "postcss": "8.2.2",
+    "postcss-cli": "8.3.1",
+    "tailwindcss": "2.0.2",
     "typescript": "4.1.3"
   }
 }

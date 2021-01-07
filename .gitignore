@@ -1,11 +1,12 @@
 node_modules
 .ds_store
 
-# various build directories
+# various build directories and artifacts
 .cache
 /build
 /data-build
 /server-build
 /public/build
+/app/**/*.css
 
 .env
