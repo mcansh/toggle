@@ -8,7 +8,8 @@ import redisConnect from "connect-redis";
 import rateLimit from "express-rate-limit";
 import RateLimitRedis from "rate-limit-redis";
 import dotenv from "dotenv-safe";
-import { PrismaClient } from "@prisma/client";
+import { Flag, PrismaClient } from "@prisma/client";
+import ms from "ms";
 
 function parseFeatureValue(type: string, value: string) {
   return type === "boolean"
@@ -34,19 +35,19 @@ const client = new Redis({
 });
 
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: ms("15m"),
   max: 100, // limit each IP to 100 requests per windowMs
   store: new RateLimitRedis({ client }),
 });
 
 const testLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: ms("15m"),
   max: 5, // limit each IP to 100 requests per windowMs
   store: new RateLimitRedis({ client }),
 });
 
 const registerLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
+  windowMs: ms("1h"),
   max: 5,
   store: new RateLimitRedis({ client }),
   message: `Too many accounts created from this IP, please try again after an hour`,
@@ -67,7 +68,7 @@ app.use(
     cookie: {
       path: "/",
       secure: process.env.NODE_ENV === "production",
-      maxAge: 60 * 60 * 60 * 24 * 15, // 15 days
+      maxAge: ms("15d"),
       sameSite: "strict",
     },
   })
@@ -96,7 +97,7 @@ app.get("/api/flags", testLimiter, async (_req, res) => {
   });
 
   const websiteFlagsObject =
-    websiteFlags?.flags.reduce((acc: { [key: string]: any }, cur) => {
+    websiteFlags?.flags.reduce((acc: { [key: string]: any }, cur: Flag) => {
       return {
         ...acc,
         [cur.feature]: parseFeatureValue(cur.type, cur.value),
@@ -113,14 +114,9 @@ app.get("/api/flags", testLimiter, async (_req, res) => {
     where: {
       teamId: "ckjnab6t20006raiszrzenw5t",
     },
-    select: {
-      value: true,
-      feature: true,
-      type: true,
-    },
   });
 
-  const flagObject = flags.reduce((acc: { [key: string]: any }, cur) => {
+  const flagObject = flags.reduce((acc: { [key: string]: Flag }, cur: Flag) => {
     return {
       ...acc,
       [cur.feature]: parseFeatureValue(cur.type, cur.value),
