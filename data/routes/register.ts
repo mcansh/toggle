@@ -27,7 +27,7 @@ export let action: Action = async ({ session, request }) => {
   if (csrf !== sessionCSRF) {
     session.flash("flash", `invalid csrf`);
 
-    return redirect("/login");
+    return redirect("/register");
   }
 
   session.unset("csrf");

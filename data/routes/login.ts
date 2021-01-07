@@ -37,6 +37,9 @@ export let action: Action = async ({ session, request }) => {
 
     if (user) {
       session.set("userId", user.id);
+      if (user.teamId) {
+        session.set("teamId", user.teamId);
+      }
     }
 
     return redirect("/");

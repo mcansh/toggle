@@ -1,3 +1,4 @@
+import * as React from "react";
 import { Meta, Scripts, Styles, Routes, useGlobalData } from "@remix-run/react";
 
 function App() {
