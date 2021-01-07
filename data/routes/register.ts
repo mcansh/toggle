@@ -1,7 +1,18 @@
-import { Action, parseFormBody, redirect } from "@remix-run/data";
+import { Action, Loader, parseFormBody, redirect } from "@remix-run/data";
 import { PrismaClient } from "@prisma/client";
+import { genCSRF } from "../csrf";
 
 const prisma = new PrismaClient();
+
+export const loader: Loader = async ({ session }) => {
+  if (session.get("userId")) {
+    return redirect("/");
+  }
+
+  const csrf = genCSRF();
+  session.set("csrf", csrf);
+  return { csrf };
+};
 
 export let action: Action = async ({ session, request }) => {
   const body = await parseFormBody(request);
@@ -9,6 +20,18 @@ export let action: Action = async ({ session, request }) => {
   const name = body.get("name") as string;
   const email = body.get("email") as string;
   const username = body.get("username") as string;
+  const csrf = body.get("_csrf") as string;
+
+  const sessionCSRF = session.get("csrf");
+
+  if (csrf !== sessionCSRF) {
+    session.flash("flash", `invalid csrf`);
+
+    return redirect("/login");
+  }
+
+  session.unset("csrf");
+
   try {
     const user = await prisma.user.create({
       data: {
@@ -19,7 +42,7 @@ export let action: Action = async ({ session, request }) => {
     });
 
     session.set("userId", user.id);
-    session.set("user.new", "true");
+
     return redirect("/");
   } catch (error) {
     console.log(error);

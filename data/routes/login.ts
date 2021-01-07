@@ -22,8 +22,6 @@ export let action: Action = async ({ session, request }) => {
 
   const sessionCSRF = session.get("csrf");
 
-  console.log({ session: sessionCSRF, csrf });
-
   if (csrf !== sessionCSRF) {
     session.flash("flash", `invalid csrf`);
 
@@ -40,6 +38,7 @@ export let action: Action = async ({ session, request }) => {
     if (user) {
       session.set("userId", user.id);
     }
+
     return redirect("/");
   } catch (error) {
     console.log(error);

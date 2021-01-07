@@ -1,6 +1,6 @@
 var { randomBytes } = require("crypto");
 
-function genCSRF() {
+function genCSRF(): string {
   return randomBytes(100).toString("base64");
 }
 

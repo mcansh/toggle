@@ -1,5 +1,10 @@
 import * as React from "react";
-import { Form, Link, usePendingFormSubmit } from "@remix-run/react";
+import {
+  Form,
+  Link,
+  usePendingFormSubmit,
+  useRouteData,
+} from "@remix-run/react";
 
 export function meta() {
   return {
@@ -10,6 +15,8 @@ export function meta() {
 
 export default function Register() {
   const pendingForm = usePendingFormSubmit();
+  const { csrf } = useRouteData<{ csrf: string }>();
+
   return (
     <div className="m-4">
       <h1 className="mb-4 text-3xl font-medium text-center">
@@ -17,6 +24,7 @@ export default function Register() {
       </h1>
       <Form method="post" action="/register">
         <fieldset disabled={!!pendingForm} className="flex flex-col space-y-4">
+          <input type="hidden" name="_csrf" value={csrf} />
           <input
             type="text"
             autoComplete="name"
