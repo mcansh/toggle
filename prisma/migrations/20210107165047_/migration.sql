@@ -25,9 +25,7 @@ CREATE TABLE "Flag" (
     "id" TEXT NOT NULL,
     "feature" TEXT NOT NULL,
     "type" "FlagType" NOT NULL,
-    "value_number" INTEGER,
-    "value_boolean" BOOLEAN,
-    "value_string" TEXT,
+    "value" TEXT NOT NULL,
     "teamId" TEXT,
 
     PRIMARY KEY ("id")
@@ -46,7 +44,7 @@ CREATE UNIQUE INDEX "Team.name_unique" ON "Team"("name");
 CREATE UNIQUE INDEX "Flag.feature_unique" ON "Flag"("feature");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "FlagPerTeam" ON "Flag"("feature");
+CREATE UNIQUE INDEX "UniqueFlagNamePerTeam" ON "Flag"("feature", "teamId");
 
 -- AddForeignKey
 ALTER TABLE "User" ADD FOREIGN KEY("teamId")REFERENCES "Team"("id") ON DELETE SET NULL ON UPDATE CASCADE;

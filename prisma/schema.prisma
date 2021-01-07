@@ -41,5 +41,5 @@ model Flag {
 
   Team   Team?   @relation(fields: [teamId], references: [id])
   teamId String?
-  @@unique(feature, name: "FlagPerTeam")
+  @@unique([feature, teamId], name: "UniqueFlagNamePerTeam")
 }
