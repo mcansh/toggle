@@ -107,7 +107,7 @@ app.use(
       httpOnly: true,
       domain:
         process.env.NODE_ENV === "production"
-          ? "feature-flags.onrender.com"
+          ? "feature-flags.mcan.sh"
           : undefined,
     },
   })
