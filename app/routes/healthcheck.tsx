@@ -31,7 +31,7 @@ function HealthCheckPage() {
   );
 }
 
-let loader: Loader = async ({ context }) => {
+const loader: Loader = async ({ context }) => {
   const { prisma } = context as RemixContext;
 
   try {

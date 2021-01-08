@@ -84,7 +84,7 @@ const loader: Loader = async ({ session }) => {
   return { csrf };
 };
 
-let action: Action = async ({ session, request, context }) => {
+const action: Action = async ({ session, request, context }) => {
   const { prisma } = context as RemixContext;
   const body = await parseFormBody(request);
 

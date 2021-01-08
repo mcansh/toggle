@@ -57,7 +57,7 @@ function Index() {
   );
 }
 
-let loader: Loader = async ({ session, context }) => {
+const loader: Loader = async ({ session, context }) => {
   const { prisma } = context as RemixContext;
   const userId = session.get("userId");
   const teamId = session.get("teamId");

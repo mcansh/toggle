@@ -1,6 +1,6 @@
 import type { Loader } from "@remix-run/data";
 
-export let loader: Loader = async ({ session, request }) => {
+export const loader: Loader = async ({ session, request }) => {
   const flash = session.get("flash");
   const userId = session.get("userId");
 

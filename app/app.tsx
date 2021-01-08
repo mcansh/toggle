@@ -2,7 +2,7 @@ import * as React from "react";
 import { Meta, Scripts, Styles, Routes, useGlobalData } from "@remix-run/react";
 
 function App() {
-  let data = useGlobalData<{ flash?: string }>();
+  const data = useGlobalData<{ flash?: string }>();
 
   return (
     <html lang="en">

@@ -60,7 +60,7 @@ function Login() {
   );
 }
 
-let loader: Loader = ({ session, context }) => {
+const loader: Loader = ({ session, context }) => {
   if (session.get("userId")) {
     return redirect("/");
   }
@@ -70,7 +70,7 @@ let loader: Loader = ({ session, context }) => {
   return { csrf };
 };
 
-let action: Action = async ({ session, request, context }) => {
+const action: Action = async ({ session, request, context }) => {
   const { prisma } = context as RemixContext;
   const body = await parseFormBody(request);
 
