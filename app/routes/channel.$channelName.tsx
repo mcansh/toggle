@@ -7,13 +7,25 @@ import { toPascalCase } from "../utils/pascal-case";
 import { Except } from "type-fest";
 import { format, isToday, parseISO } from "date-fns";
 
+function meta({ data }: { data: Data }) {
+  if (!data.channel) {
+    return {
+      title: "Feature Flags",
+    };
+  }
+
+  return {
+    title: `${data.channel.name} Feature Flags`,
+  };
+}
+
 type StringDateFlag = Except<Flag, "createdAt" | "updatedAt"> & {
   createdAt: string;
   updatedAt: string;
 };
 
 interface Data {
-  channel: FeatureChannel & { flags: Array<StringDateFlag> };
+  channel?: FeatureChannel & { flags: Array<StringDateFlag> };
 }
 
 interface BooleanForm {
@@ -44,6 +56,8 @@ const FeatureChannelPage: React.VFC = () => {
     type: "string",
     value: "",
   });
+
+  if (!data.channel) return <h1>Channel not found</h1>;
 
   function handleFormChange(
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -282,4 +296,4 @@ const action: Action = async ({ context, params, request, session }) => {
 };
 
 export default FeatureChannelPage;
-export { loader, action };
+export { loader, action, meta };
