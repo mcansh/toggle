@@ -6,6 +6,7 @@ import { RemixContext } from "../context";
 import { toPascalCase } from "../utils/pascal-case";
 import { Except } from "type-fest";
 import { format, isToday, parseISO } from "date-fns";
+import { useParams } from "react-router";
 
 function meta({ data }: { data: Data }) {
   if (!data.channel) {
@@ -49,6 +50,7 @@ interface StringForm {
 type Form = BooleanForm | NumberForm | StringForm;
 
 const FeatureChannelPage: React.VFC = () => {
+  const params = useParams()
   const data = useRouteData<Data>();
   const pendingForm = usePendingFormSubmit();
   const [form, setForm] = React.useState<Form>({
@@ -102,7 +104,7 @@ const FeatureChannelPage: React.VFC = () => {
                     <td>
                       <Form
                         className="text-center"
-                        action={`/channel/${data.channel.slug}`}
+                        action={`/channel/${params.slug}`}
                         method="delete"
                       >
                         <input type="hidden" name="_method" value="DELETE" />
