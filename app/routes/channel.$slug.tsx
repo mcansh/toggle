@@ -76,124 +76,123 @@ const FeatureChannelPage: React.VFC = () => {
         {data.channel.name} Feature Flags
       </h1>
       {data.channel.flags.length > 0 ? (
-        <>
-          <table className="w-full border rounded-md table-auto">
-            <thead>
-              <tr className="text-left border-b divide-x">
-                <th>Feature</th>
-                <th>Type</th>
-                <th>Value</th>
-                <th>Updated At</th>
-                <th>Delete</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {data.channel.flags.map((flag) => {
-                const flagUpdatedDate = parseISO(flag.updatedAt);
-                const createdToday = isToday(flagUpdatedDate);
-                return (
-                  <tr key={flag.id} className="divide-x">
-                    <td>{flag.feature}</td>
-                    <td>{flag.type}</td>
-                    <td>{flag.value}</td>
-                    <td>
-                      <time dateTime={flag.updatedAt}>
-                        {format(flagUpdatedDate, createdToday ? "p" : "P")}
-                      </time>
-                    </td>
-                    <td>
-                      <Form
-                        className="text-center"
-                        action={`/channel/${data.channel?.slug}`}
-                        method="delete"
-                      >
-                        <input type="hidden" name="_method" value="DELETE" />
-                        <input type="hidden" name="featureId" value={flag.id} />
-                        <button type="submit">&times;</button>
-                      </Form>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-          <Form
-            autoComplete="off"
-            method="POST"
-            action={`/channel/${data.channel.name}`}
-            className="w-10/12 mx-auto mt-8 max-w-7xl"
-          >
-            <fieldset disabled={!!pendingForm} className="grid gap-6">
-              <label className="block">
-                <span>Name: </span>
-                <input
-                  placeholder="MyNewFeature"
-                  className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                  type="text"
-                  name="name"
-                  value={form.name}
-                  onChange={handleFormChange}
-                />
-              </label>
-              <label className="block">
-                <span>Type: </span>
-                <select
-                  className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                  name="type"
-                  value={form.type}
-                  onChange={handleFormChange}
-                >
-                  <option value="string">String</option>
-                  <option value="boolean">Boolean</option>
-                  <option value="number">Number</option>
-                </select>
-              </label>
-              <label className="block">
-                <span>Value: </span>
-                {form.type === "boolean" ? (
-                  <select
-                    className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                    name="value"
-                    value={form.type}
-                    onChange={handleFormChange}
-                  >
-                    <option value="true">True</option>
-                    <option value="false">False</option>
-                  </select>
-                ) : form.type === "number" ? (
-                  <input
-                    placeholder="25"
-                    className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                    type="text"
-                    name="value"
-                    value={form.value}
-                    onChange={handleFormChange}
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                  />
-                ) : (
-                  <input
-                    placeholder="http://someapi.ff.io"
-                    className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                    type="text"
-                    name="value"
-                    value={form.value}
-                    onChange={handleFormChange}
-                  />
-                )}
-              </label>
-              <button
-                className="block w-full py-2 mt-1 leading-relaxed border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                type="submit"
-              >
-                Create ✅
-              </button>
-            </fieldset>
-          </Form>
-        </>
+        <table className="w-full border rounded-md table-auto">
+          <thead>
+            <tr className="text-left border-b divide-x">
+              <th>Feature</th>
+              <th>Type</th>
+              <th>Value</th>
+              <th>Updated At</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y">
+            {data.channel.flags.map((flag) => {
+              const flagUpdatedDate = parseISO(flag.updatedAt);
+              const createdToday = isToday(flagUpdatedDate);
+              return (
+                <tr key={flag.id} className="divide-x">
+                  <td>{flag.feature}</td>
+                  <td>{flag.type}</td>
+                  <td>{flag.value}</td>
+                  <td>
+                    <time dateTime={flag.updatedAt}>
+                      {format(flagUpdatedDate, createdToday ? "p" : "P")}
+                    </time>
+                  </td>
+                  <td>
+                    <Form
+                      className="text-center"
+                      action={`/channel/${data.channel?.slug}`}
+                      method="delete"
+                    >
+                      <input type="hidden" name="_method" value="DELETE" />
+                      <input type="hidden" name="featureId" value={flag.id} />
+                      <button type="submit">&times;</button>
+                    </Form>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       ) : (
         <p>Your team hasn't created any flags yet</p>
       )}
+
+      <Form
+        autoComplete="off"
+        method="POST"
+        action={`/channel/${data.channel.name}`}
+        className="w-10/12 mx-auto mt-8 max-w-7xl"
+      >
+        <fieldset disabled={!!pendingForm} className="grid gap-6">
+          <label className="block">
+            <span>Name: </span>
+            <input
+              placeholder="MyNewFeature"
+              className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              type="text"
+              name="name"
+              value={form.name}
+              onChange={handleFormChange}
+            />
+          </label>
+          <label className="block">
+            <span>Type: </span>
+            <select
+              className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              name="type"
+              value={form.type}
+              onChange={handleFormChange}
+            >
+              <option value="string">String</option>
+              <option value="boolean">Boolean</option>
+              <option value="number">Number</option>
+            </select>
+          </label>
+          <label className="block">
+            <span>Value: </span>
+            {form.type === "boolean" ? (
+              <select
+                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                name="value"
+                value={form.type}
+                onChange={handleFormChange}
+              >
+                <option value="true">True</option>
+                <option value="false">False</option>
+              </select>
+            ) : form.type === "number" ? (
+              <input
+                placeholder="25"
+                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                type="text"
+                name="value"
+                value={form.value}
+                onChange={handleFormChange}
+                inputMode="numeric"
+                pattern="[0-9]*"
+              />
+            ) : (
+              <input
+                placeholder="http://someapi.ff.io"
+                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                type="text"
+                name="value"
+                value={form.value}
+                onChange={handleFormChange}
+              />
+            )}
+          </label>
+          <button
+            className="block w-full py-2 mt-1 leading-relaxed border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+            type="submit"
+          >
+            Create ✅
+          </button>
+        </fieldset>
+      </Form>
     </div>
   );
 };
