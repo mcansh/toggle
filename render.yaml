@@ -6,6 +6,6 @@ services:
     repo: https://github.com/mcansh/feature-flags
     numInstances: 1
     buildCommand: yarn && yarn install
-    start: yarn start
+    startCommand: yarn start
     envVars:
       - fromGroup: feature-flags
