@@ -16,15 +16,37 @@ interface Data {
   channel: FeatureChannel & { flags: Array<StringDateFlag> };
 }
 
+interface Form {
+  name: string;
+  type: FlagType;
+  value: any;
+}
+
 const FeatureChannelPage: React.VFC = () => {
   const data = useRouteData<Data>();
   const pendingForm = usePendingFormSubmit();
+  const [form, setForm] = React.useState<Form>({
+    name: "",
+    type: "string",
+    value: "",
+  });
+
+  function handleFormChange(
+    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) {
+    return setForm((old) => ({
+      ...old,
+      [event.target.name]: event.target.value,
+    }));
+  }
 
   return (
     <div className="max-w-screen-md mx-auto">
-      <h1>{data.channel.name} Feature Flags</h1>
+      <h1 className="py-2 text-2xl font-medium">
+        {data.channel.name} Feature Flags
+      </h1>
       {data.channel.flags.length > 0 ? (
-        <div className="px-2">
+        <>
           <table className="w-full border rounded-md table-auto">
             <thead>
               <tr className="text-left border-b divide-x">
@@ -69,34 +91,76 @@ const FeatureChannelPage: React.VFC = () => {
             autoComplete="off"
             method="POST"
             action={`/channel/${data.channel.name}`}
+            className="w-10/12 mx-auto mt-8 max-w-7xl"
           >
-            <fieldset disabled={!!pendingForm} className="flex divide-x">
-              <input
-                placeholder="MyNewFeature"
-                className="border-0"
-                type="text"
-                name="name"
-              />
-              <select
-                className="border-r-0 border-gray-200 border-y-0"
-                name="type"
+            <fieldset disabled={!!pendingForm} className="grid gap-6">
+              <label className="block">
+                <span>Name: </span>
+                <input
+                  placeholder="MyNewFeature"
+                  className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                  type="text"
+                  name="name"
+                  value={form.name}
+                  onChange={handleFormChange}
+                />
+              </label>
+              <label className="block">
+                <span>Type: </span>
+                <select
+                  className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                  name="type"
+                  value={form.type}
+                  onChange={handleFormChange}
+                >
+                  <option value="string">String</option>
+                  <option value="boolean">Boolean</option>
+                  <option value="number">Number</option>
+                </select>
+              </label>
+              <label className="block">
+                <span>Value: </span>
+                {form.type === "boolean" ? (
+                  <select
+                    className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                    name="value"
+                    value={form.type}
+                    onChange={handleFormChange}
+                  >
+                    <option value="true">True</option>
+                    <option value="false">False</option>
+                  </select>
+                ) : form.type === "number" ? (
+                  <input
+                    placeholder="25"
+                    className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                    type="text"
+                    name="value"
+                    value={form.value}
+                    onChange={handleFormChange}
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                  />
+                ) : (
+                  <input
+                    placeholder="http://someapi.ff.io"
+                    className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                    type="text"
+                    name="value"
+                    value={form.value}
+                    onChange={handleFormChange}
+                  />
+                )}
+              </label>
+              <button
+                className="block w-full py-2 mt-1 leading-relaxed border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                type="submit"
               >
-                <option value="boolean">Boolean</option>
-                <option value="string">String</option>
-                <option value="number">Number</option>
-              </select>
-              <input
-                placeholder="true"
-                className="border-gray-200"
-                type="text"
-                name="value"
-              />
-              <button className="border-gray-200" type="submit">
-                ✅
+                Create ✅
               </button>
             </fieldset>
           </Form>
-        </div>
+        </>
       ) : (
         <p>Your team hasn't created any flags yet</p>
       )}
@@ -172,6 +236,10 @@ const action: Action = async ({ context, params, request, session }) => {
       return redirect(pathname);
     }
 
+    const featureName = body.get("name") as string;
+    const featureType = body.get("type") as FlagType;
+    const featureValue = body.get("value") as string;
+
     await prisma.flag.create({
       data: {
         createdBy: {
@@ -180,9 +248,11 @@ const action: Action = async ({ context, params, request, session }) => {
         lastUpdatedBy: {
           connect: { id: userId },
         },
-        feature: toPascalCase(body.get("name") as string),
-        type: body.get("type") as FlagType,
-        value: body.get("value") as string,
+        feature: featureName.includes(" ")
+          ? toPascalCase(featureName)
+          : featureName,
+        type: featureType,
+        value: featureValue,
         Team: {
           connect: { id: teamId },
         },
