@@ -109,10 +109,22 @@ const action: Action = async ({ session, request, context }) => {
         email,
         name,
         username,
+        Team: {
+          create: {
+            name: `${username}'s new team!`,
+            featureChannels: {
+              create: {
+                name: "My first feature channel!",
+                slug: "my-first-feature-channel",
+              },
+            },
+          },
+        },
       },
     });
 
     session.set("userId", user.id);
+    session.set("teamId", user.teamId);
 
     return redirect("/");
   } catch (error) {
