@@ -91,15 +91,15 @@ let action: Action = async ({ session, request, context }) => {
   const name = body.get("name") as string;
   const email = body.get("email") as string;
   const username = body.get("username") as string;
-  const csrf = body.get("_csrf") as string;
+  // const csrf = body.get("_csrf") as string;
 
-  const sessionCSRF = session.get("csrf");
+  // const sessionCSRF = session.get("csrf");
 
-  if (csrf !== sessionCSRF) {
-    session.flash("flash", `invalid csrf`);
+  // if (csrf !== sessionCSRF) {
+  //   session.flash("flash", `invalid csrf`);
 
-    return redirect("/register");
-  }
+  //   return redirect("/register");
+  // }
 
   session.unset("csrf");
 

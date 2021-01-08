@@ -61,7 +61,6 @@ function Login() {
 }
 
 let loader: Loader = ({ session, context }) => {
-  const { prisma } = context as RemixContext;
   if (session.get("userId")) {
     return redirect("/");
   }
@@ -76,15 +75,15 @@ let action: Action = async ({ session, request, context }) => {
   const body = await parseFormBody(request);
 
   const email = body.get("email") as string;
-  const csrf = body.get("_csrf") as string;
+  // const csrf = body.get("_csrf") as string;
 
-  const sessionCSRF = session.get("csrf");
+  // const sessionCSRF = session.get("csrf");
 
-  if (csrf !== sessionCSRF) {
-    session.flash("flash", `invalid csrf`);
+  // if (csrf !== sessionCSRF) {
+  //   session.flash("flash", `invalid csrf`);
 
-    return redirect("/login");
-  }
+  //   return redirect("/login");
+  // }
 
   session.unset("csrf");
 
