@@ -16,11 +16,25 @@ interface Data {
   channel: FeatureChannel & { flags: Array<StringDateFlag> };
 }
 
-interface Form {
+interface BooleanForm {
   name: string;
-  type: FlagType;
-  value: any;
+  type: "boolean";
+  value: boolean;
 }
+
+interface NumberForm {
+  name: string;
+  type: "number";
+  value: number;
+}
+
+interface StringForm {
+  name: string;
+  type: "string";
+  value: string;
+}
+
+type Form = BooleanForm | NumberForm | StringForm;
 
 const FeatureChannelPage: React.VFC = () => {
   const data = useRouteData<Data>();
