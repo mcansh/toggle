@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: feature-flags
+    env: node
+    region: oregon
+    repo: https://github.com/mcansh/feature-flags
+    numInstances: 1
+    healthCheckPath: /healthcheck
+    buildCommand: yarn && yarn build
+    startCommand: yarn start
+    envVars:
+      - fromGroup: feature-flags

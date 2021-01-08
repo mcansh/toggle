@@ -100,7 +100,8 @@ app.use(
     unset: "destroy",
     cookie: {
       path: "/",
-      secure: process.env.NODE_ENV === "production",
+      // secure: process.env.NODE_ENV === "production",
+      secure: "auto",
       maxAge: ms("15d"),
       sameSite: "strict",
       httpOnly: true,
