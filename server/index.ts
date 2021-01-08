@@ -92,7 +92,7 @@ app.use(express.static("public"));
 
 app.use(
   session({
-    secret: "r3mixR0x",
+    secret: process.env.SESSION_PASSWORD!,
     resave: false,
     saveUninitialized: false,
     store: new RedisStore({ client }),
