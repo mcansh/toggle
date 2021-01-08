@@ -6,7 +6,6 @@ import { RemixContext } from "../context";
 import { toPascalCase } from "../utils/pascal-case";
 import { Except } from "type-fest";
 import { format, isToday, parseISO } from "date-fns";
-import { useParams } from "react-router";
 
 function meta({ data }: { data: Data }) {
   if (!data.channel) {
@@ -26,7 +25,7 @@ type StringDateFlag = Except<Flag, "createdAt" | "updatedAt"> & {
 };
 
 interface Data {
-  channel?: FeatureChannel & { flags: Array<StringDateFlag> };
+  channel: (FeatureChannel & { flags: Array<StringDateFlag> }) | undefined;
 }
 
 interface BooleanForm {
@@ -50,7 +49,6 @@ interface StringForm {
 type Form = BooleanForm | NumberForm | StringForm;
 
 const FeatureChannelPage: React.VFC = () => {
-  const params = useParams()
   const data = useRouteData<Data>();
   const pendingForm = usePendingFormSubmit();
   const [form, setForm] = React.useState<Form>({
@@ -59,7 +57,9 @@ const FeatureChannelPage: React.VFC = () => {
     value: "",
   });
 
-  if (!data.channel) return <h1>Channel not found</h1>;
+  if (!data.channel) {
+    return <h1>Channel not found</h1>;
+  }
 
   function handleFormChange(
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -104,7 +104,7 @@ const FeatureChannelPage: React.VFC = () => {
                     <td>
                       <Form
                         className="text-center"
-                        action={`/channel/${params.slug}`}
+                        action={`/channel/${data.channel?.slug}`}
                         method="delete"
                       >
                         <input type="hidden" name="_method" value="DELETE" />
