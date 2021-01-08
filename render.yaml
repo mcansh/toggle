@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: remix
+    name: feature-flags
     env: node
     region: oregon
     repo: https://github.com/mcansh/feature-flags
