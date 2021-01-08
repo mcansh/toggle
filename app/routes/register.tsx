@@ -121,10 +121,14 @@ const action: Action = async ({ session, request, context }) => {
           },
         },
       },
+      select: {
+        id: true,
+        teamId: true,
+      },
     });
 
     session.set("userId", user.id);
-    session.set("teamId", user.teamId);
+    session.set("teamId", user.teamId!);
 
     return redirect("/");
   } catch (error) {
