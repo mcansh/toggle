@@ -8,15 +8,48 @@ import redisConnect from "connect-redis";
 import rateLimit from "express-rate-limit";
 import RateLimitRedis from "rate-limit-redis";
 import dotenv from "dotenv-safe";
-import { Flag, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import ms from "ms";
 
-function parseFeatureValue(type: string, value: string) {
+function parseFeatureValue(
+  type: string,
+  value: string
+): string | boolean | number {
   return type === "boolean"
     ? JSON.parse(value)
     : type === "number"
     ? Number(value)
     : value;
+}
+
+function convertFlagsArrayToObject(
+  flags?: Array<any>,
+  options: {
+    includeExtraProperties: boolean;
+  } = {
+    includeExtraProperties: false,
+  }
+): any {
+  if (!flags) return {};
+
+  if (options.includeExtraProperties) {
+    return flags.reduce((acc, cur) => {
+      return {
+        ...acc,
+        [cur.feature]: {
+          ...cur,
+          value: parseFeatureValue(cur.type, cur.value),
+        },
+      };
+    }, {});
+  }
+
+  return flags.reduce((acc, cur) => {
+    return {
+      ...acc,
+      [cur.feature]: parseFeatureValue(cur.type, cur.value),
+    };
+  }, {});
 }
 
 dotenv.config({
@@ -86,44 +119,69 @@ app.use((request, response, next) => {
 
 const prisma = new PrismaClient();
 
-app.get("/api/flags", testLimiter, async (_req, res) => {
+app.use(async (req, res, next) => {
+  if (!req.url.startsWith("/api")) return next();
+
   const websiteFlags = await prisma.featureChannel.findUnique({
-    where: {
-      id: "ckjndxrkg0021m7iso0db33ml",
-    },
-    select: {
-      flags: true,
-    },
+    where: { id: "ckjndxrkg0021m7iso0db33ml" },
+    select: { flags: true },
   });
 
-  const websiteFlagsObject =
-    websiteFlags?.flags.reduce((acc: { [key: string]: any }, cur: Flag) => {
-      return {
-        ...acc,
-        [cur.feature]: parseFeatureValue(cur.type, cur.value),
-      };
-    }, {}) ?? {};
+  const webFlags = convertFlagsArrayToObject(websiteFlags?.flags);
 
-  if (websiteFlagsObject.EnablePublicAPI !== true) {
+  if (
+    typeof webFlags.EnablePublicAPI === "boolean" &&
+    webFlags.EnablePublicAPI !== true
+  ) {
     return res.status(415).send({
       message: "our api isn't quite ready for you yet",
     });
   }
 
+  return next();
+});
+
+app.get("/api/flags", testLimiter, async (_req, res) => {
   const flags = await prisma.flag.findMany({
     where: {
       teamId: "ckjnab6t20006raiszrzenw5t",
     },
   });
 
-  const flagObject = flags.reduce((acc: { [key: string]: Flag }, cur: Flag) => {
-    return {
-      ...acc,
-      [cur.feature]: parseFeatureValue(cur.type, cur.value),
-    };
-  }, {});
+  const flagObject = convertFlagsArrayToObject(flags);
 
   return res.json({ flags: flagObject });
+});
+
+app.get("/api/channel/:channelId", async (req, res) => {
+  const { channelId } = req.params;
+
+  const channel = await prisma.featureChannel.findUnique({
+    where: { id: channelId },
+    include: {
+      flags: {
+        select: {
+          createdAt: true,
+          feature: true,
+          id: true,
+          updatedAt: true,
+          type: true,
+          value: true,
+        },
+      },
+    },
+  });
+
+  if (!channel) return res.status(404).json({});
+
+  return res.json({
+    channel: {
+      ...channel,
+      flags: convertFlagsArrayToObject(channel?.flags, {
+        includeExtraProperties: true,
+      }),
+    },
+  });
 });
 
 app.all(
