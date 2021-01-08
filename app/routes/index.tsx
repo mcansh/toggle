@@ -1,5 +1,10 @@
 import * as React from "react";
-import { Form, usePendingFormSubmit, useRouteData } from "@remix-run/react";
+import {
+  Form,
+  useGlobalData,
+  usePendingFormSubmit,
+  useRouteData,
+} from "@remix-run/react";
 import { Flag, FlagType } from "@prisma/client";
 import { Action, Loader, parseFormBody, redirect } from "@remix-run/data";
 import { toPascalCase } from "../utils/pascal-case";
@@ -17,8 +22,12 @@ interface Data {
 }
 
 function Index() {
-  let data = useRouteData<Data>();
+  const { disableFormAutoCompleteForFireFox } = useGlobalData<{
+    disableFormAutoCompleteForFireFox: boolean;
+  }>();
+  const data = useRouteData<Data>();
   const pendingForm = usePendingFormSubmit();
+  const [type, setType] = React.useState<FlagType>("boolean");
 
   return (
     <div className="max-w-screen-md mx-auto">
@@ -51,39 +60,69 @@ function Index() {
         <p>Your team hasn't created any flags yet</p>
       )}
 
-      <Form action="/" method="post">
+      <Form
+        action="/"
+        method="post"
+        autoComplete={disableFormAutoCompleteForFireFox ? "off" : undefined}
+      >
         <fieldset disabled={!!pendingForm}>
-          <input
-            type="text"
-            name="featureName"
-            placeholder="Name of feature"
-            onBlur={(event) => {
-              if (event.currentTarget.value.includes(" ")) {
-                event.currentTarget.value = toPascalCase(
-                  event.currentTarget.value
-                );
-              }
-            }}
-          />
-          <div>
+          <input type="text" name="featureName" placeholder="Name of feature" />
+          <div className="flex flex-col">
             <label>
               <span>Boolean (true/false)</span>
-              <input type="radio" name="featureType" value="boolean" />
+              <input
+                onChange={(event) =>
+                  setType(event.currentTarget.value as FlagType)
+                }
+                type="radio"
+                name="featureType"
+                value="boolean"
+                checked={type === "boolean"}
+              />
             </label>
             <label>
               <span>String</span>
-              <input type="radio" name="featureType" value="string" />
+              <input
+                onChange={(event) =>
+                  setType(event.currentTarget.value as FlagType)
+                }
+                type="radio"
+                name="featureType"
+                value="string"
+                checked={type === "string"}
+              />
             </label>
             <label>
               <span>Number</span>
-              <input type="radio" name="featureType" value="number" />
+              <input
+                onChange={(event) =>
+                  setType(event.currentTarget.value as FlagType)
+                }
+                type="radio"
+                name="featureType"
+                value="number"
+                checked={type === "number"}
+              />
             </label>
           </div>
-          <input
-            type="text"
-            name="featureValue"
-            placeholder="Value (if boolean, type true or false"
-          />
+          {type ? (
+            type === "boolean" ? (
+              <select name="featureValue" defaultValue="true">
+                <option value="true">True</option>
+                <option value="false">False</option>
+              </select>
+            ) : type === "string" ? (
+              <input type="text" name="featureValue" placeholder="Value" />
+            ) : (
+              <input
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                name="featureValue"
+                placeholder="Value"
+              />
+            )
+          ) : null}
           <button type="submit">Create</button>
         </fieldset>
       </Form>
