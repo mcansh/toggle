@@ -103,6 +103,11 @@ app.use(
       secure: process.env.NODE_ENV === "production",
       maxAge: ms("15d"),
       sameSite: "strict",
+      httpOnly: true,
+      domain:
+        process.env.NODE_ENV === "production"
+          ? "feature-flags.onrender.com"
+          : undefined,
     },
   })
 );
