@@ -6,6 +6,7 @@ dependencies:
   '@remix-run/express': 0.9.0-pre.2_7518ea51717683a2178a01380c5fd210
   '@remix-run/react': 0.9.0-pre.2_react-dom@17.0.1+react@17.0.1
   connect-redis: 5.0.0
+  date-fns: 2.16.1
   dotenv-safe: 8.2.0
   express: 4.17.1
   express-rate-limit: 5.2.3
@@ -17,6 +18,7 @@ dependencies:
   react-dom: 17.0.1_react@17.0.1
   react-router: 6.0.0-beta.0_react@17.0.1
   react-router-dom: 6.0.0-beta.0_react-dom@17.0.1+react@17.0.1
+  type-fest: 0.20.2
 devDependencies:
   '@prisma/cli': 2.14.0
   '@tailwindcss/forms': 0.2.1
@@ -2161,7 +2163,6 @@ packages:
     resolution:
       integrity: sha512-uVDi8LpBUKQj6sdxNaTetL6FpeCqTjOvAQuQUa/qAqq8oOd4ivkbhgnqayl0dnPal8Tb/yB1tF+gOvCBiicaiQ==
   /date-fns/2.16.1:
-    dev: true
     engines:
       node: '>=0.11'
     resolution:
@@ -4769,6 +4770,12 @@ packages:
       node: '>=10'
     resolution:
       integrity: sha512-34R7HTnG0XIJcBSn5XhDd7nNFPRcXYRZrBB2O2jdKqYODldSzBAqzsWoZYYvduky73toYS/ESqxPvkDf/F0XMg==
+  /type-fest/0.20.2:
+    dev: false
+    engines:
+      node: '>=10'
+    resolution:
+      integrity: sha512-Ne+eE4r0/iWnpAxD852z3A+N0Bt5RN//NjJwRd2VFHEmrywxf5vsZlh4R6lixl6B+wz/8d+maTSAkN1FIkI3LQ==
   /type-fest/0.6.0:
     engines:
       node: '>=8'
@@ -5170,6 +5177,7 @@ specifiers:
   concurrently: 5.3.0
   connect-redis: 5.0.0
   cross-env: 7.0.3
+  date-fns: 2.16.1
   del-cli: 3.0.1
   dotenv-safe: 8.2.0
   express: 4.17.1
@@ -5186,4 +5194,5 @@ specifiers:
   react-router: 6.0.0-beta.0
   react-router-dom: 6.0.0-beta.0
   tailwindcss: 2.0.2
+  type-fest: 0.20.2
   typescript: 4.1.3

@@ -99,6 +99,12 @@ let action: Action = async ({ session, request, context }) => {
       }
     }
 
+    const returnTo = session.get("returnTo");
+
+    if (returnTo) {
+      return redirect(returnTo);
+    }
+
     return redirect("/");
   } catch (error) {
     console.log(error);
