@@ -42,6 +42,7 @@
     "react-dom": "17.0.1",
     "react-router": "6.0.0-beta.0",
     "react-router-dom": "6.0.0-beta.0",
+    "slugify": "1.4.6",
     "type-fest": "0.20.2"
   },
   "devDependencies": {

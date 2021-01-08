@@ -33,7 +33,7 @@ function Index() {
           {data.channels.map((channel) => (
             <li key={channel.id}>
               <div className="space-x-2">
-                <Link to={`/channel/${channel.name}`}>{channel.name}</Link>
+                <Link to={`/channel/${channel.slug}`}>{channel.name}</Link>
                 <span>
                   Created:{" "}
                   <time dateTime={channel.createdAt}>

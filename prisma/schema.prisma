@@ -75,4 +75,8 @@ model FeatureChannel {
   updatedAt DateTime @updatedAt
   Team      Team?    @relation(fields: [teamId], references: [id])
   teamId    String?
+  slug      String
+
+  @@unique([name, teamId], name: "UniqueFeatureChannelNamePerTeam")
+  @@unique([slug, teamId], name: "UniqueFeatureChannelSlugPerTeam")
 }

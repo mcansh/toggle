@@ -102,7 +102,7 @@ const FeatureChannelPage: React.VFC = () => {
                     <td>
                       <Form
                         className="text-center"
-                        action={`/channel/${data.channel.name}`}
+                        action={`/channel/${data.channel.slug}`}
                         method="delete"
                       >
                         <input type="hidden" name="_method" value="DELETE" />
@@ -207,7 +207,7 @@ const loader: Loader = async ({ context, session, params }) => {
   });
 
   const matchingChannel = teamChannels?.featureChannels.find(
-    (c) => c.name.toLowerCase() === params.channelName.toLowerCase()
+    (c) => c.slug === params.slug
   );
 
   if (matchingChannel) {
@@ -219,7 +219,7 @@ const loader: Loader = async ({ context, session, params }) => {
     return { channel };
   }
 
-  return new Response("{}", {
+  return new Response(JSON.stringify({ channel: undefined }), {
     status: 404,
     headers: {
       "content-type": "application/json",
@@ -255,7 +255,7 @@ const action: Action = async ({ context, params, request, session }) => {
     const channel = await prisma.featureChannel.findFirst({
       where: {
         teamId,
-        name: params.channelName,
+        slug: params.slug,
       },
     });
 
