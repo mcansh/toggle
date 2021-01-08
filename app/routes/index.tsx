@@ -12,8 +12,8 @@ import { RemixContext } from "../context";
 
 function meta() {
   return {
-    title: "Remix Starter",
-    description: "Welcome to remix!",
+    title: "Feature Flags",
+    description: "Welcome to Feature Flags!",
   };
 }
 
@@ -33,29 +33,34 @@ function Index() {
     <div className="max-w-screen-md mx-auto">
       <h1>Your Team's Feature Flags</h1>
       {data.flags.length > 0 ? (
-        <ul className="border-t border-l border-r border-gray-300">
-          <li className="flex justify-between font-medium text-center border-b border-gray-300">
-            <span className="flex-1">Feature</span>
-            <span className="flex-1">Type</span>
-            <span className="flex-1">Value</span>
-            <span className="flex-1">Delete</span>
-          </li>
-          {data.flags.map((flag) => (
-            <li
-              key={flag.id}
-              className="flex justify-between font-medium text-center border-b border-gray-300"
-            >
-              <span className="flex-1">{flag.feature}</span>
-              <span className="flex-1">{flag.type}</span>
-              <span className="flex-1">{flag.value}</span>
-              <Form className="flex-1" action="/" method="delete">
-                <input type="hidden" name="_method" value="DELETE" />
-                <input type="hidden" name="featureId" value={flag.id} />
-                <button type="submit">&times;</button>
-              </Form>
-            </li>
-          ))}
-        </ul>
+        <div className="px-2">
+          <table className="w-full border rounded-md table-auto">
+            <thead>
+              <tr className="text-left border-b divide-x">
+                <th>Feature</th>
+                <th>Type</th>
+                <th>Value</th>
+                <th>Delete</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y">
+              {data.flags.map((flag) => (
+                <tr key={flag.id} className="divide-x">
+                  <td>{flag.feature}</td>
+                  <td>{flag.type}</td>
+                  <td>{flag.value}</td>
+                  <td>
+                    <Form className="text-center" action="/" method="delete">
+                      <input type="hidden" name="_method" value="DELETE" />
+                      <input type="hidden" name="featureId" value={flag.id} />
+                      <button type="submit">&times;</button>
+                    </Form>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       ) : (
         <p>Your team hasn't created any flags yet</p>
       )}
