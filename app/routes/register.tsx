@@ -2,6 +2,7 @@ import * as React from "react";
 import { Form, Link, usePendingFormSubmit } from "@remix-run/react";
 import { Action, Loader, parseFormBody, redirect } from "@remix-run/data";
 import { RemixContext } from "../context";
+import { hash } from "bcrypt";
 
 function meta() {
   return {
@@ -40,6 +41,13 @@ function Register() {
             autoComplete="username"
             placeholder="username"
             name="username"
+            className="w-full border-2 rounded"
+          />
+          <input
+            type="password"
+            autoComplete="new-password"
+            placeholder="password"
+            name="password"
             className="w-full border-2 rounded"
           />
           <button
@@ -82,13 +90,16 @@ const action: Action = async ({ session, request, context }) => {
   const name = body.get("name") as string;
   const email = body.get("email") as string;
   const username = body.get("username") as string;
+  const password = body.get("password") as string;
 
   try {
+    const hashedPassword = await hash(password, 10);
     const user = await prisma.user.create({
       data: {
         email,
         name,
         username,
+        hashedPassword,
         teams: {
           create: {
             name: `${username}'s new team!`,

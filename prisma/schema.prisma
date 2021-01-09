@@ -11,15 +11,16 @@ generator client {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  name         String
-  email        String   @unique
-  username     String   @unique
-  teams        Team[]
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  createdFlags Flag[]   @relation(name: "createdByUser")
-  updatedFlags Flag[]   @relation(name: "lastUpdatedByUser")
+  id             String   @id @default(cuid())
+  name           String
+  email          String   @unique
+  username       String   @unique
+  hashedPassword String   @default("")
+  teams          Team[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  createdFlags   Flag[]   @relation(name: "createdByUser")
+  updatedFlags   Flag[]   @relation(name: "lastUpdatedByUser")
 }
 
 model Team {

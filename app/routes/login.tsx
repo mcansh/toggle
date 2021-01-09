@@ -2,6 +2,7 @@ import * as React from "react";
 import { Form, Link, usePendingFormSubmit } from "@remix-run/react";
 import { Action, Loader, parseFormBody, redirect } from "@remix-run/data";
 import { RemixContext } from "../context";
+import { compare } from "bcrypt";
 
 function meta() {
   return {
@@ -25,6 +26,13 @@ function Login() {
             autoComplete="email"
             placeholder="email"
             name="email"
+            className="w-full border-2 rounded"
+          />
+          <input
+            type="password"
+            autoComplete="password"
+            placeholder="password"
+            name="password"
             className="w-full border-2 rounded"
           />
           <button
@@ -65,6 +73,7 @@ const action: Action = async ({ session, request, context }) => {
   const body = await parseFormBody(request);
 
   const email = body.get("email") as string;
+  const password = body.get("password") as string;
 
   try {
     const user = await prisma.user.findUnique({
@@ -72,6 +81,18 @@ const action: Action = async ({ session, request, context }) => {
     });
 
     if (!user) {
+      session.flash("error", "Invalid credentials");
+      return redirect("/login");
+    }
+
+    if (user.hashedPassword === '""') {
+      session.set("earlyBirdUserId", user.id);
+      return redirect("/profile/change-password");
+    }
+
+    const verified = await compare(password, user.hashedPassword);
+
+    if (!verified) {
       session.flash("error", "Invalid credentials");
       return redirect("/login");
     }
