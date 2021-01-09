@@ -3,7 +3,7 @@ import { Link, useRouteData } from "@remix-run/react";
 import { FeatureChannel, Flag, Team } from "@prisma/client";
 import { Loader, redirect } from "@remix-run/data";
 import { RemixContext } from "../context";
-import { Except } from "type-fest";
+import PlusIcon from "../components/icons/solid/plus";
 
 function meta() {
   return {
@@ -30,7 +30,14 @@ function Index() {
       ) : (
         data.teams.map((team) => (
           <div key={team.id}>
-            <h2>{team.name} Feature Channels</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl">{team.name} Feature Channels</h2>
+              <Link to={`/channel/${team.id}/new`}>
+                <span className="sr-only">Create new Channel</span>
+                <PlusIcon className="text-black" />
+              </Link>
+            </div>
+
             <ul className="pl-6 list-disc">
               {team.featureChannels.map((channel) => (
                 <li key={channel.id}>
@@ -67,6 +74,7 @@ const loader: Loader = async ({ session, context }) => {
   });
 
   if (!user) {
+    session.unset("userId");
     return redirect("/login");
   }
 
