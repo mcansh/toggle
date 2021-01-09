@@ -6,49 +6,10 @@ import { createRequestHandler } from "@remix-run/express";
 import Redis from "ioredis";
 import redisConnect from "connect-redis";
 import dotenv from "dotenv-safe";
-import { PrismaClient } from "@prisma/client";
 import ms from "ms";
 
-function parseFeatureValue(
-  type: string,
-  value: string
-): string | boolean | number {
-  return type === "boolean"
-    ? JSON.parse(value)
-    : type === "number"
-    ? Number(value)
-    : value;
-}
-
-function convertFlagsArrayToObject(
-  flags?: Array<any>,
-  options: {
-    includeExtraProperties: boolean;
-  } = {
-    includeExtraProperties: false,
-  }
-): any {
-  if (!flags) return {};
-
-  if (options.includeExtraProperties) {
-    return flags.reduce((acc, cur) => {
-      return {
-        ...acc,
-        [cur.feature]: {
-          ...cur,
-          value: parseFeatureValue(cur.type, cur.value),
-        },
-      };
-    }, {});
-  }
-
-  return flags.reduce((acc, cur) => {
-    return {
-      ...acc,
-      [cur.feature]: parseFeatureValue(cur.type, cur.value),
-    };
-  }, {});
-}
+import { prisma } from "./utils/prisma";
+import { api } from "./routes/api";
 
 dotenv.config({
   path: path.join(__dirname, "../.env"),
@@ -87,74 +48,9 @@ app.use(
   })
 );
 
-const prisma = new PrismaClient();
-
 app.set("trust proxy", 1);
 
-app.use(async (req, res, next) => {
-  if (!req.url.startsWith("/api")) return next();
-
-  const websiteFlags = await prisma.featureChannel.findUnique({
-    where: { id: "ckjndxrkg0021m7iso0db33ml" },
-    select: { flags: true },
-  });
-
-  const webFlags = convertFlagsArrayToObject(websiteFlags?.flags);
-
-  if (
-    typeof webFlags.EnablePublicAPI === "boolean" &&
-    webFlags.EnablePublicAPI !== true
-  ) {
-    return res.status(415).send({
-      message: "our api isn't quite ready for you yet",
-    });
-  }
-
-  return next();
-});
-
-app.get("/api/flags", async (_req, res) => {
-  const flags = await prisma.flag.findMany({
-    where: {
-      teamId: "ckjnab6t20006raiszrzenw5t",
-    },
-  });
-
-  const flagObject = convertFlagsArrayToObject(flags);
-
-  return res.json({ flags: flagObject });
-});
-
-app.get("/api/channel/:channelId", async (req, res) => {
-  const { channelId } = req.params;
-
-  const channel = await prisma.featureChannel.findUnique({
-    where: { id: channelId },
-    include: {
-      flags: {
-        select: {
-          createdAt: true,
-          feature: true,
-          id: true,
-          updatedAt: true,
-          type: true,
-          value: true,
-        },
-      },
-    },
-  });
-
-  if (!channel) return res.status(404).json({});
-
-  return res.json({
-    channel: {
-      ...channel,
-      flags: convertFlagsArrayToObject(channel?.flags, {
-        includeExtraProperties: true,
-      }),
-    },
-  });
-});
+app.use("/api", api);
 
 app.all(
   "*",
