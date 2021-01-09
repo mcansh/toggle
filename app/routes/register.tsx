@@ -1,13 +1,7 @@
 import * as React from "react";
-import {
-  Form,
-  Link,
-  usePendingFormSubmit,
-  useRouteData,
-} from "@remix-run/react";
+import { Form, Link, usePendingFormSubmit } from "@remix-run/react";
 import { Action, Loader, parseFormBody, redirect } from "@remix-run/data";
 import { RemixContext } from "../context";
-import { genCSRF } from "../utils/csrf";
 
 function meta() {
   return {
@@ -18,7 +12,6 @@ function meta() {
 
 function Register() {
   const pendingForm = usePendingFormSubmit();
-  const { csrf } = useRouteData<{ csrf: string }>();
 
   return (
     <div className="m-4">
@@ -28,7 +21,6 @@ function Register() {
 
       <Form method="post" action="/register">
         <fieldset disabled={!!pendingForm} className="flex flex-col space-y-4">
-          <input type="hidden" name="_csrf" value={csrf} />
           <input
             type="text"
             autoComplete="name"
@@ -80,9 +72,7 @@ const loader: Loader = async ({ session }) => {
     return redirect("/");
   }
 
-  const csrf = genCSRF();
-  session.set("csrf", csrf);
-  return { csrf };
+  return {};
 };
 
 const action: Action = async ({ session, request, context }) => {
@@ -92,17 +82,6 @@ const action: Action = async ({ session, request, context }) => {
   const name = body.get("name") as string;
   const email = body.get("email") as string;
   const username = body.get("username") as string;
-  const csrf = body.get("_csrf") as string;
-
-  const sessionCSRF = session.get("csrf");
-
-  if (csrf !== sessionCSRF) {
-    session.flash("flash", `invalid csrf`);
-
-    return redirect("/register");
-  }
-
-  session.unset("csrf");
 
   try {
     const user = await prisma.user.create({
