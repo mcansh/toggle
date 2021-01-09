@@ -5,7 +5,7 @@ dependencies:
   '@remix-run/data': 0.9.0-pre.2_react-dom@17.0.1+react@17.0.1
   '@remix-run/express': 0.9.0-pre.2_7518ea51717683a2178a01380c5fd210
   '@remix-run/react': 0.9.0-pre.2_react-dom@17.0.1+react@17.0.1
-  bcrypt: 5.0.0
+  argon2: 0.27.1
   connect-redis: 5.0.0
   date-fns: 2.16.1
   dotenv-safe: 8.2.0
@@ -22,7 +22,6 @@ dependencies:
 devDependencies:
   '@prisma/cli': 2.14.0
   '@tailwindcss/forms': 0.2.1
-  '@types/bcrypt': 3.0.0
   '@types/connect-redis': 0.0.16
   '@types/dotenv-safe': 8.1.1
   '@types/express': 4.17.9
@@ -1164,6 +1163,12 @@ packages:
       node: '>= 8'
     resolution:
       integrity: sha512-8Broas6vTtW4GIXTAHDoE32hnN2M5ykgCpWGbuXHQ15vEMqr23pB76e/GZcYsZCHALv50ktd24qhEyKr6wBtow==
+  /@phc/format/1.0.0:
+    dev: false
+    engines:
+      node: '>=10'
+    resolution:
+      integrity: sha512-m7X9U6BG2+J+R1lSOdCiITLLrxm+cWlNI3HUFA92oLO77ObGNzaKdh8pMLqdZcshtkKuV84olNNXDfMc4FezBQ==
   /@prisma/bar/0.0.1:
     dev: true
     resolution:
@@ -1398,10 +1403,6 @@ packages:
     dev: true
     resolution:
       integrity: sha512-czfvEdY+J2Ogfd6RUSr/ZSUmDxTujr34M++YLnp2cCPC3oJ4kFvFMaRXA6cEXKw7F1hJuapdjXRjsXIEXGgORg==
-  /@types/bcrypt/3.0.0:
-    dev: true
-    resolution:
-      integrity: sha512-nohgNyv+1ViVcubKBh0+XiNJ3dO8nYu///9aJ4cgSqv70gBL+94SNy/iC2NLzKPT2Zt/QavrOkBVbZRLZmw6NQ==
   /@types/body-parser/1.19.0:
     dependencies:
       '@types/connect': 3.4.34
@@ -1663,6 +1664,18 @@ packages:
     dev: false
     resolution:
       integrity: sha512-5hYdAkZlcG8tOLujVDTgCT+uPX0VnpAH28gWsLfzpXYm7wP6mp5Q/gYyR7YQ0cKVJcXJnl3j2kpBan13PtQf6w==
+  /argon2/0.27.1:
+    dependencies:
+      '@phc/format': 1.0.0
+      node-addon-api: 3.1.0
+      node-pre-gyp: 0.17.0
+      opencollective-postinstall: 2.0.3
+    dev: false
+    engines:
+      node: '>=10.0.0'
+    requiresBuild: true
+    resolution:
+      integrity: sha512-On68kSinTh4DOlLVCEYgQYpx0yuGRsqU9UwV7jUB26PWv+092r8Uz891KFVEqdsksiDXDhA7kXL4z3in/FBItg==
   /argparse/1.0.10:
     dependencies:
       sprintf-js: 1.0.3
@@ -1744,16 +1757,6 @@ packages:
       node: '>= 0.8'
     resolution:
       integrity: sha512-NF+epuEdnUYVlGuhaxbbq+dvJttwLnGY+YixlXlME5KpQ5W3CnXA5cVTneY3SPbPDRkcjMbifrwmFYcClgOZeg==
-  /bcrypt/5.0.0:
-    dependencies:
-      node-addon-api: 3.1.0
-      node-pre-gyp: 0.15.0
-    dev: false
-    engines:
-      node: '>= 10.0.0'
-    requiresBuild: true
-    resolution:
-      integrity: sha512-jB0yCBl4W/kVHM2whjfyqnxTmOHkCX4kHEa5nYKSoGeYe8YrjTYTc87/6bwt1g8cmV0QrbhKriETg9jWtcREhg==
   /binary-extensions/2.1.0:
     engines:
       node: '>=8'
@@ -3638,7 +3641,7 @@ packages:
       node: 4.x || >=6.0.0
     resolution:
       integrity: sha512-V4aYg89jEoVRxRb2fJdAg8FHvI7cEyYdVAh94HH0UIK8oJxUfkjlDQN9RbMx+bEjP7+ggMiFRprSti032Oipxw==
-  /node-pre-gyp/0.15.0:
+  /node-pre-gyp/0.17.0:
     dependencies:
       detect-libc: 1.0.3
       mkdirp: 0.5.5
@@ -3653,7 +3656,7 @@ packages:
     dev: false
     hasBin: true
     resolution:
-      integrity: sha512-7QcZa8/fpaU/BKenjcaeFF9hLz2+7S9AqyXFhlH/rilsQ/hPZKK32RtR5EQHJElgu+q5RfbJ34KriI79UWaorA==
+      integrity: sha512-abzZt1hmOjkZez29ppg+5gGqdPLUuJeAEwVPtHYEJgx0qzttCbcKFpxrCQn2HYbwCv2c+7JwH4BgEzFkUGpn4A==
   /node-releases/1.1.69:
     resolution:
       integrity: sha512-DGIjo79VDEyAnRlfSqYTsy+yoHd2IOjJiKUozD2MV2D85Vso6Bug56mb9tT/fY5Urt0iqk01H7x+llAruDR2zA==
@@ -3796,6 +3799,11 @@ packages:
       wrappy: 1.0.2
     resolution:
       integrity: sha1-WDsap3WWHUsROsF9nFC6753Xa9E=
+  /opencollective-postinstall/2.0.3:
+    dev: false
+    hasBin: true
+    resolution:
+      integrity: sha512-8AV/sCtuzUeTo8gQK5qDZzARrulB3egtLzFgteqB2tcT4Mw7B8Kt7JcDHmltjz6FOAHsvTevk70gZEbhM4ZS9Q==
   /os-homedir/1.0.2:
     dev: false
     engines:
@@ -5400,7 +5408,6 @@ specifiers:
   '@remix-run/express': 0.9.0-pre.2
   '@remix-run/react': 0.9.0-pre.2
   '@tailwindcss/forms': 0.2.1
-  '@types/bcrypt': 3.0.0
   '@types/connect-redis': 0.0.16
   '@types/dotenv-safe': 8.1.1
   '@types/express': 4.17.9
@@ -5409,8 +5416,8 @@ specifiers:
   '@types/node': 14.14.20
   '@types/react': 17.0.0
   '@types/react-dom': 17.0.0
+  argon2: 0.27.1
   autoprefixer: 10.2.0
-  bcrypt: 5.0.0
   concurrently: 5.3.0
   connect-redis: 5.0.0
   cross-env: 7.0.3

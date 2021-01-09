@@ -1,7 +1,7 @@
 import * as React from "react";
-import { Action, parseFormBody, redirect } from "@remix-run/data";
+import { Action, Loader, parseFormBody, redirect } from "@remix-run/data";
 import { Form, usePendingFormSubmit } from "@remix-run/react";
-import { hash } from "bcrypt";
+import { hash } from "argon2";
 
 import { RemixContext } from "../context";
 
@@ -36,6 +36,15 @@ const ChangePasswordPage: React.VFC = () => {
   );
 };
 
+const loader: Loader = ({ session }) => {
+  const userId = session.get("earlyBirdUserId") as string;
+  if (!userId) {
+    return redirect("/login");
+  }
+
+  return {};
+};
+
 const action: Action = async ({ session, request, context }) => {
   const { prisma } = context as RemixContext;
   const userId = session.get("earlyBirdUserId") as string;
@@ -44,7 +53,6 @@ const action: Action = async ({ session, request, context }) => {
   const { pathname } = new URL(request.url);
 
   if (!userId) {
-    session.unset("earlyBirdUserId");
     return redirect("/login");
   }
 
@@ -58,7 +66,7 @@ const action: Action = async ({ session, request, context }) => {
       return redirect(pathname);
     }
 
-    const hashedPassword = await hash(password, 10);
+    const hashedPassword = await hash(password);
 
     await prisma.user.update({
       data: { hashedPassword },
@@ -74,4 +82,4 @@ const action: Action = async ({ session, request, context }) => {
 };
 
 export default ChangePasswordPage;
-export { action };
+export { loader, action };

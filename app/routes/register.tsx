@@ -2,7 +2,7 @@ import * as React from "react";
 import { Form, Link, usePendingFormSubmit } from "@remix-run/react";
 import { Action, Loader, parseFormBody, redirect } from "@remix-run/data";
 import { RemixContext } from "../context";
-import { hash } from "bcrypt";
+import { hash } from "argon2";
 
 function meta() {
   return {
@@ -93,7 +93,7 @@ const action: Action = async ({ session, request, context }) => {
   const password = body.get("password") as string;
 
   try {
-    const hashedPassword = await hash(password, 10);
+    const hashedPassword = await hash(password);
     const user = await prisma.user.create({
       data: {
         email,

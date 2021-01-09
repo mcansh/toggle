@@ -2,7 +2,7 @@ import * as React from "react";
 import { Form, Link, usePendingFormSubmit } from "@remix-run/react";
 import { Action, Loader, parseFormBody, redirect } from "@remix-run/data";
 import { RemixContext } from "../context";
-import { compare } from "bcrypt";
+import { verify } from "argon2";
 
 function meta() {
   return {
@@ -81,7 +81,7 @@ const action: Action = async ({ session, request, context }) => {
     });
 
     if (!user) {
-      session.flash("error", "Invalid credentials");
+      session.flash("flash", "Invalid credentials");
       return redirect("/login");
     }
 
@@ -90,10 +90,10 @@ const action: Action = async ({ session, request, context }) => {
       return redirect("/profile/change-password");
     }
 
-    const verified = await compare(password, user.hashedPassword);
+    const verified = await verify(user.hashedPassword, password);
 
     if (!verified) {
-      session.flash("error", "Invalid credentials");
+      session.flash("flash", "Invalid credentials");
       return redirect("/login");
     }
 
