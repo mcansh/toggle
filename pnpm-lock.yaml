@@ -14,7 +14,7 @@ dependencies:
   heroicons: 0.4.2
   ioredis: 4.19.4
   ms: 2.1.3
-  nodemailer: 6.4.17
+  postmark: 2.7.0
   react: 17.0.1
   react-dom: 17.0.1_react@17.0.1
   react-router: 6.0.0-beta.0_react@17.0.1
@@ -31,7 +31,6 @@ devDependencies:
   '@types/express-session': 1.17.3
   '@types/ms': 0.7.31
   '@types/node': 14.14.20
-  '@types/nodemailer': 6.4.0
   '@types/react': 17.0.0
   '@types/react-dom': 17.0.0
   autoprefixer: 10.2.0_postcss@8.2.2
@@ -1585,12 +1584,6 @@ packages:
   /@types/node/14.14.20:
     resolution:
       integrity: sha512-Y93R97Ouif9JEOWPIUyU+eyIdyRqQR0I8Ez1dzku4hDx34NWh4HbtIc3WNzwB1Y9ULvNGeu5B8h8bVL5cAk4/A==
-  /@types/nodemailer/6.4.0:
-    dependencies:
-      '@types/node': 14.14.20
-    dev: true
-    resolution:
-      integrity: sha512-KY7bFWB0MahRZvVW4CuW83qcCDny59pJJ0MQ5ifvfcjNwPlIT0vW4uARO4u1gtkYnWdhSvURegecY/tzcukJcA==
   /@types/normalize-package-data/2.4.0:
     resolution:
       integrity: sha512-f5j5b/Gf71L+dbqxIpQ4Z2WlmI/mPJ0fOkGGmFgtb6sAu97EPczzbS3/tJKxmcYDj55OX6ssqwDAWOHIYDRDGA==
@@ -1806,6 +1799,12 @@ packages:
       postcss: ^8.1.0
     resolution:
       integrity: sha512-5SdPoK2Q3rxVh4xC8GKdy772KbEESdl2SyJADCw5FMUrd5eNtpOTLo7oCFMEKvK86zQdvsIVTYk93E8dAfRy6g==
+  /axios/0.21.1:
+    dependencies:
+      follow-redirects: 1.13.1
+    dev: false
+    resolution:
+      integrity: sha512-dKQiRHxGD9PPRIUNIWvZhPTPpl1rf/OxTYKsqKUDjBwYylTvV7SjSHJb9ratfyzM6wCdLCOYLzs73qpg5c4iGA==
   /babel-plugin-apply-mdx-type-prop/1.6.22_@babel+core@7.12.9:
     dependencies:
       '@babel/core': 7.12.9
@@ -2665,6 +2664,17 @@ packages:
       node: '>=8'
     resolution:
       integrity: sha512-PpOwAdQ/YlXQ2vj8a3h8IipDuYRi3wceVQQGYWxNINccq40Anw7BlsEXCMbt1Zt+OLA6Fq9suIpIWD0OsnISlw==
+  /follow-redirects/1.13.1:
+    dev: false
+    engines:
+      node: '>=4.0'
+    peerDependencies:
+      debug: '*'
+    peerDependenciesMeta:
+      debug:
+        optional: true
+    resolution:
+      integrity: sha512-SSG5xmZh1mkPGyKzjZP8zLjltIfpW32Y5QpdNJyjcfGxK3qo3NDDkZOZSFiGn1A6SclQxY9GzEwAHQ3dmYRWpg==
   /forwarded/0.1.2:
     dev: false
     engines:
@@ -3749,12 +3759,6 @@ packages:
   /node-releases/1.1.69:
     resolution:
       integrity: sha512-DGIjo79VDEyAnRlfSqYTsy+yoHd2IOjJiKUozD2MV2D85Vso6Bug56mb9tT/fY5Urt0iqk01H7x+llAruDR2zA==
-  /nodemailer/6.4.17:
-    dev: false
-    engines:
-      node: '>=6.0.0'
-    resolution:
-      integrity: sha512-89ps+SBGpo0D4Bi5ZrxcrCiRFaMmkCt+gItMXQGzEtZVR3uAD3QAQIDoxTWnx3ky0Dwwy/dhFrQ+6NNGXpw/qQ==
   /nodemon/2.0.7:
     dependencies:
       chokidar: 3.5.0
@@ -4192,6 +4196,12 @@ packages:
       node: ^10 || ^12 || >=14
     resolution:
       integrity: sha512-HM1NDNWLgglJPQQMNwvLxgH2KcrKZklKLi/xXYIOaqQB57p/pDWEJNS83PVICYsn1Dg/9C26TiejNr422/ePaQ==
+  /postmark/2.7.0:
+    dependencies:
+      axios: 0.21.1
+    dev: false
+    resolution:
+      integrity: sha512-HrRW6x/4XBkWRB6hpI8B6efGG2LlzzC4cCUnhjsb/SfRNzmM+pv0zQd1Om4qA8E9ZEhFZmAsRQdxUIwm89svIg==
   /prepend-http/2.0.0:
     dev: true
     engines:
@@ -5511,7 +5521,6 @@ specifiers:
   '@types/express-session': 1.17.3
   '@types/ms': 0.7.31
   '@types/node': 14.14.20
-  '@types/nodemailer': 6.4.0
   '@types/react': 17.0.0
   '@types/react-dom': 17.0.0
   argon2: 0.27.1
@@ -5527,10 +5536,10 @@ specifiers:
   heroicons: 0.4.2
   ioredis: 4.19.4
   ms: 2.1.3
-  nodemailer: 6.4.17
   nodemon: 2.0.7
   postcss: 8.2.2
   postcss-cli: 8.3.1
+  postmark: 2.7.0
   react: 17.0.1
   react-dom: 17.0.1
   react-router: 6.0.0-beta.0

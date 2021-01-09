@@ -6,7 +6,7 @@ import { randomBytes } from "crypto";
 import { addHours } from "date-fns";
 
 import { RemixContext } from "../context";
-import { makeANiceEmail, transport } from "../lib/mail";
+import { makeANiceEmail, client } from "../lib/mail";
 
 function meta() {
   return {
@@ -108,11 +108,11 @@ const action: Action = async ({ session, request, context }) => {
         },
       });
 
-      await transport.sendMail({
-        from: "Toggle Team <toggle@mcan.sh>",
-        to: email,
-        subject: "Your Password Reset Token",
-        html: makeANiceEmail(`Your Password Reset Token is here!
+      await client.sendEmail({
+        From: "Toggle Team <toggle@mcan.sh>",
+        To: `${user.name} <${user.email}>`,
+        Subject: "Your Password Reset Token",
+        HtmlBody: makeANiceEmail(`Your Password Reset Token is here!
           \n\n
           <a href="https://toggle.mcan.sh/reset/${resetToken}">Click Here to Reset</a>`),
       });

@@ -11,7 +11,7 @@
     "build": "npm run build:css && remix build && tsc -b",
     "dev": "concurrently \"postcss styles --base styles --dir app/ -w\" \"remix run\" \"tsc -b -w --preserveWatchOutput\" \"cross-env NODE_ENV=development nodemon -w app -w build -w server -e js,jsx,ts,tsx,md,mdx server-build/index.js\"",
     "start": "node server-build/index.js",
-    "clean": "del .cache build server-build public/build"
+    "clean": "del .cache build server-build public/build app/components/icons"
   },
   "repository": {
     "type": "git",
@@ -39,7 +39,7 @@
     "heroicons": "0.4.2",
     "ioredis": "4.19.4",
     "ms": "2.1.3",
-    "nodemailer": "6.4.17",
+    "postmark": "2.7.0",
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-router": "6.0.0-beta.0",
@@ -57,7 +57,6 @@
     "@types/express-session": "1.17.3",
     "@types/ms": "0.7.31",
     "@types/node": "14.14.20",
-    "@types/nodemailer": "6.4.0",
     "@types/react": "17.0.0",
     "@types/react-dom": "17.0.0",
     "autoprefixer": "10.2.0",

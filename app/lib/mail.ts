@@ -1,14 +1,6 @@
-import nodemailer from "nodemailer";
+import postmark from "postmark";
 
-const transport = nodemailer.createTransport({
-  host: "smtp.postmarkapp.com",
-  port: 2525,
-  auth: {
-    user: process.env.POSTMARK_API_KEY,
-    pass: process.env.POSTMARK_API_KEY,
-  },
-  secure: false,
-});
+var client = new postmark.ServerClient(process.env.POSTMARK_API_KEY);
 
 const makeANiceEmail = (text: string) => `
   <div className="email" style="
@@ -24,4 +16,4 @@ const makeANiceEmail = (text: string) => `
   </div>
 `;
 
-export { transport, makeANiceEmail };
+export { client, makeANiceEmail };

@@ -5,7 +5,7 @@ import { Action, parseFormBody, redirect } from "@remix-run/data";
 import { Form, usePendingLocation } from "@remix-run/react";
 import { addHours } from "date-fns";
 
-import { makeANiceEmail, transport } from "../lib/mail";
+import { makeANiceEmail, client } from "../lib/mail";
 import { RemixContext } from "../context";
 
 const meta = () => ({ title: "Request a password reset | Toggle" });
@@ -18,9 +18,9 @@ const RequestPasswordReset: React.VFC = () => {
       <h1 className="mb-4 text-3xl font-medium text-center">
         Request a password reset
       </h1>
-      <Form
+      <form
         autoComplete="off"
-        method="post"
+        method="POST"
         action="/reset"
         className="w-10/12 mx-auto mt-8 max-w-7xl"
       >
@@ -40,7 +40,7 @@ const RequestPasswordReset: React.VFC = () => {
             Request Reset
           </button>
         </fieldset>
-      </Form>
+      </form>
     </div>
   );
 };
@@ -54,7 +54,7 @@ const action: Action = async ({ session, request, context }) => {
   const resetToken = resetTokenBuffer.toString("hex");
   const resetTokenExpiry = addHours(Date.now(), 1);
 
-  await prisma.user.update({
+  const user = await prisma.user.update({
     where: { email },
     data: {
       resetToken,
@@ -62,17 +62,26 @@ const action: Action = async ({ session, request, context }) => {
     },
   });
 
-  await transport.sendMail({
-    from: "Toggle Team <toggle@mcan.sh>",
-    to: email,
-    subject: "Your Password Reset Token",
-    html: makeANiceEmail(`Your Password Reset Token is here!
-      \n\n
-      <a href="https://toggle.mcan.sh/reset/${resetToken}">Click Here to Reset</a>`),
-  });
+  try {
+    await client.sendEmail({
+      From: "Toggle Team <toggle@mcan.sh>",
+      To: `${user.name} <${user.email}>`,
+      Subject: "Your Password Reset Token",
+      HtmlBody: makeANiceEmail(`Your Password Reset Token is here!
+        \n\n
+        <a href="https://toggle.mcan.sh/reset/${resetToken}">Click Here to Reset</a>`),
+    });
 
-  session.flash("flash", "check your email to finish resetting your password");
-  return redirect("/reset");
+    session.flash(
+      "flash",
+      "check your email to finish resetting your password"
+    );
+    return redirect("/reset");
+  } catch (error) {
+    console.error(error);
+
+    return redirect("/reset");
+  }
 };
 
 export default RequestPasswordReset;
