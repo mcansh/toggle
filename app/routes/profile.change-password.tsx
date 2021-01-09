@@ -1,38 +1,48 @@
 import * as React from "react";
 import { Action, Loader, parseFormBody, redirect } from "@remix-run/data";
-import { Form, usePendingFormSubmit } from "@remix-run/react";
+import { Form, usePendingFormSubmit, useRouteData } from "@remix-run/react";
 import { hash } from "argon2";
 
 import { RemixContext } from "../context";
 
 const ChangePasswordPage: React.VFC = () => {
   const pendingForm = usePendingFormSubmit();
+  const { isEarlyBird } = useRouteData<{ isEarlyBird: Boolean }>();
 
   return (
-    <Form method="POST" action="/profile/change-password">
-      <fieldset disabled={!!pendingForm} className="flex flex-col space-y-4">
-        <input
-          type="password"
-          autoComplete="new-password"
-          placeholder="password"
-          name="password"
-          className="w-full border-2 rounded"
-        />
-        <input
-          type="password"
-          autoComplete="new-password"
-          placeholder="confirm password"
-          name="confirmPassword"
-          className="w-full border-2 rounded"
-        />
-        <button
-          type="submit"
-          className="py-1 font-medium leading-loose text-white uppercase transition duration-150 bg-pink-500 rounded-full shadow-lg hover:bg-pink-800 focus:bg-pink-800"
-        >
-          Change Password
-        </button>
-      </fieldset>
-    </Form>
+    <div className="max-w-screen-md p-4 mx-auto">
+      {isEarlyBird && (
+        <p>
+          You were one of the first people to try out Toggle! We weren't quite
+          ready at the time so we didn't have auth for our admin panel, please
+          reset your password 😃
+        </p>
+      )}
+      <Form method="POST" action="/profile/change-password">
+        <fieldset disabled={!!pendingForm} className="flex flex-col space-y-4">
+          <input
+            type="password"
+            autoComplete="new-password"
+            placeholder="password"
+            name="password"
+            className="w-full border-2 rounded"
+          />
+          <input
+            type="password"
+            autoComplete="new-password"
+            placeholder="confirm password"
+            name="confirmPassword"
+            className="w-full border-2 rounded"
+          />
+          <button
+            type="submit"
+            className="py-1 font-medium leading-loose text-white uppercase transition duration-150 bg-pink-500 rounded-full shadow-lg hover:bg-pink-800 focus:bg-pink-800"
+          >
+            Change Password
+          </button>
+        </fieldset>
+      </Form>
+    </div>
   );
 };
 
@@ -42,7 +52,7 @@ const loader: Loader = ({ session }) => {
     return redirect("/login");
   }
 
-  return {};
+  return { isEarlyBird: !!userId };
 };
 
 const action: Action = async ({ session, request, context }) => {
@@ -68,10 +78,12 @@ const action: Action = async ({ session, request, context }) => {
 
     const hashedPassword = await hash(password);
 
-    await prisma.user.update({
+    const user = await prisma.user.update({
       data: { hashedPassword },
       where: { id: userId },
     });
+
+    session.set("userId", user.id);
 
     return redirect(returnTo ?? "/");
   } catch (error) {
