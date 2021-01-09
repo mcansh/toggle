@@ -25,7 +25,7 @@ function Login() {
             autoComplete="email"
             placeholder="email"
             name="email"
-            className="border-2 rounded"
+            className="w-full border-2 rounded"
           />
           <button
             type="submit"
@@ -52,7 +52,7 @@ function Login() {
   );
 }
 
-const loader: Loader = ({ session, context }) => {
+const loader: Loader = ({ session }) => {
   if (session.get("userId")) {
     return redirect("/");
   }

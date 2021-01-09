@@ -26,21 +26,21 @@ function Register() {
             autoComplete="name"
             placeholder="name"
             name="name"
-            className="border-2 rounded"
+            className="w-full border-2 rounded"
           />
           <input
             type="email"
             autoComplete="email"
             placeholder="email"
             name="email"
-            className="border-2 rounded"
+            className="w-full border-2 rounded"
           />
           <input
             type="text"
             autoComplete="username"
             placeholder="username"
             name="username"
-            className="border-2 rounded"
+            className="w-full border-2 rounded"
           />
           <button
             type="submit"
