@@ -57,7 +57,14 @@ function Login() {
           >
             sign up
           </Link>{" "}
-          here
+          here, or you can reset your password{" "}
+          <Link
+            className="text-blue-500 transition duration-150 hover:text-blue-800 focus:text-blue-800 ease"
+            to="/reset"
+          >
+            here
+          </Link>{" "}
+          if you forgot it.
         </h2>
       </div>
     </div>
