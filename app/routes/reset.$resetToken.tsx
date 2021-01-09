@@ -4,21 +4,15 @@ import { Form, usePendingFormSubmit, useRouteData } from "@remix-run/react";
 import { hash } from "argon2";
 
 import { RemixContext } from "../context";
+import { subHours } from "date-fns";
 
 const ChangePasswordPage: React.VFC = () => {
   const pendingForm = usePendingFormSubmit();
-  const { isEarlyBird } = useRouteData<{ isEarlyBird: Boolean }>();
+  const { resetToken } = useRouteData<{ resetToken: string }>();
 
   return (
     <div className="max-w-screen-md p-4 mx-auto">
-      {isEarlyBird && (
-        <p>
-          You were one of the first people to try out Toggle! We weren't quite
-          ready at the time so we didn't have auth for our admin panel, please
-          reset your password 😃
-        </p>
-      )}
-      <Form method="POST" action="/profile/change-password">
+      <Form method="POST" action={`/reset/${resetToken}`}>
         <fieldset disabled={!!pendingForm} className="flex flex-col space-y-4">
           <input
             type="password"
@@ -46,41 +40,50 @@ const ChangePasswordPage: React.VFC = () => {
   );
 };
 
-const loader: Loader = ({ session }) => {
-  const userId = session.get("earlyBirdUserId") as string;
-  if (!userId) {
-    return redirect("/login");
-  }
+const loader: Loader = ({ params }) => ({ resetToken: params.resetToken });
 
-  return { isEarlyBird: !!userId };
-};
-
-const action: Action = async ({ session, request, context }) => {
+const action: Action = async ({ session, request, context, params }) => {
   const { prisma } = context as RemixContext;
-  const userId = session.get("earlyBirdUserId") as string;
+  const { resetToken } = params;
   const returnTo = session.get("returnTo") as string;
 
   const { pathname } = new URL(request.url);
 
-  if (!userId) {
-    return redirect("/login");
-  }
-
   try {
     const body = await parseFormBody(request);
+
+    // 1. find user with that reset token and make sure it's still valid
+    const user = await prisma.user.findFirst({
+      where: {
+        resetToken,
+        resetTokenExpiry: {
+          gte: subHours(Date.now(), 1),
+        },
+      },
+    });
+
+    // 2. check we got a user back
+    if (!user) {
+      session.flash("flash", "This token is either invalid or expired!");
+      return redirect("/login");
+    }
+
     const password = body.get("password") as string;
     const confirmPassword = body.get("confirmPassword") as string;
 
+    // 3. verify new password matches
     if (password !== confirmPassword) {
       session.set("flash", "password do not match");
       return redirect(pathname);
     }
 
+    // 4. hash their new password
     const hashedPassword = await hash(password);
 
-    const user = await prisma.user.update({
-      data: { hashedPassword },
-      where: { id: userId },
+    // 5. update the user's password and remove resetToken fields
+    await prisma.user.update({
+      data: { hashedPassword, resetToken: null, resetTokenExpiry: null },
+      where: { id: user.id },
     });
 
     session.set("userId", user.id);

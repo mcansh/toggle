@@ -21,6 +21,10 @@ model User {
   updatedAt      DateTime @updatedAt
   createdFlags   Flag[]   @relation(name: "createdByUser")
   updatedFlags   Flag[]   @relation(name: "lastUpdatedByUser")
+
+  // Password reset fields
+  resetToken       String?   @unique
+  resetTokenExpiry DateTime?
 }
 
 model Team {
@@ -40,7 +44,7 @@ enum FlagType {
 }
 
 model Flag {
-  // Normal flag properties
+  // normal flag properties
   id        String   @id @default(cuid())
   feature   String   @unique
   type      FlagType

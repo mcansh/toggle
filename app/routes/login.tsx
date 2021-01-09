@@ -1,8 +1,12 @@
 import * as React from "react";
 import { Form, Link, usePendingFormSubmit } from "@remix-run/react";
 import { Action, Loader, parseFormBody, redirect } from "@remix-run/data";
-import { RemixContext } from "../context";
 import { verify } from "argon2";
+import { randomBytes } from "crypto";
+import { addHours } from "date-fns";
+
+import { RemixContext } from "../context";
+import { makeANiceEmail, transport } from "../lib/mail";
 
 function meta() {
   return {
@@ -86,8 +90,31 @@ const action: Action = async ({ session, request, context }) => {
     }
 
     if (user.hashedPassword === '""') {
-      session.set("earlyBirdUserId", user.id);
-      return redirect("/profile/change-password");
+      const resetTokenBuffer = randomBytes(20);
+      const resetToken = resetTokenBuffer.toString("hex");
+      const resetTokenExpiry = addHours(Date.now(), 1);
+      await prisma.user.update({
+        where: { email },
+        data: {
+          resetToken,
+          resetTokenExpiry,
+        },
+      });
+
+      await transport.sendMail({
+        from: "Toggle Team <toggle@mcan.sh>",
+        to: email,
+        subject: "Your Password Reset Token",
+        html: makeANiceEmail(`Your Password Reset Token is here!
+          \n\n
+          <a href="https://toggle.mcan.sh/reset/${resetToken}">Click Here to Reset</a>`),
+      });
+
+      session.flash(
+        "flash",
+        "check your email to finish resetting your password"
+      );
+      return redirect("/login");
     }
 
     const verified = await verify(user.hashedPassword, password);
