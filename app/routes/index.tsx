@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Link, useRouteData } from "@remix-run/react";
-import { FeatureChannel, Team } from "@prisma/client";
+import { FeatureChannel, Flag, Team } from "@prisma/client";
 import { Loader, redirect } from "@remix-run/data";
 import { RemixContext } from "../context";
 import { Except } from "type-fest";
@@ -13,7 +13,9 @@ function meta() {
 }
 
 interface Data {
-  teams: Array<Team & { featureChannels: Array<FeatureChannel> }>;
+  teams: Array<
+    Team & { featureChannels: Array<FeatureChannel & { flags: Array<Flag> }> }
+  >;
   teamCount: number;
 }
 
@@ -34,7 +36,8 @@ function Index() {
                 <li key={channel.id}>
                   <div className="space-x-2">
                     <Link to={`/channel/${team.id}/${channel.slug}`}>
-                      {channel.name}
+                      {channel.name} - {channel.flags.length} Flag
+                      {channel.flags.length === 1 ? "" : "s"}
                     </Link>
                   </div>
                 </li>
@@ -73,7 +76,11 @@ const loader: Loader = async ({ session, context }) => {
     where: {
       id: { in: ids },
     },
-    include: { featureChannels: true },
+    include: {
+      featureChannels: {
+        include: { flags: true },
+      },
+    },
   });
 
   return { teams, teamCount: teams.length };
