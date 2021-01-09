@@ -4,7 +4,7 @@
   "description": "a feature flag platform",
   "main": "remix.config.js",
   "scripts": {
-    "postinstall": "tsc -b",
+    "postinstall": "npm run build:icons && tsc -b",
     "build:css": "postcss styles --base styles --dir app/ --env production",
     "prebuild": "npm run clean && npm run build:icons",
     "build:icons": "node scripts/convert-herocions.js",
