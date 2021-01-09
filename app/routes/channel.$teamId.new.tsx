@@ -104,7 +104,7 @@ const action: Action = async ({ session, request, context, params }) => {
     const channel = await prisma.featureChannel.create({
       data: {
         name: channelName,
-        slug: slugify(channelName),
+        slug: slugify(channelName, { lower: true }),
         team: { connect: { id: params.teamId } },
       },
     });
