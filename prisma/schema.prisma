@@ -15,8 +15,7 @@ model User {
   name         String
   email        String   @unique
   username     String   @unique
-  team         Team?    @relation(fields: [teamId], references: [id])
-  teamId       String?
+  teams        Team[]
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   createdFlags Flag[]   @relation(name: "createdByUser")

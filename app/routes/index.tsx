@@ -1,9 +1,8 @@
 import * as React from "react";
 import { Link, useRouteData } from "@remix-run/react";
-import { FeatureChannel } from "@prisma/client";
+import { FeatureChannel, Team } from "@prisma/client";
 import { Loader, redirect } from "@remix-run/data";
 import { RemixContext } from "../context";
-import { formatRelative } from "date-fns";
 import { Except } from "type-fest";
 
 function meta() {
@@ -14,12 +13,8 @@ function meta() {
 }
 
 interface Data {
-  channels: Array<
-    Except<FeatureChannel, "updatedAt" | "createdAt"> & {
-      updatedAt: string;
-      createdAt: string;
-    }
-  >;
+  teams: Array<Team & { featureChannels: Array<FeatureChannel> }>;
+  teamCount: number;
 }
 
 function Index() {
@@ -28,30 +23,25 @@ function Index() {
   return (
     <div className="max-w-screen-md mx-auto">
       <h1>Your Team's Feature Channels</h1>
-      {data.channels.length > 0 ? (
-        <ul className="pl-6 list-disc">
-          {data.channels.map((channel) => (
-            <li key={channel.id}>
-              <div className="space-x-2">
-                <Link to={`/channel/${channel.slug}`}>{channel.name}</Link>
-                <span>
-                  Created:{" "}
-                  <time dateTime={channel.createdAt}>
-                    {formatRelative(new Date(channel.createdAt), new Date())}
-                  </time>
-                </span>
-                <span>
-                  Last Updated:{" "}
-                  <time dateTime={channel.updatedAt}>
-                    {formatRelative(new Date(channel.updatedAt), new Date())}
-                  </time>
-                </span>
-              </div>
-            </li>
-          ))}
-        </ul>
-      ) : (
+      {data.teamCount === 0 ? (
         <p>Your team hasn't created any channels yet</p>
+      ) : (
+        data.teams.map((team) => (
+          <div key={team.id}>
+            <h2>{team.name} Feature Channels</h2>
+            <ul className="pl-6 list-disc">
+              {team.featureChannels.map((channel) => (
+                <li key={channel.id}>
+                  <div className="space-x-2">
+                    <Link to={`/channel/${team.id}/${channel.slug}`}>
+                      {channel.name}
+                    </Link>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
       )}
     </div>
   );
@@ -60,18 +50,34 @@ function Index() {
 const loader: Loader = async ({ session, context }) => {
   const { prisma } = context as RemixContext;
   const userId = session.get("userId");
-  const teamId = session.get("teamId");
 
-  if (!userId || !teamId) {
+  if (!userId) {
     session.set("returnTo", "/");
     return redirect("/login");
   }
 
-  const channels = await prisma.featureChannel.findMany({
-    where: { teamId },
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      teams: { select: { id: true } },
+    },
   });
 
-  return { channels };
+  if (!user) {
+    session.set("returnTo", "/");
+    return redirect("/login");
+  }
+
+  const ids = user.teams.map((team) => team.id);
+
+  const teams = await prisma.team.findMany({
+    where: {
+      id: { in: ids },
+    },
+    include: { featureChannels: true },
+  });
+
+  return { teams, teamCount: teams.length };
 };
 
 export default Index;

@@ -92,11 +92,9 @@ const action: Action = async ({ session, request, context }) => {
       where: { email },
     });
 
-    if (user) {
-      session.set("userId", user.id);
-      if (user.teamId) {
-        session.set("teamId", user.teamId);
-      }
+    if (!user) {
+      session.flash("error", "Invalid credentials");
+      return redirect("/login");
     }
 
     const returnTo = session.get("returnTo");

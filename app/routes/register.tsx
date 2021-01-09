@@ -110,7 +110,7 @@ const action: Action = async ({ session, request, context }) => {
         email,
         name,
         username,
-        team: {
+        teams: {
           create: {
             name: `${username}'s new team!`,
             featureChannels: {
@@ -124,12 +124,10 @@ const action: Action = async ({ session, request, context }) => {
       },
       select: {
         id: true,
-        teamId: true,
       },
     });
 
     session.set("userId", user.id);
-    session.set("teamId", user.teamId!);
 
     return redirect("/");
   } catch (error) {

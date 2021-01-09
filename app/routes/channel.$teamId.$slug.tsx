@@ -103,7 +103,7 @@ const FeatureChannelPage: React.VFC = () => {
                   <td>
                     <Form
                       className="text-center"
-                      action={`/channel/${data.channel?.slug}`}
+                      action={`/channel/${data.channel?.teamId}/${data.channel?.slug}`}
                       method="delete"
                     >
                       <input type="hidden" name="_method" value="DELETE" />
@@ -123,7 +123,7 @@ const FeatureChannelPage: React.VFC = () => {
       <Form
         autoComplete="off"
         method="POST"
-        action={`/channel/${data.channel.slug}`}
+        action={`/channel/${data.channel.teamId}/${data.channel.slug}`}
         className="w-10/12 mx-auto mt-8 max-w-7xl"
       >
         <fieldset disabled={!!pendingForm} className="grid gap-6">
@@ -197,13 +197,20 @@ const FeatureChannelPage: React.VFC = () => {
   );
 };
 
-const loader: Loader = async ({ context, session, params }) => {
+const loader: Loader = async ({ request, context, session, params }) => {
   const { prisma } = context as RemixContext;
 
-  const teamId = session.get("teamId");
+  const { pathname } = new URL(request.url);
+
+  const userId = session.get("userId");
+
+  if (!userId) {
+    session.set("returnTo", pathname);
+    return redirect("/login");
+  }
 
   const teamChannels = await prisma.team.findUnique({
-    where: { id: teamId },
+    where: { id: params.teamId },
     select: { featureChannels: true },
   });
 
@@ -231,11 +238,10 @@ const loader: Loader = async ({ context, session, params }) => {
 const action: Action = async ({ context, params, request, session }) => {
   // verify session
   const userId = session.get("userId");
-  const teamId = session.get("teamId");
 
   const { pathname } = new URL(request.url);
 
-  if (!userId || !teamId) {
+  if (!userId) {
     session.set("returnTo", pathname);
     return redirect("/login");
   }
@@ -255,7 +261,7 @@ const action: Action = async ({ context, params, request, session }) => {
   if (method === "POST") {
     const channel = await prisma.featureChannel.findFirst({
       where: {
-        teamId,
+        teamId: params.teamId,
         slug: params.slug,
       },
     });
@@ -283,7 +289,7 @@ const action: Action = async ({ context, params, request, session }) => {
         type: featureType,
         value: featureValue,
         team: {
-          connect: { id: teamId },
+          connect: { id: params.teamId },
         },
         featureChannel: {
           connect: { id: channel.id },
