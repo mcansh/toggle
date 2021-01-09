@@ -7,7 +7,7 @@ import { RemixContext } from "../context";
 
 function meta() {
   return {
-    title: `Create new Feature Channel |  Feature Flags`,
+    title: `Create new Feature Channel | Toggle`,
   };
 }
 

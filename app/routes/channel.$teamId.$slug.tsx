@@ -10,12 +10,12 @@ import { format, isToday, parseISO } from "date-fns";
 function meta({ data }: { data: Data }) {
   if (!data.channel) {
     return {
-      title: "Feature Flags",
+      title: "Toggle",
     };
   }
 
   return {
-    title: `${data.channel.name} Feature Flags`,
+    title: `${data.channel.name} | Toggle`,
   };
 }
 

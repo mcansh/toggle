@@ -5,7 +5,7 @@ import { RemixContext } from "../context";
 
 function meta() {
   return {
-    title: "Health Check | Feature Flags",
+    title: "Health Check | Toggle",
   };
 }
 

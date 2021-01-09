@@ -1,10 +1,15 @@
 import * as React from "react";
-import { Action, Loader, parseFormBody, redirect } from "@remix-run/data";
+import { Loader, Action, parseFormBody, redirect } from "@remix-run/data";
 import { Form, usePendingFormSubmit, useRouteData } from "@remix-run/react";
 import { hash } from "argon2";
-
-import { RemixContext } from "../context";
 import { subHours } from "date-fns";
+import { RemixContext } from "../context";
+
+function meta() {
+  return {
+    title: "Reset Password | Toggle",
+  };
+}
 
 const ChangePasswordPage: React.VFC = () => {
   const pendingForm = usePendingFormSubmit();
@@ -97,4 +102,4 @@ const action: Action = async ({ session, request, context, params }) => {
 };
 
 export default ChangePasswordPage;
-export { loader, action };
+export { loader, action, meta };

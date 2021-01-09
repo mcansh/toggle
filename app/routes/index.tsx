@@ -7,8 +7,8 @@ import PlusIcon from "../components/icons/solid/plus";
 
 function meta() {
   return {
-    title: "Feature Flags",
-    description: "Welcome to Feature Flags!",
+    title: "Toggle",
+    description: "Welcome to Toggle!",
   };
 }
 

@@ -6,8 +6,8 @@ import { hash } from "argon2";
 
 function meta() {
   return {
-    title: "Register | Remix Starter",
-    description: "Welcome to remix!",
+    title: "Register | Toggle",
+    description: "Welcome to Toggle",
   };
 }
 

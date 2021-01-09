@@ -10,7 +10,7 @@ import { makeANiceEmail, transport } from "../lib/mail";
 
 function meta() {
   return {
-    title: "Login | Remix Starter",
+    title: "Login | Toggle",
     description: "Welcome to remix!",
   };
 }
