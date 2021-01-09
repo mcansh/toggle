@@ -248,54 +248,59 @@ const action: Action = async ({ context, params, request, session }) => {
 
   const { prisma } = context as RemixContext;
   const body = await parseFormBody(request);
-  const method = body.get("_method") ?? request.method;
+  const method: string = (body.get("_method") ?? request.method).toUpperCase();
 
-  if (method === "DELETE") {
-    const featureId = body.get("featureId") as string;
-    await prisma.flag.delete({
-      where: { id: featureId },
-    });
-    return redirect(pathname);
-  }
-
-  if (method === "POST") {
-    const channel = await prisma.featureChannel.findFirst({
-      where: {
-        teamId: params.teamId,
-        slug: params.slug,
-      },
-    });
-
-    if (!channel) {
-      session.flash("flash", "something went wrong");
+  try {
+    if (method === "DELETE") {
+      const featureId = body.get("featureId") as string;
+      await prisma.flag.delete({ where: { id: featureId } });
       return redirect(pathname);
     }
 
-    const featureName = body.get("name") as string;
-    const featureType = body.get("type") as FlagType;
-    const featureValue = body.get("value") as string;
+    if (method === "POST") {
+      const channel = await prisma.featureChannel.findFirst({
+        where: {
+          teamId: params.teamId,
+          slug: params.slug,
+        },
+      });
 
-    await prisma.flag.create({
-      data: {
-        createdBy: {
-          connect: { id: userId },
+      if (!channel) {
+        session.flash("flash", "something went wrong");
+        return redirect(pathname);
+      }
+
+      const featureName = body.get("name") as string;
+      const featureType = body.get("type") as FlagType;
+      const featureValue = body.get("value") as string;
+
+      await prisma.flag.create({
+        data: {
+          createdBy: {
+            connect: { id: userId },
+          },
+          lastUpdatedBy: {
+            connect: { id: userId },
+          },
+          feature: featureName.includes(" ")
+            ? toPascalCase(featureName)
+            : featureName,
+          type: featureType,
+          value: featureValue,
+          team: {
+            connect: { id: params.teamId },
+          },
+          featureChannel: {
+            connect: { id: channel.id },
+          },
         },
-        lastUpdatedBy: {
-          connect: { id: userId },
-        },
-        feature: featureName.includes(" ")
-          ? toPascalCase(featureName)
-          : featureName,
-        type: featureType,
-        value: featureValue,
-        team: {
-          connect: { id: params.teamId },
-        },
-        featureChannel: {
-          connect: { id: channel.id },
-        },
-      },
-    });
+      });
+
+      return redirect(pathname);
+    }
+  } catch (error) {
+    session.flash("flash", error.message);
+    return redirect(pathname);
   }
 
   session.flash("flash", `invalid request method "${method}"`);
