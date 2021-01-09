@@ -15,7 +15,7 @@ model User {
   name         String
   email        String   @unique
   username     String   @unique
-  Team         Team?    @relation(fields: [teamId], references: [id])
+  team         Team?    @relation(fields: [teamId], references: [id])
   teamId       String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -58,11 +58,11 @@ model Flag {
 
 
   // relate a flag to a team
-  Team   Team   @relation(fields: [teamId], references: [id])
+  team   Team   @relation(fields: [teamId], references: [id])
   teamId String
 
   // make flags unique per team
-  FeatureChannel   FeatureChannel @relation(fields: [featureChannelId], references: [id])
+  featureChannel   FeatureChannel @relation(fields: [featureChannelId], references: [id])
   featureChannelId String
   @@unique([feature, teamId], name: "UniqueFlagNamePerTeam")
 }
@@ -73,7 +73,7 @@ model FeatureChannel {
   flags     Flag[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  Team      Team     @relation(fields: [teamId], references: [id])
+  team      Team     @relation(fields: [teamId], references: [id])
   teamId    String
   slug      String
 

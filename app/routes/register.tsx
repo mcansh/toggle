@@ -109,7 +109,7 @@ const action: Action = async ({ session, request, context }) => {
         email,
         name,
         username,
-        Team: {
+        team: {
           create: {
             name: `${username}'s new team!`,
             featureChannels: {

@@ -282,10 +282,10 @@ const action: Action = async ({ context, params, request, session }) => {
           : featureName,
         type: featureType,
         value: featureValue,
-        Team: {
+        team: {
           connect: { id: teamId },
         },
-        FeatureChannel: {
+        featureChannel: {
           connect: { id: channel.id },
         },
       },
