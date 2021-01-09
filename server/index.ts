@@ -5,8 +5,6 @@ import session from "express-session";
 import { createRequestHandler } from "@remix-run/express";
 import Redis from "ioredis";
 import redisConnect from "connect-redis";
-import rateLimit from "express-rate-limit";
-import RateLimitRedis from "rate-limit-redis";
 import dotenv from "dotenv-safe";
 import { PrismaClient } from "@prisma/client";
 import ms from "ms";
@@ -67,25 +65,6 @@ const client = new Redis({
   tls: {},
 });
 
-const limiter = rateLimit({
-  windowMs: ms("15m"),
-  max: 100, // limit each IP to 100 requests per windowMs
-  store: new RateLimitRedis({ client }),
-});
-
-const testLimiter = rateLimit({
-  windowMs: ms("15m"),
-  max: 5, // limit each IP to 100 requests per windowMs
-  store: new RateLimitRedis({ client }),
-});
-
-const registerLimiter = rateLimit({
-  windowMs: ms("1h"),
-  max: 5,
-  store: new RateLimitRedis({ client }),
-  message: `Too many accounts created from this IP, please try again after an hour`,
-});
-
 const app = express();
 
 app.use(express.static("public"));
@@ -100,28 +79,13 @@ app.use(
     unset: "destroy",
     cookie: {
       path: "/",
-      // secure: process.env.NODE_ENV === "production",
-      secure: "auto",
+      secure: process.env.NODE_ENV === "production",
       maxAge: ms("15d"),
       sameSite: "strict",
       httpOnly: true,
-      domain:
-        process.env.NODE_ENV === "production"
-          ? "feature-flags.mcan.sh"
-          : undefined,
     },
   })
 );
-
-app.use((request, response, next) => {
-  if (request.method === "POST") {
-    if (request.url === "/register") {
-      return registerLimiter(request, response, next);
-    }
-    return limiter(request, response, next);
-  }
-  return next();
-});
 
 const prisma = new PrismaClient();
 
@@ -147,7 +111,7 @@ app.use(async (req, res, next) => {
   return next();
 });
 
-app.get("/api/flags", testLimiter, async (_req, res) => {
+app.get("/api/flags", async (_req, res) => {
   const flags = await prisma.flag.findMany({
     where: {
       teamId: "ckjnab6t20006raiszrzenw5t",
