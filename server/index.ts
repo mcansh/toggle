@@ -89,6 +89,8 @@ app.use(
 
 const prisma = new PrismaClient();
 
+app.set("trust proxy", 1);
+
 app.use(async (req, res, next) => {
   if (!req.url.startsWith("/api")) return next();
 
