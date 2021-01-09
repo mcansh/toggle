@@ -64,7 +64,6 @@ const loader: Loader = async ({ session, context }) => {
   });
 
   if (!user) {
-    session.set("returnTo", "/");
     return redirect("/login");
   }
 

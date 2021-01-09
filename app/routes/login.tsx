@@ -76,6 +76,8 @@ const action: Action = async ({ session, request, context }) => {
       return redirect("/login");
     }
 
+    session.set("userId", user.id);
+
     const returnTo = session.get("returnTo");
 
     if (returnTo) {
