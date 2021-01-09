@@ -63,7 +63,7 @@ model Flag {
   // make flags unique per team
   featureChannel   FeatureChannel @relation(fields: [featureChannelId], references: [id])
   featureChannelId String
-  @@unique([feature, teamId], name: "UniqueFlagNamePerTeam")
+  @@unique([feature, featureChannelId], name: "UniqueFlagNamePerChannel")
 }
 
 model FeatureChannel {
