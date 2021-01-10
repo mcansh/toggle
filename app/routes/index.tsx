@@ -31,7 +31,7 @@ function Index() {
         data.teams.map((team) => (
           <div key={team.id}>
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl">{team.name} Feature Channels</h2>
+              <h2 className="text-2xl">{team.name}</h2>
               <Link to={`/channel/${team.id}/new`}>
                 <span className="sr-only">Create new Channel</span>
                 <PlusIcon className="text-black" />

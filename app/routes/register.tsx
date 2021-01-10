@@ -102,7 +102,7 @@ const action: Action = async ({ session, request, context }) => {
         hashedPassword,
         teams: {
           create: {
-            name: `${username}'s new team!`,
+            name: `${username}'s team`,
             featureChannels: {
               create: {
                 name: "My first feature channel!",
