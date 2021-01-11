@@ -2,10 +2,13 @@ import * as React from "react";
 import { FeatureChannel, Flag, FlagType } from "@prisma/client";
 import { Action, Loader, parseFormBody, redirect } from "@remix-run/data";
 import { Form, usePendingFormSubmit, useRouteData } from "@remix-run/react";
-import { RemixContext } from "../context";
-import { toPascalCase } from "../utils/pascal-case";
 import { Except } from "type-fest";
 import { format, isToday, parseISO } from "date-fns";
+import { Switch } from "@headlessui/react";
+import clsx from "clsx";
+
+import { RemixContext } from "../context";
+import { toPascalCase } from "../utils/pascal-case";
 
 function meta({ data }: { data: Data }) {
   if (!data.channel) {
@@ -46,12 +49,12 @@ interface StringForm {
   value: string;
 }
 
-type Form = BooleanForm | NumberForm | StringForm;
+type FormState = BooleanForm | NumberForm | StringForm;
 
 const FeatureChannelPage: React.VFC = () => {
   const data = useRouteData<Data>();
   const pendingForm = usePendingFormSubmit();
-  const [form, setForm] = React.useState<Form>({
+  const [form, setForm] = React.useState<FormState>({
     name: "",
     type: "string",
     value: "",
@@ -127,7 +130,7 @@ const FeatureChannelPage: React.VFC = () => {
         className="w-10/12 mx-auto mt-8 max-w-7xl"
       >
         <fieldset disabled={!!pendingForm} className="grid gap-6">
-          <label className="block">
+          <label className="flex items-center space-x-2">
             <span>Name: </span>
             <input
               placeholder="MyNewFeature"
@@ -138,7 +141,7 @@ const FeatureChannelPage: React.VFC = () => {
               onChange={handleFormChange}
             />
           </label>
-          <label className="block">
+          <label className="flex items-center space-x-2">
             <span>Type: </span>
             <select
               className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
@@ -151,18 +154,42 @@ const FeatureChannelPage: React.VFC = () => {
               <option value="number">Number</option>
             </select>
           </label>
-          <label className="block">
+          <label className="flex items-center space-x-2">
             <span>Value: </span>
             {form.type === "boolean" ? (
-              <select
-                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                name="value"
-                value={form.type}
-                onChange={handleFormChange}
-              >
-                <option value="true">True</option>
-                <option value="false">False</option>
-              </select>
+              <>
+                <Switch
+                  checked={
+                    typeof form.value === "boolean" && form.value === true
+                  }
+                  onChange={(checked) =>
+                    setForm((old) => ({
+                      ...old,
+                      type: "boolean",
+                      value: checked,
+                    }))
+                  }
+                  className={clsx(
+                    "relative items-center inline-flex h-5 rounded-full w-8",
+                    form.value === true ? "bg-blue-600" : "bg-gray-200"
+                  )}
+                >
+                  <span className="sr-only">Enable feature</span>
+                  <span
+                    className={clsx(
+                      "inline-block w-4 h-4 transition-transform ease-in-out duration-100 transform bg-white rounded-full",
+                      form.value === true ? "translate-x-4" : "translate-x-0"
+                    )}
+                  />
+                </Switch>
+                <input
+                  type="text"
+                  hidden
+                  name="value"
+                  readOnly
+                  value={String(form.value)}
+                />
+              </>
             ) : form.type === "number" ? (
               <input
                 placeholder="25"

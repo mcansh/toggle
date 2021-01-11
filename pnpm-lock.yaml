@@ -1,4 +1,5 @@
 dependencies:
+  '@headlessui/react': 0.2.0_react@17.0.1
   '@prisma/client': 2.14.0_@prisma+cli@2.14.0
   '@remix-run/cli': 0.9.0-pre.2_react-dom@17.0.1+react@17.0.1
   '@remix-run/core': 0.9.0-pre.2_react-dom@17.0.1+react@17.0.1
@@ -6,6 +7,7 @@ dependencies:
   '@remix-run/express': 0.9.0-pre.2_7518ea51717683a2178a01380c5fd210
   '@remix-run/react': 0.9.0-pre.2_react-dom@17.0.1+react@17.0.1
   argon2: 0.27.1
+  clsx: 1.1.1
   connect-redis: 5.0.0
   date-fns: 2.16.1
   dotenv-safe: 8.2.0
@@ -1098,6 +1100,16 @@ packages:
     dev: true
     resolution:
       integrity: sha512-kwOXw8fZ0Lt1QmeOOrd+o4Ibvp4UTEBFQbzvWldjlKv5n+G9sXfIPn1hh63IQIL8K8vbvv1oYMJiIUbuy9bGaA==
+  /@headlessui/react/0.2.0_react@17.0.1:
+    dependencies:
+      react: 17.0.1
+    dev: false
+    engines:
+      node: '>=10'
+    peerDependencies:
+      react: '>=16'
+    resolution:
+      integrity: sha512-YV+vF+QhTRcspydPdHF3ZXe+FkOiJpRdqMjjFIIX9bSdT2O2T7GurgKQdGgamNUM+B99MZBOTRqxS8Dlh485eg==
   /@mdx-js/mdx/1.6.22:
     dependencies:
       '@babel/core': 7.12.9
@@ -2074,6 +2086,12 @@ packages:
     dev: true
     resolution:
       integrity: sha1-0dyXOSAxTfZ/vrlCI7TuNQI56Ws=
+  /clsx/1.1.1:
+    dev: false
+    engines:
+      node: '>=6'
+    resolution:
+      integrity: sha512-6/bPho624p3S2pMyvP5kKBPXnI3ufHLObBFCfgx+LkeR5lg2XYy2hqZqUf45ypD8COn2bhgGJSUE+l5dhNBieA==
   /cluster-key-slot/1.1.0:
     dev: false
     engines:
@@ -5506,6 +5524,7 @@ packages:
     resolution:
       integrity: sha512-V50KMwwzqJV0NpZIZFwfOD5/lyny3WlSzRiXgA0G7VUnRlqttta1L6UQIHzd6EuBY/cHGfwTIck7w1yH6Q5zUw==
 specifiers:
+  '@headlessui/react': 0.2.0
   '@prisma/cli': 2.14.0
   '@prisma/client': 2.14.0
   '@remix-run/cli': 0.9.0-pre.2
@@ -5525,6 +5544,7 @@ specifiers:
   '@types/react-dom': 17.0.0
   argon2: 0.27.1
   autoprefixer: 10.2.0
+  clsx: 1.1.1
   concurrently: 5.3.0
   connect-redis: 5.0.0
   cross-env: 7.0.3
