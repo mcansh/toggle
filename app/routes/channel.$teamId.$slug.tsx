@@ -130,8 +130,8 @@ const FeatureChannelPage: React.VFC = () => {
         className="w-10/12 mx-auto mt-8 max-w-7xl"
       >
         <fieldset disabled={!!pendingForm} className="grid gap-6">
-          <label className="flex items-center space-x-2">
-            <span>Name: </span>
+          <label>
+            <span className="block">Name: </span>
             <input
               placeholder="MyNewFeature"
               className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
@@ -141,8 +141,8 @@ const FeatureChannelPage: React.VFC = () => {
               onChange={handleFormChange}
             />
           </label>
-          <label className="flex items-center space-x-2">
-            <span>Type: </span>
+          <label>
+            <span className="block">Type: </span>
             <select
               className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
               name="type"
@@ -154,8 +154,8 @@ const FeatureChannelPage: React.VFC = () => {
               <option value="number">Number</option>
             </select>
           </label>
-          <label className="flex items-center space-x-2">
-            <span>Value: </span>
+          <label>
+            <span className="block">Value: </span>
             {form.type === "boolean" ? (
               <>
                 <Switch
