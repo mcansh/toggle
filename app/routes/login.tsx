@@ -1,17 +1,19 @@
-import * as React from "react";
-import { Form, Link, usePendingFormSubmit } from "@remix-run/react";
-import { Action, Loader, parseFormBody, redirect } from "@remix-run/data";
-import { verify } from "argon2";
-import { randomBytes } from "crypto";
-import { addHours } from "date-fns";
+import { randomBytes } from 'crypto';
 
-import { RemixContext } from "../context";
-import { makeANiceEmail, client } from "../lib/mail";
+import * as React from 'react';
+import { Form, Link, usePendingFormSubmit } from '@remix-run/react';
+import type { Action, Loader } from '@remix-run/data';
+import { parseFormBody, redirect } from '@remix-run/data';
+import { verify } from 'argon2';
+import { addHours } from 'date-fns';
+
+import type { RemixContext } from '../context';
+import { makeANiceEmail, client } from '../lib/mail';
 
 function meta() {
   return {
-    title: "Login | Toggle",
-    description: "Welcome to remix!",
+    title: 'Login | Toggle',
+    description: 'Welcome to remix!',
   };
 }
 
@@ -34,7 +36,7 @@ function Login() {
           />
           <input
             type="password"
-            autoComplete="password"
+            autoComplete="current-password"
             placeholder="password"
             name="password"
             className="w-full border-2 rounded"
@@ -50,20 +52,20 @@ function Login() {
 
       <div className="mt-4">
         <h2>
-          Don't have an account yet? No sweat, you can{" "}
+          Don&apos;t have an account yet? No sweat, you can{' '}
           <Link
             className="text-blue-500 transition duration-150 hover:text-blue-800 focus:text-blue-800 ease"
             to="/register"
           >
             sign up
-          </Link>{" "}
-          here, or you can reset your password{" "}
+          </Link>{' '}
+          here, or you can reset your password{' '}
           <Link
             className="text-blue-500 transition duration-150 hover:text-blue-800 focus:text-blue-800 ease"
             to="/reset"
           >
             here
-          </Link>{" "}
+          </Link>{' '}
           if you forgot it.
         </h2>
       </div>
@@ -72,8 +74,8 @@ function Login() {
 }
 
 const loader: Loader = ({ session }) => {
-  if (session.get("userId")) {
-    return redirect("/");
+  if (session.get('userId')) {
+    return redirect('/');
   }
 
   return {};
@@ -83,8 +85,8 @@ const action: Action = async ({ session, request, context }) => {
   const { prisma } = context as RemixContext;
   const body = await parseFormBody(request);
 
-  const email = body.get("email") as string;
-  const password = body.get("password") as string;
+  const email = body.get('email') as string;
+  const password = body.get('password') as string;
 
   try {
     const user = await prisma.user.findUnique({
@@ -92,13 +94,13 @@ const action: Action = async ({ session, request, context }) => {
     });
 
     if (!user) {
-      session.flash("flash", "Invalid credentials");
-      return redirect("/login");
+      session.flash('flash', 'Invalid credentials');
+      return redirect('/login');
     }
 
     if (user.hashedPassword === '""') {
       const resetTokenBuffer = randomBytes(20);
-      const resetToken = resetTokenBuffer.toString("hex");
+      const resetToken = resetTokenBuffer.toString('hex');
       const resetTokenExpiry = addHours(Date.now(), 1);
       await prisma.user.update({
         where: { email },
@@ -109,43 +111,43 @@ const action: Action = async ({ session, request, context }) => {
       });
 
       await client.sendEmail({
-        From: "Toggle Team <toggle@mcan.sh>",
+        From: 'Toggle Team <toggle@mcan.sh>',
         To: `${user.name} <${user.email}>`,
-        Subject: "Your Password Reset Token",
+        Subject: 'Your Password Reset Token',
         HtmlBody: makeANiceEmail(`Your Password Reset Token is here!
           \n\n
           <a href="https://toggle.mcan.sh/reset/${resetToken}">Click Here to Reset</a>`),
       });
 
       session.flash(
-        "flash",
-        "check your email to finish resetting your password"
+        'flash',
+        'check your email to finish resetting your password'
       );
-      return redirect("/login");
+      return redirect('/login');
     }
 
     const verified = await verify(user.hashedPassword, password);
 
     if (!verified) {
-      session.flash("flash", "Invalid credentials");
-      return redirect("/login");
+      session.flash('flash', 'Invalid credentials');
+      return redirect('/login');
     }
 
-    session.set("userId", user.id);
+    session.set('userId', user.id);
 
-    const returnTo = session.get("returnTo");
+    const returnTo = session.get('returnTo');
 
     if (returnTo) {
       return redirect(returnTo);
     }
 
-    return redirect("/");
+    return redirect('/');
   } catch (error) {
     console.error(error);
     if (error instanceof Error) {
-      session.flash("flash", error.message);
+      session.flash('flash', error.message);
     }
-    return redirect("/login");
+    return redirect('/login');
   }
 };
 

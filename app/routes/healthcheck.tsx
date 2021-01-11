@@ -1,11 +1,12 @@
-import * as React from "react";
-import { useRouteData } from "@remix-run/react";
-import { Loader } from "@remix-run/data";
-import { RemixContext } from "../context";
+import * as React from 'react';
+import { useRouteData } from '@remix-run/react';
+import type { Loader } from '@remix-run/data';
+
+import type { RemixContext } from '../context';
 
 function meta() {
   return {
-    title: "Health Check | Toggle",
+    title: 'Health Check | Toggle',
   };
 }
 
@@ -39,14 +40,14 @@ const loader: Loader = async ({ context }) => {
     return new Response(JSON.stringify({ ok: true }), {
       status: 200,
       headers: {
-        "content-type": "application/json",
+        'content-type': 'application/json',
       },
     });
   } catch (error) {
     return new Response(JSON.stringify({ ok: false }), {
       status: 500,
       headers: {
-        "content-type": "application/json",
+        'content-type': 'application/json',
       },
     });
   }

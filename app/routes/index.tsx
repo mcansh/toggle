@@ -1,14 +1,16 @@
-import * as React from "react";
-import { Link, useRouteData } from "@remix-run/react";
-import { FeatureChannel, Flag, Team } from "@prisma/client";
-import { Loader, redirect } from "@remix-run/data";
-import { RemixContext } from "../context";
-import PlusIcon from "../components/icons/solid/plus";
+import * as React from 'react';
+import { Link, useRouteData } from '@remix-run/react';
+import type { FeatureChannel, Flag, Team } from '@prisma/client';
+import type { Loader } from '@remix-run/data';
+import { redirect } from '@remix-run/data';
+
+import type { RemixContext } from '../context';
+import PlusIcon from '../components/icons/solid/plus';
 
 function meta() {
   return {
-    title: "Toggle",
-    description: "Welcome to Toggle!",
+    title: 'Toggle',
+    description: 'Welcome to Toggle!',
   };
 }
 
@@ -24,11 +26,11 @@ function Index() {
 
   return (
     <div className="max-w-screen-md p-4 mx-auto">
-      <h1>Your Team's Feature Channels</h1>
+      <h1>Your Team&apos;s Feature Channels</h1>
       {data.teamCount === 0 ? (
-        <p>Your team hasn't created any channels yet</p>
+        <p>Your team hasn&apos;t created any channels yet</p>
       ) : (
-        data.teams.map((team) => (
+        data.teams.map(team => (
           <div key={team.id}>
             <div className="flex items-center justify-between">
               <h2 className="text-2xl">{team.name}</h2>
@@ -39,12 +41,12 @@ function Index() {
             </div>
 
             <ul className="pl-6 list-disc">
-              {team.featureChannels.map((channel) => (
+              {team.featureChannels.map(channel => (
                 <li key={channel.id}>
                   <div className="space-x-2">
                     <Link to={`/channel/${team.id}/${channel.slug}`}>
                       {channel.name} - {channel.flags.length} Flag
-                      {channel.flags.length === 1 ? "" : "s"}
+                      {channel.flags.length === 1 ? '' : 's'}
                     </Link>
                   </div>
                 </li>
@@ -59,11 +61,11 @@ function Index() {
 
 const loader: Loader = async ({ session, context }) => {
   const { prisma } = context as RemixContext;
-  const userId = session.get("userId");
+  const userId = session.get('userId');
 
   if (!userId) {
-    session.set("returnTo", "/");
-    return redirect("/login");
+    session.set('returnTo', '/');
+    return redirect('/login');
   }
 
   const user = await prisma.user.findUnique({
@@ -74,11 +76,11 @@ const loader: Loader = async ({ session, context }) => {
   });
 
   if (!user) {
-    session.unset("userId");
-    return redirect("/login");
+    session.unset('userId');
+    return redirect('/login');
   }
 
-  const ids = user.teams.map((team) => team.id);
+  const ids = user.teams.map(team => team.id);
 
   const teams = await prisma.team.findMany({
     where: {

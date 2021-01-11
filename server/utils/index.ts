@@ -2,9 +2,9 @@ function parseFeatureValue(
   type: string,
   value: string
 ): string | boolean | number {
-  return type === "boolean"
+  return type === 'boolean'
     ? JSON.parse(value)
-    : type === "number"
+    : type === 'number'
     ? Number(value)
     : value;
 }
@@ -20,23 +20,25 @@ function convertFlagsArrayToObject(
   if (!flags) return {};
 
   if (options.includeExtraProperties) {
-    return flags.reduce((acc, cur) => {
-      return {
+    return flags.reduce(
+      (acc, cur) => ({
         ...acc,
         [cur.feature]: {
           ...cur,
           value: parseFeatureValue(cur.type, cur.value),
         },
-      };
-    }, {});
+      }),
+      {}
+    );
   }
 
-  return flags.reduce((acc, cur) => {
-    return {
+  return flags.reduce(
+    (acc, cur) => ({
       ...acc,
       [cur.feature]: parseFeatureValue(cur.type, cur.value),
-    };
-  }, {});
+    }),
+    {}
+  );
 }
 
 export { parseFeatureValue, convertFlagsArrayToObject };
