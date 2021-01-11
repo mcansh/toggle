@@ -6,6 +6,9 @@ dependencies:
   '@remix-run/data': 0.9.0-pre.2_react-dom@17.0.1+react@17.0.1
   '@remix-run/express': 0.9.0-pre.2_7518ea51717683a2178a01380c5fd210
   '@remix-run/react': 0.9.0-pre.2_react-dom@17.0.1+react@17.0.1
+  '@sentry/node': 5.29.2
+  '@sentry/react': 5.29.2_react-dom@17.0.1+react@17.0.1
+  '@sentry/tracing': 5.29.2
   argon2: 0.27.1
   clsx: 1.1.1
   connect-redis: 5.0.0
@@ -1382,6 +1385,110 @@ packages:
       rollup: ^1.20.0||^2.0.0
     resolution:
       integrity: sha512-GksZ6pr6TpIjHm8h9lSQ8pi8BE9VeubNT0OMJ3B5uZJ8pz73NPiqOtCog/x2/QzM1ENChPKxMDhiQuRHsqc+lg==
+  /@sentry/browser/5.29.2:
+    dependencies:
+      '@sentry/core': 5.29.2
+      '@sentry/types': 5.29.2
+      '@sentry/utils': 5.29.2
+      tslib: 1.14.1
+    dev: false
+    engines:
+      node: '>=6'
+    resolution:
+      integrity: sha512-uxZ7y7rp85tJll+RZtXRhXPbnFnOaxZqJEv05vJlXBtBNLQtlczV5iCtU9mZRLVHDtmZ5VVKUV8IKXntEqqDpQ==
+  /@sentry/core/5.29.2:
+    dependencies:
+      '@sentry/hub': 5.29.2
+      '@sentry/minimal': 5.29.2
+      '@sentry/types': 5.29.2
+      '@sentry/utils': 5.29.2
+      tslib: 1.14.1
+    dev: false
+    engines:
+      node: '>=6'
+    resolution:
+      integrity: sha512-7WYkoxB5IdlNEbwOwqSU64erUKH4laavPsM0/yQ+jojM76ErxlgEF0u//p5WaLPRzh3iDSt6BH+9TL45oNZeZw==
+  /@sentry/hub/5.29.2:
+    dependencies:
+      '@sentry/types': 5.29.2
+      '@sentry/utils': 5.29.2
+      tslib: 1.14.1
+    dev: false
+    engines:
+      node: '>=6'
+    resolution:
+      integrity: sha512-LaAIo2hwUk9ykeh9RF0cwLy6IRw+DjEee8l1HfEaDFUM6TPGlNNGObMJNXb9/95jzWp7jWwOpQjoIE3jepdQJQ==
+  /@sentry/minimal/5.29.2:
+    dependencies:
+      '@sentry/hub': 5.29.2
+      '@sentry/types': 5.29.2
+      tslib: 1.14.1
+    dev: false
+    engines:
+      node: '>=6'
+    resolution:
+      integrity: sha512-0aINSm8fGA1KyM7PavOBe1GDZDxrvnKt+oFnU0L+bTcw8Lr+of+v6Kwd97rkLRNOLw621xP076dL/7LSIzMuhw==
+  /@sentry/node/5.29.2:
+    dependencies:
+      '@sentry/core': 5.29.2
+      '@sentry/hub': 5.29.2
+      '@sentry/tracing': 5.29.2
+      '@sentry/types': 5.29.2
+      '@sentry/utils': 5.29.2
+      cookie: 0.4.1
+      https-proxy-agent: 5.0.0
+      lru_map: 0.3.3
+      tslib: 1.14.1
+    dev: false
+    engines:
+      node: '>=6'
+    resolution:
+      integrity: sha512-98m1ZejmJgA+eiz6jEFyYYfp6kJZQnx6d6KrJDMxGfss4YTmmJY57bE4xStnjjk7WINDGzlCiHuk+wJFMBjuoA==
+  /@sentry/react/5.29.2_react-dom@17.0.1+react@17.0.1:
+    dependencies:
+      '@sentry/browser': 5.29.2
+      '@sentry/minimal': 5.29.2
+      '@sentry/types': 5.29.2
+      '@sentry/utils': 5.29.2
+      hoist-non-react-statics: 3.3.2
+      react: 17.0.1
+      react-dom: 17.0.1_react@17.0.1
+      tslib: 1.14.1
+    dev: false
+    engines:
+      node: '>=6'
+    peerDependencies:
+      react: 15.x || 16.x || 17.x
+      react-dom: 15.x || 16.x || 17.x
+    resolution:
+      integrity: sha512-Fvh4l6/wrnO3FWqte7lPUsuWE5o6t3FHwZqVINgCIabpwPMorvOVzm/gwG7uzhuCoyNTP28svR670sl4BnRuTg==
+  /@sentry/tracing/5.29.2:
+    dependencies:
+      '@sentry/hub': 5.29.2
+      '@sentry/minimal': 5.29.2
+      '@sentry/types': 5.29.2
+      '@sentry/utils': 5.29.2
+      tslib: 1.14.1
+    dev: false
+    engines:
+      node: '>=6'
+    resolution:
+      integrity: sha512-iumYbVRpvoU3BUuIooxibydeaOOjl5ysc+mzsqhRs2NGW/C3uKAsFXdvyNfqt3bxtRQwJEhwJByLP2u3pLThpw==
+  /@sentry/types/5.29.2:
+    dev: false
+    engines:
+      node: '>=6'
+    resolution:
+      integrity: sha512-dM9wgt8wy4WRty75QkqQgrw9FV9F+BOMfmc0iaX13Qos7i6Qs2Q0dxtJ83SoR4YGtW8URaHzlDtWlGs5egBiMA==
+  /@sentry/utils/5.29.2:
+    dependencies:
+      '@sentry/types': 5.29.2
+      tslib: 1.14.1
+    dev: false
+    engines:
+      node: '>=6'
+    resolution:
+      integrity: sha512-nEwQIDjtFkeE4k6yIk4Ka5XjGRklNLThWLs2xfXlL7uwrYOH2B9UBBOOIRUraBm/g/Xrra3xsam/kRxuiwtXZQ==
   /@sindresorhus/is/0.14.0:
     dev: true
     engines:
@@ -1688,6 +1795,14 @@ packages:
     hasBin: true
     resolution:
       integrity: sha512-nQyp0o1/mNdbTO1PO6kHkwSrmgZ0MT/jCCpNiwbUjGoRN4dlBhqJtoQuCnEOKzgTVwg0ZWiCoQy6SxMebQVh8A==
+  /agent-base/6.0.2:
+    dependencies:
+      debug: 4.3.1
+    dev: false
+    engines:
+      node: '>= 6.0.0'
+    resolution:
+      integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==
   /aggregate-error/3.1.0:
     dependencies:
       clean-stack: 2.2.0
@@ -2235,6 +2350,12 @@ packages:
       node: '>= 0.6'
     resolution:
       integrity: sha512-+Hp8fLp57wnUSt0tY0tHEXh4voZRDnoIrZPqlo3DPiI4y9lwg/jqx+1Om94/W6ZaPDOUbnjOt/99w66zk+l1Xg==
+  /cookie/0.4.1:
+    dev: false
+    engines:
+      node: '>= 0.6'
+    resolution:
+      integrity: sha512-ZwrFkGJxUR3EIoXtO+yVE69Eb7KlixbaeAWfBQB9vVsNn/o+Yw69gBWSSDK825hQNdN+wF8zELf3dFNl/kxkUA==
   /core-js-compat/3.8.2:
     dependencies:
       browserslist: 4.16.1
@@ -3000,6 +3121,12 @@ packages:
     dev: false
     resolution:
       integrity: sha512-3NyRMKIiFSJmIPdq7FxkNMJkQ7ZEtVblOQ38VtKaA0zZMW1Eo6Q6W8oDKEflr1kNNTItSnk4JMCO1deeSgbLLg==
+  /hoist-non-react-statics/3.3.2:
+    dependencies:
+      react-is: 16.13.1
+    dev: false
+    resolution:
+      integrity: sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==
   /hosted-git-info/2.8.8:
     resolution:
       integrity: sha512-f/wzC2QaWBs7t9IYqB4T3sR1xviIViXJRJTWBlx2Gf3g0Xi5vI7Yy4koXQ1c9OYDGHN9sBy1DQ2AB8fqZBWhUg==
@@ -3041,6 +3168,15 @@ packages:
       node: '>= 0.6'
     resolution:
       integrity: sha512-ZTTX0MWrsQ2ZAhA1cejAwDLycFsd7I7nVtnkT3Ol0aqodaKW+0CTZDQ1uBv5whptCnc8e8HeRRJxRs0kmm/Qfw==
+  /https-proxy-agent/5.0.0:
+    dependencies:
+      agent-base: 6.0.2
+      debug: 4.3.1
+    dev: false
+    engines:
+      node: '>= 6'
+    resolution:
+      integrity: sha512-EkYm5BcKUGiduxzSt3Eppko+PiNWNEpa4ySk9vTC6wDsQJW9rHSa+UhGNJoRYp7bz6Ht1eaRIa6QaJqO5rCFbA==
   /iconv-lite/0.4.24:
     dependencies:
       safer-buffer: 2.1.2
@@ -3486,6 +3622,10 @@ packages:
       node: '>=8'
     resolution:
       integrity: sha512-tqNXrS78oMOE73NMxK4EMLQsQowWf8jKooH9g7xPavRT706R6bkQJ6DY2Te7QukaZsulxa30wQ7bk0pm4XiHmA==
+  /lru_map/0.3.3:
+    dev: false
+    resolution:
+      integrity: sha1-tcg1G5Rky9dQM1p5ZQoOwOVhGN0=
   /magic-string/0.25.7:
     dependencies:
       sourcemap-codec: 1.4.8
@@ -5122,7 +5262,6 @@ packages:
     resolution:
       integrity: sha512-rvuRbTarPXmMb79SmzEp8aqXNKcK+y0XaB298IXueQ8I2PsrATcPBCSPyK/dDNa2iWOhKlfNnOjdAOTBU/nkFA==
   /tslib/1.14.1:
-    dev: true
     resolution:
       integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
   /type-fest/0.13.1:
@@ -5532,6 +5671,9 @@ specifiers:
   '@remix-run/data': 0.9.0-pre.2
   '@remix-run/express': 0.9.0-pre.2
   '@remix-run/react': 0.9.0-pre.2
+  '@sentry/node': 5.29.2
+  '@sentry/react': 5.29.2
+  '@sentry/tracing': 5.29.2
   '@svgr/core': 5.5.0
   '@tailwindcss/forms': 0.2.1
   '@types/connect-redis': 0.0.16
