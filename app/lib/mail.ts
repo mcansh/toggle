@@ -1,6 +1,6 @@
-import postmark from "postmark";
+import postmark from 'postmark';
 
-var client = new postmark.ServerClient(process.env.POSTMARK_API_KEY);
+const client = new postmark.ServerClient(process.env.POSTMARK_API_KEY);
 
 const makeANiceEmail = (text: string) => `
   <div className="email" style="

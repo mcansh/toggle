@@ -1,19 +1,19 @@
-import path from "path";
+import path from 'path';
 
-import express from "express";
-import session from "express-session";
-import { createRequestHandler } from "@remix-run/express";
-import Redis from "ioredis";
-import redisConnect from "connect-redis";
-import dotenv from "dotenv-safe";
-import ms from "ms";
+import express from 'express';
+import session from 'express-session';
+import { createRequestHandler } from '@remix-run/express';
+import Redis from 'ioredis';
+import redisConnect from 'connect-redis';
+import dotenv from 'dotenv-safe';
+import ms from 'ms';
 
-import { prisma } from "./utils/prisma";
-import { api } from "./routes/api";
+import { prisma } from './utils/prisma';
+import { api } from './routes/api';
 
 dotenv.config({
-  path: path.join(__dirname, "../.env"),
-  example: path.join(__dirname, "../.env.example"),
+  path: path.join(__dirname, '../.env'),
+  example: path.join(__dirname, '../.env.example'),
 });
 
 const RedisStore = redisConnect(session);
@@ -28,32 +28,32 @@ const client = new Redis({
 
 const app = express();
 
-app.use(express.static("public"));
+app.use(express.static('public'));
 
 app.use(
   session({
-    secret: process.env.SESSION_PASSWORD!,
+    secret: process.env.SESSION_PASSWORD,
     resave: false,
     saveUninitialized: false,
     store: new RedisStore({ client }),
     rolling: true,
-    unset: "destroy",
+    unset: 'destroy',
     cookie: {
-      path: "/",
-      secure: process.env.NODE_ENV === "production",
-      maxAge: ms("15d"),
-      sameSite: "strict",
+      path: '/',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: ms('15d'),
+      sameSite: 'strict',
       httpOnly: true,
     },
   })
 );
 
-app.set("trust proxy", 1);
+app.set('trust proxy', 1);
 
-app.use("/api", api);
+app.use('/api', api);
 
 app.all(
-  "*",
+  '*',
   createRequestHandler({
     getLoadContext() {
       return { prisma };
@@ -61,8 +61,9 @@ app.all(
   })
 );
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT ?? 3000;
 
 app.listen(port, () => {
+  // eslint-disable-next-line no-console
   console.log(`Express server started on http://localhost:${port}`);
 });

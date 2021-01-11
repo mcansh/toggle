@@ -1,9 +1,9 @@
 function meta() {
-  return { title: "Shoot..." };
+  return { title: 'Shoot...' };
 }
 
 function FiveHundred() {
-  console.error("Check your server terminal output");
+  console.error('Check your server terminal output');
 
   return (
     <div>

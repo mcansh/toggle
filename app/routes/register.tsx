@@ -1,13 +1,15 @@
-import * as React from "react";
-import { Form, Link, usePendingFormSubmit } from "@remix-run/react";
-import { Action, Loader, parseFormBody, redirect } from "@remix-run/data";
-import { RemixContext } from "../context";
-import { hash } from "argon2";
+import * as React from 'react';
+import { Form, Link, usePendingFormSubmit } from '@remix-run/react';
+import type { Action, Loader } from '@remix-run/data';
+import { parseFormBody, redirect } from '@remix-run/data';
+import { hash } from 'argon2';
+
+import type { RemixContext } from '../context';
 
 function meta() {
   return {
-    title: "Register | Toggle",
-    description: "Welcome to Toggle",
+    title: 'Register | Toggle',
+    description: 'Welcome to Toggle',
   };
 }
 
@@ -61,13 +63,13 @@ function Register() {
 
       <div className="mt-4">
         <h2>
-          Already have an account yet? Awesome, you can{" "}
+          Already have an account yet? Awesome, you can{' '}
           <Link
             className="text-blue-500 transition duration-150 hover:text-blue-800 focus:text-blue-800 ease"
             to="/login"
           >
             log in
-          </Link>{" "}
+          </Link>{' '}
           here
         </h2>
       </div>
@@ -75,9 +77,9 @@ function Register() {
   );
 }
 
-const loader: Loader = async ({ session }) => {
-  if (session.get("userId")) {
-    return redirect("/");
+const loader: Loader = ({ session }) => {
+  if (session.get('userId')) {
+    return redirect('/');
   }
 
   return {};
@@ -87,10 +89,10 @@ const action: Action = async ({ session, request, context }) => {
   const { prisma } = context as RemixContext;
   const body = await parseFormBody(request);
 
-  const name = body.get("name") as string;
-  const email = body.get("email") as string;
-  const username = body.get("username") as string;
-  const password = body.get("password") as string;
+  const name = body.get('name') as string;
+  const email = body.get('email') as string;
+  const username = body.get('username') as string;
+  const password = body.get('password') as string;
 
   try {
     const hashedPassword = await hash(password);
@@ -105,8 +107,8 @@ const action: Action = async ({ session, request, context }) => {
             name: `${username}'s team`,
             featureChannels: {
               create: {
-                name: "My first feature channel!",
-                slug: "my-first-feature-channel",
+                name: 'My first feature channel!',
+                slug: 'my-first-feature-channel',
               },
             },
           },
@@ -117,15 +119,15 @@ const action: Action = async ({ session, request, context }) => {
       },
     });
 
-    session.set("userId", user.id);
+    session.set('userId', user.id);
 
-    return redirect("/");
+    return redirect('/');
   } catch (error) {
-    console.log(error);
+    console.error(error);
     if (error instanceof Error) {
-      session.flash("flash", error.message);
+      session.flash('flash', error.message);
     }
-    return redirect("/register");
+    return redirect('/register');
   }
 };
 

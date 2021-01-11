@@ -1,5 +1,5 @@
-import * as React from "react";
-import { Meta, Scripts, Styles, Routes, useGlobalData } from "@remix-run/react";
+import * as React from 'react';
+import { Meta, Scripts, Styles, Routes, useGlobalData } from '@remix-run/react';
 
 function App() {
   const data = useGlobalData<{ flash?: string }>();
@@ -16,8 +16,11 @@ function App() {
         {data.flash && <pre>{data.flash}</pre>}
         <noscript>
           <div className="fixed top-0 left-0 p-2 text-white bg-pink-500 sm:rounded-lg sm:top-2 sm:left-2 sm:max-w-md">
-            While this app will technically work without javascript, you'll have
-            a happier time if you enable it 😃
+            While this app will technically work without javascript, you&apos;ll
+            have a happier time if you enable it{' '}
+            <span role="img" aria-label="smiley face">
+              😃
+            </span>
           </div>
           <div className="mt-20" />
         </noscript>

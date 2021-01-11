@@ -1,19 +1,20 @@
-import * as React from "react";
-import { FeatureChannel, Flag, FlagType } from "@prisma/client";
-import { Action, Loader, parseFormBody, redirect } from "@remix-run/data";
-import { Form, usePendingFormSubmit, useRouteData } from "@remix-run/react";
-import { Except } from "type-fest";
-import { format, isToday, parseISO } from "date-fns";
-import { Switch } from "@headlessui/react";
-import clsx from "clsx";
+import * as React from 'react';
+import type { FeatureChannel, Flag, FlagType } from '@prisma/client';
+import type { Action, Loader } from '@remix-run/data';
+import { parseFormBody, redirect } from '@remix-run/data';
+import { Form, usePendingFormSubmit, useRouteData } from '@remix-run/react';
+import type { Except } from 'type-fest';
+import { format, isToday, parseISO } from 'date-fns';
+import { Switch } from '@headlessui/react';
+import clsx from 'clsx';
 
-import { RemixContext } from "../context";
-import { toPascalCase } from "../utils/pascal-case";
+import type { RemixContext } from '../context';
+import { toPascalCase } from '../utils/pascal-case';
 
 function meta({ data }: { data: Data }) {
   if (!data.channel) {
     return {
-      title: "Toggle",
+      title: 'Toggle',
     };
   }
 
@@ -22,7 +23,7 @@ function meta({ data }: { data: Data }) {
   };
 }
 
-type StringDateFlag = Except<Flag, "createdAt" | "updatedAt"> & {
+type StringDateFlag = Except<Flag, 'createdAt' | 'updatedAt'> & {
   createdAt: string;
   updatedAt: string;
 };
@@ -33,19 +34,19 @@ interface Data {
 
 interface BooleanForm {
   name: string;
-  type: "boolean";
+  type: 'boolean';
   value: boolean;
 }
 
 interface NumberForm {
   name: string;
-  type: "number";
+  type: 'number';
   value: number;
 }
 
 interface StringForm {
   name: string;
-  type: "string";
+  type: 'string';
   value: string;
 }
 
@@ -55,9 +56,9 @@ const FeatureChannelPage: React.VFC = () => {
   const data = useRouteData<Data>();
   const pendingForm = usePendingFormSubmit();
   const [form, setForm] = React.useState<FormState>({
-    name: "",
-    type: "string",
-    value: "",
+    name: '',
+    type: 'string',
+    value: '',
   });
 
   if (!data.channel) {
@@ -67,7 +68,7 @@ const FeatureChannelPage: React.VFC = () => {
   function handleFormChange(
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) {
-    return setForm((old) => ({
+    return setForm(old => ({
       ...old,
       [event.target.name]: event.target.value,
     }));
@@ -90,7 +91,7 @@ const FeatureChannelPage: React.VFC = () => {
             </tr>
           </thead>
           <tbody className="divide-y">
-            {data.channel.flags.map((flag) => {
+            {data.channel.flags.map(flag => {
               const flagUpdatedDate = parseISO(flag.updatedAt);
               const createdToday = isToday(flagUpdatedDate);
               return (
@@ -100,7 +101,7 @@ const FeatureChannelPage: React.VFC = () => {
                   <td>{flag.value}</td>
                   <td>
                     <time dateTime={flag.updatedAt}>
-                      {format(flagUpdatedDate, createdToday ? "p" : "P")}
+                      {format(flagUpdatedDate, createdToday ? 'p' : 'P')}
                     </time>
                   </td>
                   <td>
@@ -120,7 +121,7 @@ const FeatureChannelPage: React.VFC = () => {
           </tbody>
         </table>
       ) : (
-        <p>Your team hasn't created any flags yet</p>
+        <p>Your team hasn&apos;t created any flags yet</p>
       )}
 
       <Form
@@ -156,29 +157,29 @@ const FeatureChannelPage: React.VFC = () => {
           </label>
           <label>
             <span className="block">Value: </span>
-            {form.type === "boolean" ? (
+            {form.type === 'boolean' ? (
               <>
                 <Switch
                   checked={
-                    typeof form.value === "boolean" && form.value === true
+                    typeof form.value === 'boolean' && form.value === true
                   }
-                  onChange={(checked) =>
-                    setForm((old) => ({
+                  onChange={checked =>
+                    setForm(old => ({
                       ...old,
-                      type: "boolean",
+                      type: 'boolean',
                       value: checked,
                     }))
                   }
                   className={clsx(
-                    "relative items-center inline-flex h-5 rounded-full w-8",
-                    form.value === true ? "bg-blue-600" : "bg-gray-200"
+                    'relative items-center inline-flex h-5 rounded-full w-8',
+                    form.value === true ? 'bg-blue-600' : 'bg-gray-200'
                   )}
                 >
                   <span className="sr-only">Enable feature</span>
                   <span
                     className={clsx(
-                      "inline-block w-4 h-4 transition-transform ease-in-out duration-100 transform bg-white rounded-full",
-                      form.value === true ? "translate-x-4" : "translate-x-0"
+                      'inline-block w-4 h-4 transition-transform ease-in-out duration-100 transform bg-white rounded-full',
+                      form.value === true ? 'translate-x-4' : 'translate-x-0'
                     )}
                   />
                 </Switch>
@@ -190,7 +191,7 @@ const FeatureChannelPage: React.VFC = () => {
                   value={String(form.value)}
                 />
               </>
-            ) : form.type === "number" ? (
+            ) : form.type === 'number' ? (
               <input
                 placeholder="25"
                 className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
@@ -216,7 +217,10 @@ const FeatureChannelPage: React.VFC = () => {
             className="block w-full py-2 mt-1 leading-relaxed border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
             type="submit"
           >
-            Create ✅
+            Create{' '}
+            <span role="img" aria-label="check mark">
+              ✅
+            </span>
           </button>
         </fieldset>
       </Form>
@@ -229,11 +233,11 @@ const loader: Loader = async ({ request, context, session, params }) => {
 
   const { pathname } = new URL(request.url);
 
-  const userId = session.get("userId");
+  const userId = session.get('userId');
 
   if (!userId) {
-    session.set("returnTo", pathname);
-    return redirect("/login");
+    session.set('returnTo', pathname);
+    return redirect('/login');
   }
 
   const teamChannels = await prisma.team.findUnique({
@@ -242,13 +246,13 @@ const loader: Loader = async ({ request, context, session, params }) => {
   });
 
   const matchingChannel = teamChannels?.featureChannels.find(
-    (c) => c.slug === params.slug
+    c => c.slug === params.slug
   );
 
   if (matchingChannel) {
     const channel = await prisma.featureChannel.findUnique({
       where: { id: matchingChannel.id },
-      include: { flags: { orderBy: { updatedAt: "desc" } } },
+      include: { flags: { orderBy: { updatedAt: 'desc' } } },
     });
 
     return { channel };
@@ -257,34 +261,34 @@ const loader: Loader = async ({ request, context, session, params }) => {
   return new Response(JSON.stringify({ channel: undefined }), {
     status: 404,
     headers: {
-      "content-type": "application/json",
+      'content-type': 'application/json',
     },
   });
 };
 
 const action: Action = async ({ context, params, request, session }) => {
   // verify session
-  const userId = session.get("userId");
+  const userId = session.get('userId');
 
   const { pathname } = new URL(request.url);
 
   if (!userId) {
-    session.set("returnTo", pathname);
-    return redirect("/login");
+    session.set('returnTo', pathname);
+    return redirect('/login');
   }
 
   const { prisma } = context as RemixContext;
   const body = await parseFormBody(request);
-  const method: string = (body.get("_method") ?? request.method).toUpperCase();
+  const method: string = (body.get('_method') ?? request.method).toUpperCase();
 
   try {
-    if (method === "DELETE") {
-      const featureId = body.get("featureId") as string;
+    if (method === 'DELETE') {
+      const featureId = body.get('featureId') as string;
       await prisma.flag.delete({ where: { id: featureId } });
       return redirect(pathname);
     }
 
-    if (method === "POST") {
+    if (method === 'POST') {
       const channel = await prisma.featureChannel.findFirst({
         where: {
           teamId: params.teamId,
@@ -293,13 +297,13 @@ const action: Action = async ({ context, params, request, session }) => {
       });
 
       if (!channel) {
-        session.flash("flash", "something went wrong");
+        session.flash('flash', 'something went wrong');
         return redirect(pathname);
       }
 
-      const featureName = body.get("name") as string;
-      const featureType = body.get("type") as FlagType;
-      const featureValue = body.get("value") as string;
+      const featureName = body.get('name') as string;
+      const featureType = body.get('type') as FlagType;
+      const featureValue = body.get('value') as string;
 
       await prisma.flag.create({
         data: {
@@ -309,7 +313,7 @@ const action: Action = async ({ context, params, request, session }) => {
           lastUpdatedBy: {
             connect: { id: userId },
           },
-          feature: featureName.includes(" ")
+          feature: featureName.includes(' ')
             ? toPascalCase(featureName)
             : featureName,
           type: featureType,
@@ -326,11 +330,11 @@ const action: Action = async ({ context, params, request, session }) => {
       return redirect(pathname);
     }
   } catch (error) {
-    session.flash("flash", error.message);
+    session.flash('flash', error.message);
     return redirect(pathname);
   }
 
-  session.flash("flash", `invalid request method "${method}"`);
+  session.flash('flash', `invalid request method "${method}"`);
   return redirect(pathname);
 };
 

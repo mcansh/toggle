@@ -1,13 +1,15 @@
-import * as React from "react";
-import { Loader, Action, parseFormBody, redirect } from "@remix-run/data";
-import { Form, usePendingFormSubmit, useRouteData } from "@remix-run/react";
-import { hash } from "argon2";
-import { subHours } from "date-fns";
-import { RemixContext } from "../context";
+import * as React from 'react';
+import type { Loader, Action } from '@remix-run/data';
+import { parseFormBody, redirect } from '@remix-run/data';
+import { Form, usePendingFormSubmit, useRouteData } from '@remix-run/react';
+import { hash } from 'argon2';
+import { subHours } from 'date-fns';
+
+import type { RemixContext } from '../context';
 
 function meta() {
   return {
-    title: "Reset Password | Toggle",
+    title: 'Reset Password | Toggle',
   };
 }
 
@@ -50,7 +52,7 @@ const loader: Loader = ({ params }) => ({ resetToken: params.resetToken });
 const action: Action = async ({ session, request, context, params }) => {
   const { prisma } = context as RemixContext;
   const { resetToken } = params;
-  const returnTo = session.get("returnTo") as string;
+  const returnTo = session.get('returnTo') as string;
 
   const { pathname } = new URL(request.url);
 
@@ -69,16 +71,16 @@ const action: Action = async ({ session, request, context, params }) => {
 
     // 2. check we got a user back
     if (!user) {
-      session.flash("flash", "This token is either invalid or expired!");
-      return redirect("/login");
+      session.flash('flash', 'This token is either invalid or expired!');
+      return redirect('/login');
     }
 
-    const password = body.get("password") as string;
-    const confirmPassword = body.get("confirmPassword") as string;
+    const password = body.get('password') as string;
+    const confirmPassword = body.get('confirmPassword') as string;
 
     // 3. verify new password matches
     if (password !== confirmPassword) {
-      session.set("flash", "password do not match");
+      session.set('flash', 'password do not match');
       return redirect(pathname);
     }
 
@@ -91,12 +93,12 @@ const action: Action = async ({ session, request, context, params }) => {
       where: { id: user.id },
     });
 
-    session.set("userId", user.id);
+    session.set('userId', user.id);
 
-    return redirect(returnTo ?? "/");
+    return redirect(returnTo ?? '/');
   } catch (error) {
     console.error(error);
-    session.set("flash", error.message);
+    session.set('flash', error.message);
     return redirect(pathname);
   }
 };

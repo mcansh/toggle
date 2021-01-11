@@ -1,9 +1,10 @@
-import * as React from "react";
-import { Action, Loader, parseFormBody, redirect } from "@remix-run/data";
-import { Form, usePendingFormSubmit, useRouteData } from "@remix-run/react";
-import slugify from "slugify";
+import * as React from 'react';
+import type { Action, Loader } from '@remix-run/data';
+import { parseFormBody, redirect } from '@remix-run/data';
+import { Form, usePendingFormSubmit, useRouteData } from '@remix-run/react';
+import slugify from 'slugify';
 
-import { RemixContext } from "../context";
+import type { RemixContext } from '../context';
 
 function meta() {
   return {
@@ -41,7 +42,10 @@ const FeatureChannelPage: React.VFC = () => {
             className="block w-full py-2 mt-1 leading-relaxed border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
             type="submit"
           >
-            Create ✅
+            Create{' '}
+            <span role="img" aria-label="check mark">
+              ✅
+            </span>
           </button>
         </fieldset>
       </Form>
@@ -50,13 +54,13 @@ const FeatureChannelPage: React.VFC = () => {
 };
 
 const loader: Loader = async ({ session, request, context, params }) => {
-  const userId = session.get("userId");
+  const userId = session.get('userId');
 
   const { pathname } = new URL(request.url);
 
   if (!userId) {
-    session.set("returnTo", pathname);
-    return redirect("/login");
+    session.set('returnTo', pathname);
+    return redirect('/login');
   }
 
   const { prisma } = context as RemixContext;
@@ -69,37 +73,37 @@ const loader: Loader = async ({ session, request, context, params }) => {
   });
 
   if (!user) {
-    session.set("returnTo", pathname);
-    return redirect("/login");
+    session.set('returnTo', pathname);
+    return redirect('/login');
   }
 
-  const teamIds = user.teams.map((t) => t.id);
+  const teamIds = user.teams.map(t => t.id);
 
   const userBelongsToTeam = teamIds.includes(params.teamId);
 
   if (!userBelongsToTeam) {
-    session.set("returnTo", pathname);
-    session.flash("flash", `You do not belong to that team`);
-    return redirect("/login");
+    session.set('returnTo', pathname);
+    session.flash('flash', `You do not belong to that team`);
+    return redirect('/login');
   }
 
   return { teamId: params.teamId };
 };
 
 const action: Action = async ({ session, request, context, params }) => {
-  const userId = session.get("userId");
+  const userId = session.get('userId');
 
   const { pathname } = new URL(request.url);
 
   if (!userId) {
-    session.set("returnTo", pathname);
+    session.set('returnTo', pathname);
   }
 
   const { prisma } = context as RemixContext;
 
   try {
     const body = await parseFormBody(request);
-    const channelName = body.get("name") as string;
+    const channelName = body.get('name') as string;
 
     const channel = await prisma.featureChannel.create({
       data: {
@@ -112,7 +116,7 @@ const action: Action = async ({ session, request, context, params }) => {
     return redirect(`/channel/${params.teamId}/${channel.slug}`);
   } catch (error) {
     console.error(error);
-    session.flash("flash", error.message);
+    session.flash('flash', error.message);
     return redirect(pathname);
   }
 };
