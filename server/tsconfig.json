@@ -1,6 +1,6 @@
 {
   "extends": "../config/shared-tsconfig.json",
-  "include": ["**/*"],
+  "include": ["**/*", "../@types/global.d.ts", "../node_modules"],
   "compilerOptions": {
     "outDir": "../server-build",
     "module": "commonjs"
