@@ -5,5 +5,5 @@
     // directory, so we don't need to emit anything with `tsc`.
     "noEmit": true
   },
-  "include": ["./", "../@types/global.d.ts", "../node_modules"]
+  "include": ["./"]
 }
