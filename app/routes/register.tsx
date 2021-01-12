@@ -17,7 +17,7 @@ function Register() {
   const pendingForm = usePendingFormSubmit();
 
   return (
-    <div className="max-w-screen-md p-4 mx-auto">
+    <>
       <h1 className="mb-4 text-3xl font-medium text-center">
         Welcome to Feature Flags!
       </h1>
@@ -73,7 +73,7 @@ function Register() {
           here
         </h2>
       </div>
-    </div>
+    </>
   );
 }
 

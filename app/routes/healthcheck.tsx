@@ -17,18 +17,16 @@ interface Data {
 function HealthCheckPage() {
   const data = useRouteData<Data>();
 
+  if (data.ok) {
+    return <h1 className="text-lg">Everything is fine</h1>;
+  }
+
   return (
-    <div className="max-w-screen-md p-2 mx-auto">
-      {data.ok ? (
-        <h1 className="text-lg">Everything is fine</h1>
-      ) : (
-        <img
-          src="/thisisfine.gif"
-          alt="cartoon dog sitting at a kitchen table while his house is on fire"
-          className="object-contain w-full h-full"
-        />
-      )}
-    </div>
+    <img
+      src="/thisisfine.gif"
+      alt="cartoon dog sitting at a kitchen table while his house is on fire"
+      className="object-contain w-full h-full"
+    />
   );
 }
 

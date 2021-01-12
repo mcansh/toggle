@@ -25,7 +25,7 @@ function Index() {
   const data = useRouteData<Data>();
 
   return (
-    <div className="max-w-screen-md p-4 mx-auto">
+    <>
       <h1>Your Team&apos;s Feature Channels</h1>
       {data.teamCount === 0 ? (
         <p>Your team hasn&apos;t created any channels yet</p>
@@ -55,7 +55,7 @@ function Index() {
           </div>
         ))
       )}
-    </div>
+    </>
   );
 }
 

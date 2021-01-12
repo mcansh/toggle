@@ -15,7 +15,7 @@ const RequestPasswordReset: React.VFC = () => {
   const pendingForm = usePendingLocation();
 
   return (
-    <div className="max-w-screen-md p-4 mx-auto">
+    <>
       <h1 className="mb-4 text-3xl font-medium text-center">
         Request a password reset
       </h1>
@@ -42,7 +42,7 @@ const RequestPasswordReset: React.VFC = () => {
           </button>
         </fieldset>
       </Form>
-    </div>
+    </>
   );
 };
 

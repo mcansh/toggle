@@ -75,7 +75,7 @@ const FeatureChannelPage: React.VFC = () => {
   }
 
   return (
-    <div className="max-w-screen-md mx-auto">
+    <>
       <h1 className="py-2 text-2xl font-medium">
         {data.channel.name} Feature Flags
       </h1>
@@ -224,7 +224,7 @@ const FeatureChannelPage: React.VFC = () => {
           </button>
         </fieldset>
       </Form>
-    </div>
+    </>
   );
 };
 

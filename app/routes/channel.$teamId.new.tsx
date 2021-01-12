@@ -17,7 +17,7 @@ const FeatureChannelPage: React.VFC = () => {
   const data = useRouteData<{ teamId: string }>();
 
   return (
-    <div className="max-w-screen-md mx-auto">
+    <>
       <h1 className="py-2 text-2xl font-medium">
         Create a new Feature Channel
       </h1>
@@ -49,7 +49,7 @@ const FeatureChannelPage: React.VFC = () => {
           </button>
         </fieldset>
       </Form>
-    </div>
+    </>
   );
 };
 

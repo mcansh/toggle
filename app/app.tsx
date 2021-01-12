@@ -24,7 +24,9 @@ function App() {
           </div>
           <div className="mt-20" />
         </noscript>
-        <Routes />
+        <div className="w-10/12 mx-auto mt-8 max-w-7xl">
+          <Routes />
+        </div>
         <Scripts />
       </body>
     </html>

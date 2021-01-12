@@ -18,32 +18,30 @@ const ChangePasswordPage: React.VFC = () => {
   const { resetToken } = useRouteData<{ resetToken: string }>();
 
   return (
-    <div className="max-w-screen-md p-4 mx-auto">
-      <Form method="POST" action={`/reset/${resetToken}`}>
-        <fieldset disabled={!!pendingForm} className="flex flex-col space-y-4">
-          <input
-            type="password"
-            autoComplete="new-password"
-            placeholder="password"
-            name="password"
-            className="w-full border-2 rounded"
-          />
-          <input
-            type="password"
-            autoComplete="new-password"
-            placeholder="confirm password"
-            name="confirmPassword"
-            className="w-full border-2 rounded"
-          />
-          <button
-            type="submit"
-            className="py-1 font-medium leading-loose text-white uppercase transition duration-150 bg-pink-500 rounded-full shadow-lg hover:bg-pink-800 focus:bg-pink-800"
-          >
-            Change Password
-          </button>
-        </fieldset>
-      </Form>
-    </div>
+    <Form method="POST" action={`/reset/${resetToken}`}>
+      <fieldset disabled={!!pendingForm} className="flex flex-col space-y-4">
+        <input
+          type="password"
+          autoComplete="new-password"
+          placeholder="password"
+          name="password"
+          className="w-full border-2 rounded"
+        />
+        <input
+          type="password"
+          autoComplete="new-password"
+          placeholder="confirm password"
+          name="confirmPassword"
+          className="w-full border-2 rounded"
+        />
+        <button
+          type="submit"
+          className="py-1 font-medium leading-loose text-white uppercase transition duration-150 bg-pink-500 rounded-full shadow-lg hover:bg-pink-800 focus:bg-pink-800"
+        >
+          Change Password
+        </button>
+      </fieldset>
+    </Form>
   );
 };
 

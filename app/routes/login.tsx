@@ -21,31 +21,35 @@ function Login() {
   const pendingForm = usePendingFormSubmit();
 
   return (
-    <div className="max-w-screen-md p-4 mx-auto">
+    <>
       <h1 className="mb-4 text-3xl font-medium text-center">
         Welcome Back to Feature Flags!
       </h1>
-      <Form method="post" action="/login">
-        <fieldset disabled={!!pendingForm} className="flex flex-col space-y-4">
-          <input
-            type="email"
-            autoComplete="email"
-            placeholder="email"
-            name="email"
-            className="w-full border-2 rounded"
-          />
-          <input
-            type="password"
-            autoComplete="current-password"
-            placeholder="password"
-            name="password"
-            className="w-full border-2 rounded"
-          />
+      <Form autoComplete="off" method="post" action="/login">
+        <fieldset disabled={!!pendingForm} className="grid gap-6">
+          <label className="block">
+            <span>Email: </span>
+            <input
+              placeholder="jane@doe.com"
+              className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              type="email"
+              name="email"
+            />
+          </label>
+          <label className="block">
+            <span>Password: </span>
+            <input
+              placeholder="jane@doe.com"
+              className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              type="password"
+              name="password"
+            />
+          </label>
           <button
+            className="block w-full py-2 mt-1 leading-relaxed border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
             type="submit"
-            className="py-1 font-medium leading-loose text-white uppercase transition duration-150 bg-pink-500 rounded-full shadow-lg hover:bg-pink-800 focus:bg-pink-800"
           >
-            Log in
+            Login
           </button>
         </fieldset>
       </Form>
@@ -69,7 +73,7 @@ function Login() {
           if you forgot it.
         </h2>
       </div>
-    </div>
+    </>
   );
 }
 
