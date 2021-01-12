@@ -116,7 +116,14 @@ const action: Action = async ({ session, request, context, params }) => {
     return redirect(`/channel/${params.teamId}/${channel.slug}`);
   } catch (error) {
     console.error(error);
-    session.flash('flash', error.message);
+    session.flash('flash', `Something went wrong`);
+    session.flash(
+      'errorDetails',
+      JSON.stringify({
+        name: error.name,
+        message: error.message,
+      })
+    );
     return redirect(pathname);
   }
 };

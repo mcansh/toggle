@@ -330,7 +330,14 @@ const action: Action = async ({ context, params, request, session }) => {
       return redirect(pathname);
     }
   } catch (error) {
-    session.flash('flash', error.message);
+    session.flash('flash', `Something went wrong`);
+    session.flash(
+      'errorDetails',
+      JSON.stringify({
+        name: error.name,
+        message: error.message,
+      })
+    );
     return redirect(pathname);
   }
 

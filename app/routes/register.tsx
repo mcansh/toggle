@@ -125,7 +125,14 @@ const action: Action = async ({ session, request, context }) => {
   } catch (error) {
     console.error(error);
     if (error instanceof Error) {
-      session.flash('flash', error.message);
+      session.flash('flash', `Something went wrong`);
+      session.flash(
+        'errorDetails',
+        JSON.stringify({
+          name: error.name,
+          message: error.message,
+        })
+      );
     }
     return redirect('/register');
   }
