@@ -9,5 +9,6 @@ declare namespace NodeJS {
     readonly REMIX_REGISTRY_TOKEN: string;
     readonly SESSION_PASSWORD: string;
     readonly POSTMARK_API_KEY: string;
+    readonly FRONTEND_URL: string;
   }
 }

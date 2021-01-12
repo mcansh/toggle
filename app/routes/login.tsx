@@ -120,7 +120,7 @@ const action: Action = async ({ session, request, context }) => {
         Subject: 'Your Password Reset Token',
         HtmlBody: makeANiceEmail(`Your Password Reset Token is here!
           \n\n
-          <a href="https://toggle.mcan.sh/reset/${resetToken}">Click Here to Reset</a>`),
+          <a href="${process.env.FRONTEND_URL}/reset/${resetToken}">Click Here to Reset</a>`),
       });
 
       session.flash(
