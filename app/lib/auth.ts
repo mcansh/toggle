@@ -11,7 +11,7 @@ async function hash(password: string) {
 async function verify(hashedPassword: string, password: string) {
   try {
     const passwordBuffer = Buffer.from(password);
-    const hashedPasswordBuffer = Buffer.from(hashedPassword);
+    const hashedPasswordBuffer = Buffer.from(hashedPassword, 'base64');
     const result = await pwd.verify(passwordBuffer, hashedPasswordBuffer);
     return result;
   } catch (error) {

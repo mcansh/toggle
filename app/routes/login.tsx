@@ -135,11 +135,6 @@ const action: Action = async ({ session, request, context }) => {
 
     const result = await verify(user.hashedPassword, password);
 
-    if (!result) {
-      session.flash(flashTypes.error, `Invalid credentials`);
-      return redirect('/login');
-    }
-
     switch (result) {
       case SecurePassword.VALID: {
         session.set('userId', user.id);
