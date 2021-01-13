@@ -2,10 +2,10 @@ import * as React from 'react';
 import type { Loader, Action } from '@remix-run/data';
 import { parseFormBody, redirect } from '@remix-run/data';
 import { Form, usePendingFormSubmit, useRouteData } from '@remix-run/react';
-import { hash } from 'argon2';
 import { subHours } from 'date-fns';
 
 import type { RemixContext } from '../context';
+import { hash } from '../lib/auth';
 
 function meta() {
   return {
@@ -96,7 +96,11 @@ const action: Action = async ({ session, request, context, params }) => {
     return redirect(returnTo ?? '/');
   } catch (error) {
     console.error(error);
-    session.set('flash', error.message);
+    session.flash('flash', `Something went wrong`);
+    session.flash(
+      'errorDetails',
+      JSON.stringify({ name: error.name, message: error.message })
+    );
     return redirect(pathname);
   }
 };

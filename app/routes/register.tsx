@@ -2,9 +2,9 @@ import * as React from 'react';
 import { Form, Link, usePendingFormSubmit } from '@remix-run/react';
 import type { Action, Loader } from '@remix-run/data';
 import { parseFormBody, redirect } from '@remix-run/data';
-import { hash } from 'argon2';
 
 import type { RemixContext } from '../context';
+import { hash } from '../lib/auth';
 
 function meta() {
   return {

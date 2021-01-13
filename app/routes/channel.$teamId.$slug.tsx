@@ -7,9 +7,9 @@ import type { Except } from 'type-fest';
 import { format, isToday, parseISO } from 'date-fns';
 import { Switch } from '@headlessui/react';
 import clsx from 'clsx';
+import { pascalCase } from 'change-case';
 
 import type { RemixContext } from '../context';
-import { toPascalCase } from '../utils/pascal-case';
 
 function meta({ data }: { data: Data }) {
   if (!data.channel) {
@@ -314,7 +314,7 @@ const action: Action = async ({ context, params, request, session }) => {
             connect: { id: userId },
           },
           feature: featureName.includes(' ')
-            ? toPascalCase(featureName)
+            ? pascalCase(featureName)
             : featureName,
           type: featureType,
           value: featureValue,

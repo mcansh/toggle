@@ -4,11 +4,13 @@ import * as React from 'react';
 import { Form, Link, usePendingFormSubmit } from '@remix-run/react';
 import type { Action, Loader } from '@remix-run/data';
 import { parseFormBody, redirect } from '@remix-run/data';
-import { verify } from 'argon2';
 import { addHours } from 'date-fns';
+import SecurePassword from 'secure-password';
+import type { Session } from '@remix-run/core';
 
 import type { RemixContext } from '../context';
 import { makeANiceEmail, client } from '../lib/mail';
+import { hash, verify } from '../lib/auth';
 
 function meta() {
   return {
@@ -85,6 +87,20 @@ const loader: Loader = ({ session }) => {
   return {};
 };
 
+function returnToPath(session: Session, message?: string, returnPath?: string) {
+  session.unset('userId');
+
+  if (message) {
+    session.flash('flash', message);
+  }
+
+  if (returnPath) {
+    return redirect(returnPath);
+  }
+
+  return redirect('/login');
+}
+
 const action: Action = async ({ session, request, context }) => {
   const { prisma } = context as RemixContext;
   const body = await parseFormBody(request);
@@ -92,73 +108,83 @@ const action: Action = async ({ session, request, context }) => {
   const email = body.get('email') as string;
   const password = body.get('password') as string;
 
-  try {
-    const user = await prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (!user) {
+    return returnToPath(session, `Invalid credentials`, '/login');
+  }
+
+  if (user.hashedPassword === '""') {
+    const resetTokenBuffer = randomBytes(20);
+    const resetToken = resetTokenBuffer.toString('hex');
+    const resetTokenExpiry = addHours(Date.now(), 1);
+    await prisma.user.update({
       where: { email },
+      data: {
+        resetToken,
+        resetTokenExpiry,
+      },
     });
 
-    if (!user) {
-      session.flash('flash', 'Invalid credentials');
-      return redirect('/login');
-    }
-
-    if (user.hashedPassword === '""') {
-      const resetTokenBuffer = randomBytes(20);
-      const resetToken = resetTokenBuffer.toString('hex');
-      const resetTokenExpiry = addHours(Date.now(), 1);
-      await prisma.user.update({
-        where: { email },
-        data: {
-          resetToken,
-          resetTokenExpiry,
-        },
-      });
-
-      await client.sendEmail({
-        From: 'Toggle Team <toggle@mcan.sh>',
-        To: `${user.name} <${user.email}>`,
-        Subject: 'Your Password Reset Token',
-        HtmlBody: makeANiceEmail(`Your Password Reset Token is here!
+    await client.sendEmail({
+      From: 'Toggle Team <toggle@mcan.sh>',
+      To: `${user.name} <${user.email}>`,
+      Subject: 'Your Password Reset Token',
+      HtmlBody: makeANiceEmail(`Your Password Reset Token is here!
           \n\n
           <a href="${process.env.FRONTEND_URL}/reset/${resetToken}">Click Here to Reset</a>`),
+    });
+
+    return returnToPath(
+      session,
+      `check your email to finish resetting your password`,
+      `/login`
+    );
+  }
+
+  const result = await verify(user.hashedPassword, password);
+
+  if (!result) {
+    session.flash('flash', 'Invalid credentials');
+    return redirect('/login');
+  }
+
+  switch (result) {
+    case SecurePassword.VALID: {
+      session.set('userId', user.id);
+
+      const returnTo = session.get('returnTo');
+
+      if (returnTo) {
+        return redirect(returnTo);
+      }
+
+      return redirect('/');
+    }
+
+    case SecurePassword.VALID_NEEDS_REHASH: {
+      const improvedHash = await hash(password);
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { hashedPassword: improvedHash },
       });
 
-      session.flash(
-        'flash',
-        'check your email to finish resetting your password'
-      );
-      return redirect('/login');
+      session.set('userId', user.id);
+
+      const returnTo = session.get('returnTo');
+
+      if (returnTo) {
+        return redirect(returnTo);
+      }
+
+      return redirect('/');
     }
 
-    const verified = await verify(user.hashedPassword, password);
-
-    if (!verified) {
-      session.flash('flash', 'Invalid credentials');
-      return redirect('/login');
+    default: {
+      return returnToPath(session, `Invalid credentials`, '/login');
     }
-
-    session.set('userId', user.id);
-
-    const returnTo = session.get('returnTo');
-
-    if (returnTo) {
-      return redirect(returnTo);
-    }
-
-    return redirect('/');
-  } catch (error) {
-    console.error(error);
-    if (error instanceof Error) {
-      session.flash('flash', `Something went wrong`);
-      session.flash(
-        'errorDetails',
-        JSON.stringify({
-          message: error.message,
-          name: error.name,
-        })
-      );
-    }
-    return redirect('/login');
   }
 };
 
