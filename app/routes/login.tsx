@@ -6,11 +6,11 @@ import type { Action, Loader } from '@remix-run/data';
 import { parseFormBody, redirect } from '@remix-run/data';
 import { addHours } from 'date-fns';
 import SecurePassword from 'secure-password';
-import type { Session } from '@remix-run/core';
 
 import type { RemixContext } from '../context';
 import { makeANiceEmail, client } from '../lib/mail';
 import { hash, verify } from '../lib/auth';
+import { flashTypes } from '../lib/flash';
 
 function meta() {
   return {
@@ -32,6 +32,7 @@ function Login() {
           <label className="block">
             <span>Email: </span>
             <input
+              required
               placeholder="jane@doe.com"
               className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
               type="email"
@@ -41,6 +42,7 @@ function Login() {
           <label className="block">
             <span>Password: </span>
             <input
+              required
               placeholder="jane@doe.com"
               className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
               type="password"
@@ -87,20 +89,7 @@ const loader: Loader = ({ session }) => {
   return {};
 };
 
-function returnToPath(session: Session, message?: string, returnPath?: string) {
-  session.unset('userId');
-
-  if (message) {
-    session.flash('flash', message);
-  }
-
-  if (returnPath) {
-    return redirect(returnPath);
-  }
-
-  return redirect('/login');
-}
-
+// eslint-disable-next-line max-statements
 const action: Action = async ({ session, request, context }) => {
   const { prisma } = context as RemixContext;
   const body = await parseFormBody(request);
@@ -108,83 +97,98 @@ const action: Action = async ({ session, request, context }) => {
   const email = body.get('email') as string;
   const password = body.get('password') as string;
 
-  const user = await prisma.user.findUnique({
-    where: { email },
-  });
+  try {
+    const user = await prisma.user.findUnique({ where: { email } });
 
-  if (!user) {
-    return returnToPath(session, `Invalid credentials`, '/login');
-  }
-
-  if (user.hashedPassword === '""') {
-    const resetTokenBuffer = randomBytes(20);
-    const resetToken = resetTokenBuffer.toString('hex');
-    const resetTokenExpiry = addHours(Date.now(), 1);
-    await prisma.user.update({
-      where: { email },
-      data: {
-        resetToken,
-        resetTokenExpiry,
-      },
-    });
-
-    await client.sendEmail({
-      From: 'Toggle Team <toggle@mcan.sh>',
-      To: `${user.name} <${user.email}>`,
-      Subject: 'Your Password Reset Token',
-      HtmlBody: makeANiceEmail(`Your Password Reset Token is here!
-          \n\n
-          <a href="${process.env.FRONTEND_URL}/reset/${resetToken}">Click Here to Reset</a>`),
-    });
-
-    return returnToPath(
-      session,
-      `check your email to finish resetting your password`,
-      `/login`
-    );
-  }
-
-  const result = await verify(user.hashedPassword, password);
-
-  if (!result) {
-    session.flash('flash', 'Invalid credentials');
-    return redirect('/login');
-  }
-
-  switch (result) {
-    case SecurePassword.VALID: {
-      session.set('userId', user.id);
-
-      const returnTo = session.get('returnTo');
-
-      if (returnTo) {
-        return redirect(returnTo);
-      }
-
-      return redirect('/');
+    if (!user) {
+      session.flash(flashTypes.generic, `Invalid credentials`);
+      return redirect('/login');
     }
 
-    case SecurePassword.VALID_NEEDS_REHASH: {
-      const improvedHash = await hash(password);
+    if (user.hashedPassword === '""') {
+      const resetTokenBuffer = randomBytes(20);
+      const resetToken = resetTokenBuffer.toString('hex');
+      const resetTokenExpiry = addHours(Date.now(), 1);
       await prisma.user.update({
-        where: { id: user.id },
-        data: { hashedPassword: improvedHash },
+        where: { email },
+        data: {
+          resetToken,
+          resetTokenExpiry,
+        },
       });
 
-      session.set('userId', user.id);
+      await client.sendEmail({
+        From: 'Toggle Team <toggle@mcan.sh>',
+        To: `${user.name} <${user.email}>`,
+        Subject: 'Your Password Reset Token',
+        HtmlBody: makeANiceEmail(`Your Password Reset Token is here!
+          \n\n
+          <a href="${process.env.FRONTEND_URL}/reset/${resetToken}">Click Here to Reset</a>`),
+      });
 
-      const returnTo = session.get('returnTo');
+      session.flash(
+        flashTypes.generic,
+        `check your email to finish resetting your password`
+      );
+      return redirect('/login');
+    }
 
-      if (returnTo) {
-        return redirect(returnTo);
+    const result = await verify(user.hashedPassword, password);
+
+    if (!result) {
+      session.flash(flashTypes.generic, `Invalid credentials`);
+      return redirect('/login');
+    }
+
+    switch (result) {
+      case SecurePassword.VALID: {
+        session.set('userId', user.id);
+
+        const returnTo = session.get('returnTo');
+
+        if (returnTo) {
+          return redirect(returnTo);
+        }
+
+        return redirect('/');
       }
 
-      return redirect('/');
-    }
+      case SecurePassword.VALID_NEEDS_REHASH: {
+        const improvedHash = await hash(password);
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { hashedPassword: improvedHash },
+        });
 
-    default: {
-      return returnToPath(session, `Invalid credentials`, '/login');
+        session.set('userId', user.id);
+
+        const returnTo = session.get('returnTo');
+
+        if (returnTo) {
+          return redirect(returnTo);
+        }
+
+        return redirect('/');
+      }
+
+      default: {
+        session.flash(flashTypes.generic, `Invalid credentials`);
+        return redirect('/login');
+      }
     }
+  } catch (error) {
+    console.error(error);
+    if (error instanceof Error) {
+      session.flash(flashTypes.generic, `Something went wrong`);
+      session.flash(
+        flashTypes.errorDetails,
+        JSON.stringify({
+          message: error.message,
+          name: error.name,
+        })
+      );
+    }
+    return redirect('/login');
   }
 };
 

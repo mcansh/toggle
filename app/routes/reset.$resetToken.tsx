@@ -96,9 +96,9 @@ const action: Action = async ({ session, request, context, params }) => {
     return redirect(returnTo ?? '/');
   } catch (error) {
     console.error(error);
-    session.flash('flash', `Something went wrong`);
+    session.flash(`flash`, `Something went wrong`);
     session.flash(
-      'errorDetails',
+      `errorDetails`,
       JSON.stringify({ name: error.name, message: error.message })
     );
     return redirect(pathname);

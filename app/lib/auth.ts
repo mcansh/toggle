@@ -16,7 +16,7 @@ async function verify(hashedPassword: string, password: string) {
     return result;
   } catch (error) {
     console.error(error);
-    return false;
+    return undefined;
   }
 }
 
