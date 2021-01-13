@@ -101,6 +101,7 @@ const action: Action = async ({ session, request, context }) => {
     const user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {
+      session.unset('userId');
       session.flash(flashTypes.error, `Invalid credentials`);
       return redirect('/login');
     }
