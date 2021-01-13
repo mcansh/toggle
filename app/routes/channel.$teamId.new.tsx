@@ -5,6 +5,7 @@ import { Form, usePendingFormSubmit, useRouteData } from '@remix-run/react';
 import slugify from 'slugify';
 
 import type { RemixContext } from '../context';
+import { flashTypes } from '../lib/flash';
 
 function meta() {
   return {
@@ -83,7 +84,7 @@ const loader: Loader = async ({ session, request, context, params }) => {
 
   if (!userBelongsToTeam) {
     session.set('returnTo', pathname);
-    session.flash('flash', `You do not belong to that team`);
+    session.flash(flashTypes.error, `You do not belong to that team`);
     return redirect('/login');
   }
 
@@ -116,13 +117,10 @@ const action: Action = async ({ session, request, context, params }) => {
     return redirect(`/channel/${params.teamId}/${channel.slug}`);
   } catch (error) {
     console.error(error);
-    session.flash('flash', `Something went wrong`);
+    session.flash(flashTypes.error, `Something went wrong`);
     session.flash(
-      'errorDetails',
-      JSON.stringify({
-        name: error.name,
-        message: error.message,
-      })
+      flashTypes.errorDetails,
+      JSON.stringify({ name: error.name, message: error.message }, null, 2)
     );
     return redirect(pathname);
   }

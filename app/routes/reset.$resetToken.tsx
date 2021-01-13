@@ -6,6 +6,7 @@ import { subHours } from 'date-fns';
 
 import type { RemixContext } from '../context';
 import { hash } from '../lib/auth';
+import { flashTypes } from '../lib/flash';
 
 function meta() {
   return {
@@ -69,7 +70,10 @@ const action: Action = async ({ session, request, context, params }) => {
 
     // 2. check we got a user back
     if (!user) {
-      session.flash('flash', 'This token is either invalid or expired!');
+      session.flash(
+        flashTypes.error,
+        'This token is either invalid or expired!'
+      );
       return redirect('/login');
     }
 
@@ -96,10 +100,10 @@ const action: Action = async ({ session, request, context, params }) => {
     return redirect(returnTo ?? '/');
   } catch (error) {
     console.error(error);
-    session.flash(`flash`, `Something went wrong`);
+    session.flash(flashTypes.error, `Something went wrong`);
     session.flash(
-      `errorDetails`,
-      JSON.stringify({ name: error.name, message: error.message })
+      flashTypes.errorDetails,
+      JSON.stringify({ name: error.name, message: error.message }, null, 2)
     );
     return redirect(pathname);
   }

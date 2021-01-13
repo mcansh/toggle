@@ -8,6 +8,7 @@ import { addHours } from 'date-fns';
 
 import { makeANiceEmail, client } from '../lib/mail';
 import type { RemixContext } from '../context';
+import { flashTypes } from '../lib/flash';
 
 const meta = () => ({ title: 'Request a password reset | Toggle' });
 
@@ -74,7 +75,7 @@ const action: Action = async ({ session, request, context }) => {
     });
 
     session.flash(
-      'flash',
+      flashTypes.info,
       'check your email to finish resetting your password'
     );
     return redirect('/reset');

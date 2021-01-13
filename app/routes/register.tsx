@@ -5,6 +5,7 @@ import { parseFormBody, redirect } from '@remix-run/data';
 
 import type { RemixContext } from '../context';
 import { hash } from '../lib/auth';
+import { flashTypes } from '../lib/flash';
 
 function meta() {
   return {
@@ -125,13 +126,10 @@ const action: Action = async ({ session, request, context }) => {
   } catch (error) {
     console.error(error);
     if (error instanceof Error) {
-      session.flash('flash', `Something went wrong`);
+      session.flash(flashTypes.error, `Something went wrong`);
       session.flash(
-        'errorDetails',
-        JSON.stringify({
-          name: error.name,
-          message: error.message,
-        })
+        flashTypes.errorDetails,
+        JSON.stringify({ name: error.name, message: error.message }, null, 2)
       );
     }
     return redirect('/register');

@@ -1,19 +1,19 @@
 import type { Loader } from '@remix-run/data';
 
-function safelyParseJson(input: string) {
-  try {
-    return JSON.parse(input);
-  } catch (error) {
-    return undefined;
-  }
-}
+import { flashTypes } from './lib/flash';
 
 export const loader: Loader = ({ session }) => {
-  const flash = session.get('flash');
-  const errorDetailsString = session.get('errorDetails');
-  const errorDetails = errorDetailsString
-    ? safelyParseJson(errorDetailsString)
-    : undefined;
+  const errorDetails = session.get(flashTypes.errorDetails);
+  const success = session.get(flashTypes.success);
+  const error = session.get(flashTypes.error);
+  const info = session.get(flashTypes.info);
 
-  return { flash, errorDetails };
+  return {
+    flash: {
+      errorDetails,
+      success,
+      error,
+      info,
+    },
+  };
 };

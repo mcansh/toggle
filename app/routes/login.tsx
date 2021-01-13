@@ -101,7 +101,7 @@ const action: Action = async ({ session, request, context }) => {
     const user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {
-      session.flash(flashTypes.generic, `Invalid credentials`);
+      session.flash(flashTypes.error, `Invalid credentials`);
       return redirect('/login');
     }
 
@@ -127,7 +127,7 @@ const action: Action = async ({ session, request, context }) => {
       });
 
       session.flash(
-        flashTypes.generic,
+        flashTypes.success,
         `check your email to finish resetting your password`
       );
       return redirect('/login');
@@ -136,7 +136,7 @@ const action: Action = async ({ session, request, context }) => {
     const result = await verify(user.hashedPassword, password);
 
     if (!result) {
-      session.flash(flashTypes.generic, `Invalid credentials`);
+      session.flash(flashTypes.error, `Invalid credentials`);
       return redirect('/login');
     }
 
@@ -172,20 +172,17 @@ const action: Action = async ({ session, request, context }) => {
       }
 
       default: {
-        session.flash(flashTypes.generic, `Invalid credentials`);
+        session.flash(flashTypes.error, `Invalid credentials`);
         return redirect('/login');
       }
     }
   } catch (error) {
     console.error(error);
     if (error instanceof Error) {
-      session.flash(flashTypes.generic, `Something went wrong`);
+      session.flash(flashTypes.error, `Something went wrong`);
       session.flash(
         flashTypes.errorDetails,
-        JSON.stringify({
-          message: error.message,
-          name: error.name,
-        })
+        JSON.stringify({ name: error.name, message: error.message }, null, 2)
       );
     }
     return redirect('/login');

@@ -1,5 +1,4 @@
 const flashTypes = {
-  generic: 'flash',
   errorDetails: 'errorDetails',
   success: 'success',
   error: 'error',
@@ -7,4 +6,5 @@ const flashTypes = {
 } as const;
 
 export type Flash = typeof flashTypes;
+
 export { flashTypes };

@@ -10,6 +10,7 @@ import clsx from 'clsx';
 import { pascalCase } from 'change-case';
 
 import type { RemixContext } from '../context';
+import { flashTypes } from '../lib/flash';
 
 function meta({ data }: { data: Data }) {
   if (!data.channel) {
@@ -297,7 +298,7 @@ const action: Action = async ({ context, params, request, session }) => {
       });
 
       if (!channel) {
-        session.flash('flash', 'something went wrong');
+        session.flash(flashTypes.error, 'Something went wrong');
         return redirect(pathname);
       }
 
@@ -330,18 +331,15 @@ const action: Action = async ({ context, params, request, session }) => {
       return redirect(pathname);
     }
   } catch (error) {
-    session.flash('flash', `Something went wrong`);
+    session.flash(flashTypes.error, 'Something went wrong');
     session.flash(
-      'errorDetails',
-      JSON.stringify({
-        name: error.name,
-        message: error.message,
-      })
+      flashTypes.errorDetails,
+      JSON.stringify({ name: error.name, message: error.message }, null, 2)
     );
     return redirect(pathname);
   }
 
-  session.flash('flash', `invalid request method "${method}"`);
+  session.flash(flashTypes.error, `invalid request method "${method}"`);
   return redirect(pathname);
 };
 

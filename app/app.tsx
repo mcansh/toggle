@@ -1,11 +1,17 @@
 import * as React from 'react';
 import { Meta, Scripts, Styles, Routes, useGlobalData } from '@remix-run/react';
 
+import {} from './lib/flash';
+
+interface FlashMessages {
+  errorDetails?: string;
+  success?: string;
+  error?: string;
+  info?: string;
+}
+
 function App() {
-  const data = useGlobalData<{
-    flash?: string;
-    errorDetails?: { name: string; message: string };
-  }>();
+  const data = useGlobalData<{ flash: FlashMessages }>();
 
   return (
     <html lang="en">
@@ -27,16 +33,30 @@ function App() {
           <div className="mt-20" />
         </noscript>
         <div className="w-10/12 mx-auto mt-8 max-w-7xl">
-          {(data.flash || data.errorDetails) && (
-            <div className="mb-2">
-              {data.flash && <span>{data.flash}</span>}
-              {data.errorDetails && (
+          {Object.keys(data.flash).length > 0 && (
+            <div className="grid gap-2 mb-2">
+              {data.flash.errorDetails && (
                 <details className="px-1 py-2 font-mono text-white bg-blue-700 rounded-lg">
                   <summary>Error Details</summary>
                   <pre className="max-w-full overflow-scroll">
-                    {JSON.stringify(data.errorDetails, null, 2)}
+                    {data.flash.errorDetails}
                   </pre>
                 </details>
+              )}
+              {data.flash.error && (
+                <span className="px-1 py-2 text-white bg-red-500 rounded-lg">
+                  {data.flash.error}
+                </span>
+              )}
+              {data.flash.success && (
+                <span className="px-1 py-2 text-white bg-green-400 rounded-lg">
+                  {data.flash.success}
+                </span>
+              )}
+              {data.flash.info && (
+                <span className="px-1 py-2 text-white bg-indigo-500 rounded-lg">
+                  {data.flash.info}
+                </span>
               )}
             </div>
           )}
