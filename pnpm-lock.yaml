@@ -1,11 +1,11 @@
 dependencies:
   '@headlessui/react': 0.2.0_react@17.0.1
   '@prisma/client': 2.14.0_@prisma+cli@2.14.0
-  '@remix-run/cli': 0.9.0-pre.3_react-dom@17.0.1+react@17.0.1
-  '@remix-run/core': 0.9.0-pre.3_react-dom@17.0.1+react@17.0.1
-  '@remix-run/data': 0.9.0-pre.3_react-dom@17.0.1+react@17.0.1
-  '@remix-run/express': 0.9.0-pre.3_7518ea51717683a2178a01380c5fd210
-  '@remix-run/react': 0.9.0-pre.3_react-dom@17.0.1+react@17.0.1
+  '@remix-run/cli': 0.9.0_react-dom@17.0.1+react@17.0.1
+  '@remix-run/core': 0.9.0_react-dom@17.0.1+react@17.0.1
+  '@remix-run/data': 0.9.0_react-dom@17.0.1+react@17.0.1
+  '@remix-run/express': 0.9.0_7518ea51717683a2178a01380c5fd210
+  '@remix-run/react': 0.9.0_react-dom@17.0.1+react@17.0.1
   change-case: 4.1.2
   clsx: 1.1.1
   connect-redis: 5.0.0
@@ -13,6 +13,7 @@ dependencies:
   dotenv-safe: 8.2.0
   express: 4.17.1
   express-session: 1.17.1
+  framer-motion: 3.2.1_react-dom@17.0.1+react@17.0.1
   heroicons: 0.4.2
   ioredis: 4.19.4
   ms: 2.1.3
@@ -31,10 +32,10 @@ devDependencies:
   '@tailwindcss/forms': 0.2.1
   '@types/connect-redis': 0.0.16
   '@types/dotenv-safe': 8.1.1
-  '@types/express': 4.17.10
+  '@types/express': 4.17.11
   '@types/express-session': 1.17.3
   '@types/ms': 0.7.31
-  '@types/node': 14.14.20
+  '@types/node': 14.14.21
   '@types/react': 17.0.0
   '@types/react-dom': 17.0.0
   '@types/secure-password': 3.1.0
@@ -1108,6 +1109,18 @@ packages:
       to-fast-properties: 2.0.0
     resolution:
       integrity: sha512-lnIX7piTxOH22xE7fDXDbSHg9MM1/6ORnafpJmov5rs0kX5g4BZxeXNJLXsMRiO0U5Rb8/FvMS6xlTnTHvxonQ==
+  /@emotion/is-prop-valid/0.8.8:
+    dependencies:
+      '@emotion/memoize': 0.7.4
+    dev: false
+    optional: true
+    resolution:
+      integrity: sha512-u5WtneEAr5IDG2Wv65yhunPSMLIpuKsbuOktRojfrEiEvRyC85LgPMZI63cr7NUqT8ZIGdSVg8ZKGxIug4lXcA==
+  /@emotion/memoize/0.7.4:
+    dev: false
+    optional: true
+    resolution:
+      integrity: sha512-Ja/Vfqe3HpuzRsG1oBtWTHk2PGZ7GR+2Vz5iYGelAw8dx32K0y7PjVuxK6z1nMpZOqAFsRUPCkK1YjJ56qJlgw==
   /@eslint/eslintrc/0.2.2:
     dependencies:
       ajv: 6.12.6
@@ -1282,9 +1295,9 @@ packages:
     requiresBuild: true
     resolution:
       integrity: sha512-t5/Mq0VtL7khYQtbap8myr7RwyIvmruCFxsph6oTi8QZaklmuxSp7FAC2DWBz8r/KoZFngMpmliKfDrWN7uwzQ==
-  /@remix-run/cli/0.9.0-pre.3_react-dom@17.0.1+react@17.0.1:
+  /@remix-run/cli/0.9.0_react-dom@17.0.1+react@17.0.1:
     dependencies:
-      '@remix-run/core': 0.9.0-pre.3_react-dom@17.0.1+react@17.0.1
+      '@remix-run/core': 0.9.0_react-dom@17.0.1+react@17.0.1
       meow: 7.1.1
     dev: false
     hasBin: true
@@ -1292,9 +1305,9 @@ packages:
       react: '*'
       react-dom: '*'
     resolution:
-      integrity: sha512-qd8hHt1fBdOWjdHqnA3wVaCnJtiO0N7r9F6Nz4jzFdfhAw/zoB28+f1+wyRX12Im2E2hz0dPXTXBtgGWucY/gg==
-      tarball: download/@remix-run/cli/0.9.0-pre.3/f0289883afe934f09812853143216047297a09e3c93e6bf01a376ab024c86210
-  /@remix-run/core/0.9.0-pre.3_react-dom@17.0.1+react@17.0.1:
+      integrity: sha512-Lm5XilqUaDXEvqyF+/PiDq4mEpwSPBSA6uq01WjV8TnKI9SQhPRWBC2ZcPQumZ4t9ydDPMpr1dF0Z4U6mU1/tw==
+      tarball: download/@remix-run/cli/0.9.0/07fcf5f7a0e8a7743b34e2f34cf0afb1fa11ff9fd81a12c819df31e55781ba10
+  /@remix-run/core/0.9.0_react-dom@17.0.1+react@17.0.1:
     dependencies:
       '@babel/core': 7.12.10
       '@babel/preset-env': 7.12.11_@babel+core@7.12.10
@@ -1303,9 +1316,9 @@ packages:
       '@mdx-js/mdx': 1.6.22
       '@rollup/plugin-alias': 3.1.1_rollup@2.36.1
       '@rollup/plugin-babel': 5.2.2_e0cada4da7a71db21bdab1b0cd39501f
-      '@rollup/plugin-commonjs': 15.1.0_rollup@2.36.1
+      '@rollup/plugin-commonjs': 17.0.0_rollup@2.36.1
       '@rollup/plugin-json': 4.1.0_rollup@2.36.1
-      '@rollup/plugin-node-resolve': 9.0.0_rollup@2.36.1
+      '@rollup/plugin-node-resolve': 11.0.1_rollup@2.36.1
       '@rollup/plugin-replace': 2.3.4_rollup@2.36.1
       chokidar: 3.5.0
       express: 4.17.1
@@ -1326,21 +1339,21 @@ packages:
       react: '>=16.8'
       react-dom: '>=16.8'
     resolution:
-      integrity: sha512-N+SGbQsAlgzkEGwjv2YKVWRG4j2+c6AL3hsVrIX0Lqzr+gO5XgfwvR9QHLcB5mzJgdMLS0w/iIfgxG7t3zRlMQ==
-      tarball: download/@remix-run/core/0.9.0-pre.3/022f128d271329a5c413bfd44a838eef27b33a3da92f36a741861bc7e1b6c672
-  /@remix-run/data/0.9.0-pre.3_react-dom@17.0.1+react@17.0.1:
+      integrity: sha512-c1TDmZ53VSrtrdcHHTDCivyh9IMhiUTwC9mDPx+2KF66bOZ2odOMi79lqem/O1HKG30GCdc+i9p0Quoh8GBuDQ==
+      tarball: download/@remix-run/core/0.9.0/ce17d501981f67e2bd545cab2f4d9103bcca04b737781b4d8a76828c3dc359a5
+  /@remix-run/data/0.9.0_react-dom@17.0.1+react@17.0.1:
     dependencies:
-      '@remix-run/core': 0.9.0-pre.3_react-dom@17.0.1+react@17.0.1
+      '@remix-run/core': 0.9.0_react-dom@17.0.1+react@17.0.1
     dev: false
     peerDependencies:
       react: '*'
       react-dom: '*'
     resolution:
-      integrity: sha512-osuJYS1ScJF9bKPJeaP1Dnmm3xc43Y/DsRW16OGA9HlHxPkrEwN7JQVuALX80DaxR+V5ElaWZE9kDSVB/YKGFA==
-      tarball: download/@remix-run/data/0.9.0-pre.3/b2691241b8f4711d369d3031f0000e74ae4a312ba4b3f79f79d9c6b4e6151eef
-  /@remix-run/express/0.9.0-pre.3_7518ea51717683a2178a01380c5fd210:
+      integrity: sha512-YO2DRn4jKJzsRLroNOHNjnA9b1cINKnWjTt2dap2n7wnE27Ve940kAPwCgRK4z8I/iwqFW3H7BWE+S97nTVu3Q==
+      tarball: download/@remix-run/data/0.9.0/d8050cd49ec0f21776fe0de4f953bb186902301cc54acf8027dda1d60ea2c0f1
+  /@remix-run/express/0.9.0_7518ea51717683a2178a01380c5fd210:
     dependencies:
-      '@remix-run/core': 0.9.0-pre.3_react-dom@17.0.1+react@17.0.1
+      '@remix-run/core': 0.9.0_react-dom@17.0.1+react@17.0.1
       express: 4.17.1
     dev: false
     peerDependencies:
@@ -1348,9 +1361,9 @@ packages:
       react: '*'
       react-dom: '*'
     resolution:
-      integrity: sha512-enugv6xsuO5DAE7Fsi8Dc0cGYiSNe8kfvpVaroIiDiON4n0fo9pri8wkzeiE38egjSOOrUoXe39TXstIaQbHsA==
-      tarball: download/@remix-run/express/0.9.0-pre.3/dc2d440692f0bba4d79aa8f14fcfdb89f7d8fa6623bc0095d20cdbf3b01c7239
-  /@remix-run/react/0.9.0-pre.3_react-dom@17.0.1+react@17.0.1:
+      integrity: sha512-tkgy6dskEWwd7SCEtXnCN9597zbq+on34fnaVofZf8du+fzDy6D0VxObvAJqFF1MPxaHao6eQjOlniCeM5SMSA==
+      tarball: download/@remix-run/express/0.9.0/1053f1be899b975faaf5938ae3204ada2339c75b24257a2f897a404003d7555c
+  /@remix-run/react/0.9.0_react-dom@17.0.1+react@17.0.1:
     dependencies:
       history: 5.0.0
       react: 17.0.1
@@ -1361,8 +1374,8 @@ packages:
       react: '>=16.8'
       react-dom: '>=16.8'
     resolution:
-      integrity: sha512-3gAGtsQiUHOAqYSa/JItYtVMYyczuUnMuer+f6794qi5PEmEvKpC/7J0lOy3zjZLRtZZ4ovVW7tIl6GJtwRiqg==
-      tarball: download/@remix-run/react/0.9.0-pre.3/8c3f2a723b0ff2bf599c0a7efa75e0384d95cd2521a9432983d9dbcebf7fbd14
+      integrity: sha512-c/0HczhJ35niTDC/9kLXYvwgPYe3UR110x4sZ2xPSizcu8l/CMHOpG46/a+HtkG32Ojo4sGY0LaRCk0uJ5/agQ==
+      tarball: download/@remix-run/react/0.9.0/d4e733e774e66c90e4460a4a33d6d8855971edc8e37c2eb4ad8ced197fe3bdcc
   /@rollup/plugin-alias/3.1.1_rollup@2.36.1:
     dependencies:
       rollup: 2.36.1
@@ -1392,7 +1405,7 @@ packages:
         optional: true
     resolution:
       integrity: sha512-MjmH7GvFT4TW8xFdIeFS3wqIX646y5tACdxkTO+khbHvS3ZcVJL6vkAHLw2wqPmkhwCfWHoNsp15VYNwW6JEJA==
-  /@rollup/plugin-commonjs/15.1.0_rollup@2.36.1:
+  /@rollup/plugin-commonjs/17.0.0_rollup@2.36.1:
     dependencies:
       '@rollup/pluginutils': 3.1.0_rollup@2.36.1
       commondir: 1.0.1
@@ -1406,9 +1419,9 @@ packages:
     engines:
       node: '>= 8.0.0'
     peerDependencies:
-      rollup: ^2.22.0
+      rollup: ^2.30.0
     resolution:
-      integrity: sha512-xCQqz4z/o0h2syQ7d9LskIMvBSH4PX5PjYdpSSvgS+pQik3WahkQVNWg3D8XJeYjZoVWnIUQYDghuEMRGrmQYQ==
+      integrity: sha512-/omBIJG1nHQc+bgkYDuLpb/V08QyutP9amOrJRUSlYJZP+b/68gM//D8sxJe3Yry2QnYIr3QjR3x4AlxJEN3GA==
   /@rollup/plugin-json/4.1.0_rollup@2.36.1:
     dependencies:
       '@rollup/pluginutils': 3.1.0_rollup@2.36.1
@@ -1418,7 +1431,7 @@ packages:
       rollup: ^1.20.0 || ^2.0.0
     resolution:
       integrity: sha512-yfLbTdNS6amI/2OpmbiBoW12vngr5NW2jCJVZSBEz+H5KfUJZ2M7sDjk0U6GOOdCWFVScShte29o9NezJ53TPw==
-  /@rollup/plugin-node-resolve/9.0.0_rollup@2.36.1:
+  /@rollup/plugin-node-resolve/11.0.1_rollup@2.36.1:
     dependencies:
       '@rollup/pluginutils': 3.1.0_rollup@2.36.1
       '@types/resolve': 1.17.1
@@ -1433,7 +1446,7 @@ packages:
     peerDependencies:
       rollup: ^1.20.0||^2.0.0
     resolution:
-      integrity: sha512-gPz+utFHLRrd41WMP13Jq5mqqzHL3OXrfj3/MkSyB6UBIcuNt9j60GCbarzMzdf1VHFpOxfQh/ez7wyadLMqkg==
+      integrity: sha512-ltlsj/4Bhwwhb+Nb5xCz/6vieuEj2/BAkkqVIKmZwC7pIdl8srmgmglE4S0jFlZa32K4qvdQ6NHdmpRKD/LwoQ==
   /@rollup/plugin-replace/2.3.4_rollup@2.36.1:
     dependencies:
       '@rollup/pluginutils': 3.1.0_rollup@2.36.1
@@ -1614,7 +1627,7 @@ packages:
   /@types/body-parser/1.19.0:
     dependencies:
       '@types/connect': 3.4.34
-      '@types/node': 14.14.20
+      '@types/node': 14.14.21
     dev: true
     resolution:
       integrity: sha512-W98JrE0j2K78swW4ukqMleo8R7h/pFETjM2DQ90MF6XK2i4LO4W3gQ71Lt4w3bfm2EvVSyWHplECvB5sK22yFQ==
@@ -1629,7 +1642,7 @@ packages:
       integrity: sha512-ToZRmwoeqRhzGIqMO9k8Hs1B9pFSGYCjHvMpPlgo+kQ4M7xaPwi2/5HjikJ0MOfPDFcAe9Qwl1SaULYCNE6jYg==
   /@types/connect/3.4.34:
     dependencies:
-      '@types/node': 14.14.20
+      '@types/node': 14.14.21
     dev: true
     resolution:
       integrity: sha512-ePPA/JuI+X0vb+gSWlPKOY0NdNAie/rPUqX2GUPpbZwiKTkSPhjXWuee47E4MtE54QVzGCQMQkAL6JhV2E1+cQ==
@@ -1658,8 +1671,13 @@ packages:
     resolution:
       integrity: sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==
   /@types/estree/0.0.45:
+    dev: true
     resolution:
       integrity: sha512-jnqIUKDUqJbDIUxm0Uj7bnlMnRm1T/eZ9N+AVMqhPgzrba2GhGG5o/jCTwmdPK709nEZsGoMzXEDUjcXHa3W0g==
+  /@types/estree/0.0.46:
+    dev: false
+    resolution:
+      integrity: sha512-laIjwTQaD+5DukBZaygQ79K1Z0jb1bPEMRrkXSLjtCcZm+abyp5YbrqpSLzD42FwWW6gK/aS4NYpJ804nG2brg==
   /@types/express-serve-static-core/4.17.17:
     dependencies:
       '@types/node': 14.14.20
@@ -1670,7 +1688,7 @@ packages:
       integrity: sha512-YYlVaCni5dnHc+bLZfY908IG1+x5xuibKZMGv8srKkvtul3wUuanYvpIj9GXXoWkQbaAdR+kgX46IETKUALWNQ==
   /@types/express-serve-static-core/4.17.18:
     dependencies:
-      '@types/node': 14.14.20
+      '@types/node': 14.14.21
       '@types/qs': 6.9.5
       '@types/range-parser': 1.2.3
     dev: true
@@ -1682,7 +1700,7 @@ packages:
     dev: true
     resolution:
       integrity: sha512-57DnyxiqClXOIjoCgeKCUYfKxBPOlOY/k+l1TPK+7bSwyiPTrS5FIk1Ycql7twk4wO7P5lfOVy6akDGiaMSLfw==
-  /@types/express/4.17.10:
+  /@types/express/4.17.11:
     dependencies:
       '@types/body-parser': 1.19.0
       '@types/express-serve-static-core': 4.17.18
@@ -1690,7 +1708,7 @@ packages:
       '@types/serve-static': 1.13.8
     dev: true
     resolution:
-      integrity: sha512-GRwKdE+iV6mA8glCvQ7W5iaoIhd6u1HDsNTF76UPRi7T89SLjOfeCLShVmQSgpXzcpf3zgcz2SbMiCcjnYRRxQ==
+      integrity: sha512-no+R6rW60JEc59977wIxreQVsIEOAYwgCqldrA/vkpCnbD7MqTefO97lmoBe4WE0F156bC4uLSP1XHDOySnChg==
   /@types/express/4.17.9:
     dependencies:
       '@types/body-parser': 1.19.0
@@ -1764,8 +1782,12 @@ packages:
     resolution:
       integrity: sha512-iiUgKzV9AuaEkZqkOLDIvlQiL6ltuZd9tGcW3gwpnX8JbuiuhFlEGmmFXEXkN50Cvq7Os88IY2v0dkDqXYWVgA==
   /@types/node/14.14.20:
+    dev: true
     resolution:
       integrity: sha512-Y93R97Ouif9JEOWPIUyU+eyIdyRqQR0I8Ez1dzku4hDx34NWh4HbtIc3WNzwB1Y9ULvNGeu5B8h8bVL5cAk4/A==
+  /@types/node/14.14.21:
+    resolution:
+      integrity: sha512-cHYfKsnwllYhjOzuC5q1VpguABBeecUp24yFluHpn/BQaVxB1CuQ1FSRZCzrPxrkIfWISXV2LbeoBthLWg0+0A==
   /@types/normalize-package-data/2.4.0:
     resolution:
       integrity: sha512-f5j5b/Gf71L+dbqxIpQ4Z2WlmI/mPJ0fOkGGmFgtb6sAu97EPczzbS3/tJKxmcYDj55OX6ssqwDAWOHIYDRDGA==
@@ -1810,7 +1832,7 @@ packages:
       integrity: sha512-8l2gr2OQ969ypa7hFOeKqtFoY70XkHxISV0pAwmQ2nm6CSPb1brmTmqJCGGrekCo+pAZyWlNXr+Kvo6L/1wijA==
   /@types/resolve/1.17.1:
     dependencies:
-      '@types/node': 14.14.20
+      '@types/node': 14.14.21
     dev: false
     resolution:
       integrity: sha512-yy7HuzQhj0dhGpD8RLXSZWEkLsV9ibvxvi6EiJ3bkqLAO1RGo0WbkWQiwpRlSFymTJRz0d3k5LM3kkx8ArDbLw==
@@ -1823,7 +1845,7 @@ packages:
   /@types/serve-static/1.13.8:
     dependencies:
       '@types/mime': 2.0.3
-      '@types/node': 14.14.20
+      '@types/node': 14.14.21
     dev: true
     resolution:
       integrity: sha512-MoJhSQreaVoL+/hurAZzIm8wafFR6ajiTM1m4A0kv6AGeVBl4r4pOV8bGFrjjq1sGxDTnCoF8i22o0/aE5XCyA==
@@ -2450,11 +2472,11 @@ packages:
       node: '>= 0.8'
     resolution:
       integrity: sha512-NF+epuEdnUYVlGuhaxbbq+dvJttwLnGY+YixlXlME5KpQ5W3CnXA5cVTneY3SPbPDRkcjMbifrwmFYcClgOZeg==
-  /binary-extensions/2.1.0:
+  /binary-extensions/2.2.0:
     engines:
       node: '>=8'
     resolution:
-      integrity: sha512-1Yj8h9Q+QDF5FzhMs/c9+6UntbD5MkRfRwac8DoEm9ZfUBZ7tZ55YcGVAzEe4bXsdQHEk+s9S5wsOKVdZrw0tQ==
+      integrity: sha512-jDctJ/IVQbZoJykoeHbhXpOlNBqGNcwXJKJog42E5HDPUwQTSdjCHdihjj0DlnheQ7blbT6dHOafNAiS8ooQKA==
   /bn.js/4.11.9:
     dev: true
     resolution:
@@ -4245,6 +4267,27 @@ packages:
     dev: true
     resolution:
       integrity: sha512-E1fz2Xs9ltlUp+qbiyx9wmt2n9dRzPsS11Jtdb8D2o+cC7wr9xkkKsVKJuBX0ST+LVS+LhLO+SbLJNtfWcJvXA==
+  /framer-motion/3.2.1_react-dom@17.0.1+react@17.0.1:
+    dependencies:
+      framesync: 5.0.0
+      hey-listen: 1.0.8
+      popmotion: 9.1.0
+      react: 17.0.1
+      react-dom: 17.0.1_react@17.0.1
+      style-value-types: 4.0.1
+      tslib: 1.14.1
+    dev: false
+    optionalDependencies:
+      '@emotion/is-prop-valid': 0.8.8
+    peerDependencies:
+      react: '>=16.8'
+      react-dom: '>=16.8'
+    resolution:
+      integrity: sha512-5AWrh4JElgFAXWLqk0u8lVcdkigyuofyEy2LSsjuCxKbAb1hHqRn3PPdrV0KgPrysTHq95QO1bHFTLA7/Q8g+Q==
+  /framesync/5.0.0:
+    dev: false
+    resolution:
+      integrity: sha512-wd8t+JsQGisluSv1twiEeDv0aNGpavGb9q7xgIk9fGbcIWkNXF/KVtrjnOrCwBWJuiXxlJfNkcvGudsI32FxYA==
   /fresh/0.5.2:
     dev: false
     engines:
@@ -4592,6 +4635,10 @@ packages:
     dev: false
     resolution:
       integrity: sha512-24Bc6LKmamKHzGiNC80/r9v/7pQrma2V5KlaLUHGoarqm+hggmxnngU+RjHQT8sANWPa5FWKLftn4fpmvry/7w==
+  /hey-listen/1.0.8:
+    dev: false
+    resolution:
+      integrity: sha512-COpmrF2NOg4TBWUJ5UVyaCU2A88wEMkUPK4hNqyCkqHbxT92BbvfjoSozkAIIm6XhicGlJHhFdullInrdhwU8Q==
   /history/5.0.0:
     dependencies:
       '@babel/runtime': 7.12.5
@@ -4868,7 +4915,7 @@ packages:
       integrity: sha512-eVRqCvVlZbuw3GrM63ovNSNAeA1K16kaR/LRY/92w0zxQ5/1YzwblUX652i4Xs9RwAGjW9d9y6X88t8OaAJfWQ==
   /is-binary-path/2.1.0:
     dependencies:
-      binary-extensions: 2.1.0
+      binary-extensions: 2.2.0
     engines:
       node: '>=8'
     resolution:
@@ -4998,7 +5045,7 @@ packages:
       integrity: sha512-YWnfyRwxL/+SsrWYfOpUtz5b3YD+nyfkHvjbcanzk8zgyO4ASD67uVMRt8k5bM4lLMDnXfriRhOpemw+NfT1eA==
   /is-reference/1.2.1:
     dependencies:
-      '@types/estree': 0.0.45
+      '@types/estree': 0.0.46
     dev: false
     resolution:
       integrity: sha512-U82MsXXiFIrjCK4otLT+o2NA2Cd2g5MLoOVXUZjIOhLurrRxpEXzI8O0KZHr3IjLvlAH1kTPYSuqer5T9ZVBKQ==
@@ -5068,7 +5115,7 @@ packages:
       integrity: sha1-6PvzdNxVb/iUehDcsFctYz8s+hA=
   /jest-worker/26.6.2:
     dependencies:
-      '@types/node': 14.14.20
+      '@types/node': 14.14.21
       merge-stream: 2.0.0
       supports-color: 7.2.0
     engines:
@@ -6254,6 +6301,15 @@ packages:
     dev: true
     resolution:
       integrity: sha512-gQR3WpIgNIKwBMVLkpMUeR3e1/E1y42bqDQZfql+kDeXd8COYfM8PQA4X6y7a8u9Ua9FHmsrrmirW2vHs45hWg==
+  /popmotion/9.1.0:
+    dependencies:
+      framesync: 5.0.0
+      hey-listen: 1.0.8
+      style-value-types: 4.0.1
+      tslib: 1.14.1
+    dev: false
+    resolution:
+      integrity: sha512-+J7pzzBy5kk2qsP8ilowKs/CH+HoZa3kOGEBNCleCvsPXEF3nKHdfAR3SboMyPvdpIrofaT7ZIy/xWgz446Azw==
   /postcss-cli/8.3.1_postcss@8.2.4:
     dependencies:
       chalk: 4.1.0
@@ -6890,7 +6946,7 @@ packages:
       regenerate: 1.4.2
       regenerate-unicode-properties: 8.2.0
       regjsgen: 0.5.2
-      regjsparser: 0.6.4
+      regjsparser: 0.6.6
       unicode-match-property-ecmascript: 1.0.4
       unicode-match-property-value-ecmascript: 1.2.0
     dev: false
@@ -6918,13 +6974,13 @@ packages:
     dev: false
     resolution:
       integrity: sha512-OFFT3MfrH90xIW8OOSyUrk6QHD5E9JOTeGodiJeBS3J6IwlgzJMNE/1bZklWz5oTg+9dCMyEetclvCVXOPoN3A==
-  /regjsparser/0.6.4:
+  /regjsparser/0.6.6:
     dependencies:
       jsesc: 0.5.0
     dev: false
     hasBin: true
     resolution:
-      integrity: sha512-64O87/dPDgfk8/RQqC4gkZoGyyWFIEUTTh80CU6CWuK5vkCGyekIx+oKcEIYtP/RAxSQltCZHCNu/mdd7fqlJw==
+      integrity: sha512-jjyuCp+IEMIm3N1H1LLTJW1EISEJV9+5oHdEyrt43Pg9cDSb6rrLZei2cVWpl0xTjmmlpec/lEQGYgM7xfpGCQ==
   /remark-footnotes/2.0.0:
     dev: false
     resolution:
@@ -7557,6 +7613,13 @@ packages:
     dev: false
     resolution:
       integrity: sha512-CzFnRRXhzWIdItT3OmF8SQfWyahHhjq3HwcMNCNLn+N7klOOqPjMeG/4JSu77D7ypZdGvSzvkrbyeTMizz2VrA==
+  /style-value-types/4.0.1:
+    dependencies:
+      hey-listen: 1.0.8
+      tslib: 1.14.1
+    dev: false
+    resolution:
+      integrity: sha512-aOV/HHyynIyTmU27qfs0oAHhFde6BFIvV4+nMerE2MAPZMwYOeQk1/F3S6djxF2u4HdbiieCPs3ZzWsbNUoc9A==
   /stylelint-config-prettier/8.0.2_stylelint@13.8.0:
     dependencies:
       stylelint: 13.8.0
@@ -7864,7 +7927,6 @@ packages:
     resolution:
       integrity: sha512-dRcuzokWhajtZWkQsDVKbWyY+jgcLC5sqJhg2PSgf4ZkH2aHPvaOY8YWGhmjb68b5qqTfasSsDO9k7RUiEmZAw==
   /tslib/1.14.1:
-    dev: true
     resolution:
       integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
   /tslib/2.1.0:
@@ -8436,19 +8498,19 @@ specifiers:
   '@mcansh/eslint-config': 3.0.1
   '@prisma/cli': 2.14.0
   '@prisma/client': 2.14.0
-  '@remix-run/cli': 0.9.0-pre.3
-  '@remix-run/core': 0.9.0-pre.3
-  '@remix-run/data': 0.9.0-pre.3
-  '@remix-run/express': 0.9.0-pre.3
-  '@remix-run/react': 0.9.0-pre.3
+  '@remix-run/cli': 0.9.0
+  '@remix-run/core': 0.9.0
+  '@remix-run/data': 0.9.0
+  '@remix-run/express': 0.9.0
+  '@remix-run/react': 0.9.0
   '@svgr/core': 5.5.0
   '@tailwindcss/forms': 0.2.1
   '@types/connect-redis': 0.0.16
   '@types/dotenv-safe': 8.1.1
-  '@types/express': 4.17.10
+  '@types/express': 4.17.11
   '@types/express-session': 1.17.3
   '@types/ms': 0.7.31
-  '@types/node': 14.14.20
+  '@types/node': 14.14.21
   '@types/react': 17.0.0
   '@types/react-dom': 17.0.0
   '@types/secure-password': 3.1.0
@@ -8464,6 +8526,7 @@ specifiers:
   eslint: 7.17.0
   express: 4.17.1
   express-session: 1.17.1
+  framer-motion: 3.2.1
   heroicons: 0.4.2
   husky: 4.3.7
   ioredis: 4.19.4
