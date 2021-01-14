@@ -1,10 +1,10 @@
 const flashTypes = {
-  errorDetails: 'errorDetails',
   success: 'success',
   error: 'error',
+  errorDetails: 'errorDetails',
   info: 'info',
 } as const;
 
-export type Flash = typeof flashTypes;
+export type Flash = keyof typeof flashTypes;
 
 export { flashTypes };
