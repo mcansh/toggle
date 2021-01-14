@@ -6,6 +6,9 @@ import { parseFormBody, redirect } from '@remix-run/data';
 import type { RemixContext } from '../context';
 import { hash } from '../lib/auth';
 import { flashTypes } from '../lib/flash';
+import { Fieldset } from '../components/form/fieldset';
+import { Input } from '../components/form/input';
+import { SubmitButton } from '../components/form/button';
 
 function meta() {
   return {
@@ -24,42 +27,37 @@ function Register() {
       </h1>
 
       <Form method="post" action="/register">
-        <fieldset disabled={!!pendingForm} className="flex flex-col space-y-4">
-          <input
+        <Fieldset disabled={!!pendingForm}>
+          <Input
+            label="Full Name"
             type="text"
             autoComplete="name"
             placeholder="name"
             name="name"
-            className="w-full border-2 rounded"
           />
-          <input
+          <Input
+            label="Email"
             type="email"
             autoComplete="email"
             placeholder="email"
             name="email"
-            className="w-full border-2 rounded"
           />
-          <input
+          <Input
+            label="Username"
             type="text"
             autoComplete="username"
             placeholder="username"
             name="username"
-            className="w-full border-2 rounded"
           />
-          <input
+          <Input
+            label="Password"
             type="password"
             autoComplete="new-password"
             placeholder="password"
             name="password"
-            className="w-full border-2 rounded"
           />
-          <button
-            type="submit"
-            className="py-1 font-medium leading-loose text-white uppercase transition duration-150 bg-pink-500 rounded-full shadow-lg hover:bg-pink-800 focus:bg-pink-800"
-          >
-            Register
-          </button>
-        </fieldset>
+          <SubmitButton type="submit">Register</SubmitButton>
+        </Fieldset>
       </Form>
 
       <div className="mt-4">

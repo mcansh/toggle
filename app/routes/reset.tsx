@@ -9,6 +9,9 @@ import { addHours } from 'date-fns';
 import { makeANiceEmail, client } from '../lib/mail';
 import type { RemixContext } from '../context';
 import { flashTypes } from '../lib/flash';
+import { Input } from '../components/form/input';
+import { SubmitButton } from '../components/form/button';
+import { Fieldset } from '../components/form/fieldset';
 
 const meta = () => ({ title: 'Request a password reset | Toggle' });
 
@@ -20,28 +23,17 @@ const RequestPasswordReset: React.VFC = () => {
       <h1 className="mb-4 text-3xl font-medium text-center">
         Request a password reset
       </h1>
-      <Form
-        autoComplete="off"
-        method="POST"
-        action="/reset"
-        className="w-10/12 mx-auto mt-8 max-w-7xl"
-      >
-        <fieldset disabled={!!pendingForm} className="grid gap-6">
-          <label className="block">
-            <span>Email: </span>
-            <input
-              className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-              type="email"
-              name="email"
-            />
-          </label>
-          <button
-            className="block w-full py-2 mt-1 leading-relaxed border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-            type="submit"
-          >
-            Request Reset
-          </button>
-        </fieldset>
+      <Form method="POST" action="/reset">
+        <Fieldset disabled={!!pendingForm}>
+          <Input
+            autoComplete="email"
+            label="Email"
+            type="email"
+            name="email"
+            placeholder="jane@doe.com"
+          />
+          <SubmitButton type="submit">Request Reset</SubmitButton>
+        </Fieldset>
       </Form>
     </>
   );

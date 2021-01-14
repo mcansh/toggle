@@ -129,7 +129,6 @@ const FeatureChannelPage: React.VFC = () => {
         autoComplete="off"
         method="POST"
         action={`/channel/${data.channel.teamId}/${data.channel.slug}`}
-        className="w-10/12 mx-auto mt-8 max-w-7xl"
       >
         <fieldset disabled={!!pendingForm} className="grid gap-6">
           <label>

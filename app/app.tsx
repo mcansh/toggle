@@ -32,7 +32,7 @@ function App() {
           </div>
           <div className="mt-20" />
         </noscript>
-        <div className="w-10/12 mx-auto mt-8 max-w-7xl">
+        <div className="w-10/12 h-full mx-auto max-w-7xl">
           {Object.keys(data.flash).length > 0 && (
             <div className="grid gap-2 mb-2">
               {data.flash.errorDetails && (

@@ -11,6 +11,9 @@ import type { RemixContext } from '../context';
 import { makeANiceEmail, client } from '../lib/mail';
 import { hash, verify } from '../lib/auth';
 import { flashTypes } from '../lib/flash';
+import { Input } from '../components/form/input';
+import { SubmitButton } from '../components/form/button';
+import { Fieldset } from '../components/form/fieldset';
 
 function meta() {
   return {
@@ -27,35 +30,27 @@ function Login() {
       <h1 className="mb-4 text-3xl font-medium text-center">
         Welcome Back to Feature Flags!
       </h1>
-      <Form autoComplete="off" method="post" action="/login">
-        <fieldset disabled={!!pendingForm} className="grid gap-6">
-          <label className="block">
-            <span>Email: </span>
-            <input
-              required
-              placeholder="jane@doe.com"
-              className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-              type="email"
-              name="email"
-            />
-          </label>
-          <label className="block">
-            <span>Password: </span>
-            <input
-              required
-              placeholder="jane@doe.com"
-              className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-              type="password"
-              name="password"
-            />
-          </label>
-          <button
-            className="block w-full py-2 mt-1 leading-relaxed border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-            type="submit"
-          >
-            Login
-          </button>
-        </fieldset>
+      <Form method="post" action="/login">
+        <Fieldset disabled={!!pendingForm}>
+          <Input
+            type="email"
+            label="Email"
+            name="email"
+            placeholder="jane@doe.com"
+            autoComplete="email"
+          />
+          <Input
+            type="password"
+            label="Password"
+            name="password"
+            autoComplete="current-password"
+            placeholder={`thequickbrownfoxjumpedoverthelazydog`
+              .split('')
+              .map(() => '•')
+              .join('')}
+          />
+          <SubmitButton type="submit">Login</SubmitButton>
+        </Fieldset>
       </Form>
 
       <div className="mt-4">
