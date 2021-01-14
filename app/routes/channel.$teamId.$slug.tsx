@@ -11,6 +11,9 @@ import { pascalCase } from 'change-case';
 
 import type { RemixContext } from '../context';
 import { flashTypes } from '../lib/flash';
+import { Fieldset } from '../components/form/fieldset';
+import { Input, InputOnly, Label } from '../components/form/input';
+import { SubmitButton } from '../components/form/button';
 
 function meta({ data }: { data: Data }) {
   if (!data.channel) {
@@ -129,21 +132,18 @@ const FeatureChannelPage: React.VFC = () => {
         autoComplete="off"
         method="POST"
         action={`/channel/${data.channel.teamId}/${data.channel.slug}`}
+        className="pt-6"
       >
-        <fieldset disabled={!!pendingForm} className="grid gap-6">
-          <label>
-            <span className="block">Name: </span>
-            <input
-              placeholder="MyNewFeature"
-              className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-              type="text"
-              name="name"
-              value={form.name}
-              onChange={handleFormChange}
-            />
-          </label>
-          <label>
-            <span className="block">Type: </span>
+        <Fieldset disabled={!!pendingForm}>
+          <Input
+            name="name"
+            label="Name"
+            type="text"
+            placeholder="MyNewFeature"
+            value={form.name}
+            onChange={handleFormChange}
+          />
+          <Label label="Type">
             <select
               className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
               name="type"
@@ -154,9 +154,8 @@ const FeatureChannelPage: React.VFC = () => {
               <option value="boolean">Boolean</option>
               <option value="number">Number</option>
             </select>
-          </label>
-          <label>
-            <span className="block">Value: </span>
+          </Label>
+          <Label label="Value">
             {form.type === 'boolean' ? (
               <>
                 <Switch
@@ -183,7 +182,7 @@ const FeatureChannelPage: React.VFC = () => {
                     )}
                   />
                 </Switch>
-                <input
+                <InputOnly
                   type="text"
                   hidden
                   name="value"
@@ -192,9 +191,8 @@ const FeatureChannelPage: React.VFC = () => {
                 />
               </>
             ) : form.type === 'number' ? (
-              <input
+              <InputOnly
                 placeholder="25"
-                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 type="text"
                 name="value"
                 value={form.value}
@@ -203,26 +201,19 @@ const FeatureChannelPage: React.VFC = () => {
                 pattern="[0-9]*"
               />
             ) : (
-              <input
+              <InputOnly
                 placeholder="http://someapi.ff.io"
-                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 type="text"
                 name="value"
                 value={form.value}
                 onChange={handleFormChange}
               />
             )}
-          </label>
-          <button
-            className="block w-full py-2 mt-1 leading-relaxed border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-            type="submit"
-          >
-            Create{' '}
-            <span role="img" aria-label="check mark">
-              ✅
-            </span>
-          </button>
-        </fieldset>
+          </Label>
+          <SubmitButton type="submit">
+            Creat{pendingForm ? 'ing' : 'e'} Feature Toggle
+          </SubmitButton>
+        </Fieldset>
       </Form>
     </>
   );

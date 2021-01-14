@@ -16,15 +16,29 @@ interface MyProps {
 
 interface Props extends FinalInputProps, MyProps {}
 
-const Input: React.VFC<Props> = ({ type = 'text', label, ...props }) => (
+const Label: React.FC<{ label: string }> = ({ children, label }) => (
   <label className="block">
     <span>{label}: </span>
-    <input
-      className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-      type={type}
-      {...props}
-    />
+    {children}
   </label>
 );
 
-export { Input };
+const InputOnly: React.VFC<FinalInputProps> = ({ type = 'text', ...props }) => (
+  <input
+    className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 disabled:bg-indigo-100"
+    type={type}
+    {...props}
+  />
+);
+
+const Input: React.VFC<Props> = ({ type = 'text', label, ...props }) => (
+  <Label label={label}>
+    <input
+      className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 disabled:bg-indigo-100"
+      type={type}
+      {...props}
+    />
+  </Label>
+);
+
+export { Input, Label, InputOnly };

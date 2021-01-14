@@ -5,7 +5,7 @@ interface Props {
 }
 
 const Fieldset: React.FC<Props> = ({ children, disabled }) => (
-  <fieldset disabled={disabled} className="grid gap-6">
+  <fieldset disabled={disabled} className="grid gap-6 disabled:opacity-50">
     {children}
   </fieldset>
 );
