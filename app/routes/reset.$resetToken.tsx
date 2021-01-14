@@ -22,23 +22,30 @@ const ChangePasswordPage: React.VFC = () => {
   const { resetToken } = useRouteData<{ resetToken: string }>();
 
   return (
-    <Form method="POST" action={`/reset/${resetToken}`}>
-      <Fieldset disabled={!!pendingForm}>
-        <Input
-          label="New Password"
-          type="password"
-          autoComplete="new-password"
-          name="password"
-        />
-        <Input
-          label="Confirm Password"
-          type="password"
-          autoComplete="new-password"
-          name="confirmPassword"
-        />
-        <SubmitButton type="submit">Change Password</SubmitButton>
-      </Fieldset>
-    </Form>
+    <div className="grid h-full place-items-center">
+      <div className="w-full">
+        <h1 className="mb-4 text-3xl font-medium text-center">
+          Request Your Password
+        </h1>
+        <Form method="POST" action={`/reset/${resetToken}`}>
+          <Fieldset disabled={!!pendingForm}>
+            <Input
+              label="New Password"
+              type="password"
+              autoComplete="new-password"
+              name="password"
+            />
+            <Input
+              label="Confirm Password"
+              type="password"
+              autoComplete="new-password"
+              name="confirmPassword"
+            />
+            <SubmitButton type="submit">Change Password</SubmitButton>
+          </Fieldset>
+        </Form>
+      </div>
+    </div>
   );
 };
 

@@ -19,23 +19,25 @@ const RequestPasswordReset: React.VFC = () => {
   const pendingForm = usePendingLocation();
 
   return (
-    <>
-      <h1 className="mb-4 text-3xl font-medium text-center">
-        Request a password reset
-      </h1>
-      <Form method="POST" action="/reset">
-        <Fieldset disabled={!!pendingForm}>
-          <Input
-            autoComplete="email"
-            label="Email"
-            type="email"
-            name="email"
-            placeholder="jane@doe.com"
-          />
-          <SubmitButton type="submit">Request Reset</SubmitButton>
-        </Fieldset>
-      </Form>
-    </>
+    <div className="grid h-full place-items-center">
+      <div className="w-full">
+        <h1 className="mb-4 text-3xl font-medium text-center">
+          Request a password reset
+        </h1>
+        <Form method="POST" action="/reset">
+          <Fieldset disabled={!!pendingForm}>
+            <Input
+              autoComplete="email"
+              label="Email"
+              type="email"
+              name="email"
+              placeholder="jane@doe.com"
+            />
+            <SubmitButton type="submit">Request Reset</SubmitButton>
+          </Fieldset>
+        </Form>
+      </div>
+    </div>
   );
 };
 

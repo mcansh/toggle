@@ -26,53 +26,55 @@ function Login() {
   const pendingForm = usePendingFormSubmit();
 
   return (
-    <>
-      <h1 className="mb-4 text-3xl font-medium text-center">
-        Welcome Back to Feature Flags!
-      </h1>
-      <Form method="post" action="/login">
-        <Fieldset disabled={!!pendingForm}>
-          <Input
-            type="email"
-            label="Email"
-            name="email"
-            placeholder="jane@doe.com"
-            autoComplete="email"
-          />
-          <Input
-            type="password"
-            label="Password"
-            name="password"
-            autoComplete="current-password"
-            placeholder={`thequickbrownfoxjumpedoverthelazydog`
-              .split('')
-              .map(() => '•')
-              .join('')}
-          />
-          <SubmitButton type="submit">Login</SubmitButton>
-        </Fieldset>
-      </Form>
+    <div className="grid h-full place-items-center">
+      <div className="w-full">
+        <h1 className="mb-4 text-3xl font-medium text-center">
+          Welcome Back to Feature Flags!
+        </h1>
+        <Form method="post" action="/login">
+          <Fieldset disabled={!!pendingForm}>
+            <Input
+              type="email"
+              label="Email"
+              name="email"
+              placeholder="jane@doe.com"
+              autoComplete="email"
+            />
+            <Input
+              type="password"
+              label="Password"
+              name="password"
+              autoComplete="current-password"
+              placeholder={`thequickbrownfoxjumpedoverthelazydog`
+                .split('')
+                .map(() => '•')
+                .join('')}
+            />
+            <SubmitButton type="submit">Login</SubmitButton>
+          </Fieldset>
+        </Form>
 
-      <div className="mt-4">
-        <h2>
-          Don&apos;t have an account yet? No sweat, you can{' '}
-          <Link
-            className="text-blue-500 transition duration-150 hover:text-blue-800 focus:text-blue-800 ease"
-            to="/register"
-          >
-            sign up
-          </Link>{' '}
-          here, or you can reset your password{' '}
-          <Link
-            className="text-blue-500 transition duration-150 hover:text-blue-800 focus:text-blue-800 ease"
-            to="/reset"
-          >
-            here
-          </Link>{' '}
-          if you forgot it.
-        </h2>
+        <div className="mt-4">
+          <h2>
+            Don&apos;t have an account yet? No sweat, you can{' '}
+            <Link
+              className="text-blue-500 transition duration-150 hover:text-blue-800 focus:text-blue-800 ease"
+              to="/register"
+            >
+              sign up
+            </Link>{' '}
+            here, or you can reset your password{' '}
+            <Link
+              className="text-blue-500 transition duration-150 hover:text-blue-800 focus:text-blue-800 ease"
+              to="/reset"
+            >
+              here
+            </Link>{' '}
+            if you forgot it.
+          </h2>
+        </div>
       </div>
-    </>
+    </div>
   );
 }
 

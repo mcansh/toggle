@@ -21,58 +21,60 @@ function Register() {
   const pendingForm = usePendingFormSubmit();
 
   return (
-    <>
-      <h1 className="mb-4 text-3xl font-medium text-center">
-        Welcome to Feature Flags!
-      </h1>
+    <div className="grid h-full place-items-center">
+      <div className="w-full">
+        <h1 className="mb-4 text-3xl font-medium text-center">
+          Welcome to Feature Flags!
+        </h1>
 
-      <Form method="post" action="/register">
-        <Fieldset disabled={!!pendingForm}>
-          <Input
-            label="Full Name"
-            type="text"
-            autoComplete="name"
-            placeholder="name"
-            name="name"
-          />
-          <Input
-            label="Email"
-            type="email"
-            autoComplete="email"
-            placeholder="email"
-            name="email"
-          />
-          <Input
-            label="Username"
-            type="text"
-            autoComplete="username"
-            placeholder="username"
-            name="username"
-          />
-          <Input
-            label="Password"
-            type="password"
-            autoComplete="new-password"
-            placeholder="password"
-            name="password"
-          />
-          <SubmitButton type="submit">Register</SubmitButton>
-        </Fieldset>
-      </Form>
+        <Form method="post" action="/register">
+          <Fieldset disabled={!!pendingForm}>
+            <Input
+              label="Full Name"
+              type="text"
+              autoComplete="name"
+              placeholder="name"
+              name="name"
+            />
+            <Input
+              label="Email"
+              type="email"
+              autoComplete="email"
+              placeholder="email"
+              name="email"
+            />
+            <Input
+              label="Username"
+              type="text"
+              autoComplete="username"
+              placeholder="username"
+              name="username"
+            />
+            <Input
+              label="Password"
+              type="password"
+              autoComplete="new-password"
+              placeholder="password"
+              name="password"
+            />
+            <SubmitButton type="submit">Register</SubmitButton>
+          </Fieldset>
+        </Form>
 
-      <div className="mt-4">
-        <h2>
-          Already have an account yet? Awesome, you can{' '}
-          <Link
-            className="text-blue-500 transition duration-150 hover:text-blue-800 focus:text-blue-800 ease"
-            to="/login"
-          >
-            log in
-          </Link>{' '}
-          here
-        </h2>
+        <div className="mt-4">
+          <h2>
+            Already have an account yet? Awesome, you can{' '}
+            <Link
+              className="text-blue-500 transition duration-150 hover:text-blue-800 focus:text-blue-800 ease"
+              to="/login"
+            >
+              log in
+            </Link>{' '}
+            here
+          </h2>
+        </div>
       </div>
-    </>
+    </div>
   );
 }
 
