@@ -34,9 +34,9 @@ function App() {
         </noscript>
         <div className="w-10/12 h-full mx-auto max-w-7xl">
           {Object.keys(data.flash).length > 0 && (
-            <div className="grid gap-2 mb-2">
+            <div className="absolute grid w-10/12 gap-2 mb-2 top-4">
               {data.flash.errorDetails && (
-                <details className="px-1 py-2 font-mono text-white bg-blue-700 rounded-lg">
+                <details className="px-4 py-2 font-mono text-white bg-blue-700 rounded-lg">
                   <summary>Error Details</summary>
                   <pre className="max-w-full overflow-scroll">
                     {data.flash.errorDetails}
@@ -44,17 +44,17 @@ function App() {
                 </details>
               )}
               {data.flash.error && (
-                <span className="px-1 py-2 text-white bg-red-500 rounded-lg">
+                <span className="px-4 py-2 text-white bg-red-500 rounded-lg">
                   {data.flash.error}
                 </span>
               )}
               {data.flash.success && (
-                <span className="px-1 py-2 text-white bg-green-400 rounded-lg">
+                <span className="px-4 py-2 text-white bg-green-400 rounded-lg">
                   {data.flash.success}
                 </span>
               )}
               {data.flash.info && (
-                <span className="px-1 py-2 text-white bg-indigo-500 rounded-lg">
+                <span className="px-4 py-2 text-white bg-indigo-500 rounded-lg">
                   {data.flash.info}
                 </span>
               )}
