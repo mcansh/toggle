@@ -10,6 +10,64 @@ import { Fieldset } from '../components/form/fieldset';
 import { Input } from '../components/form/input';
 import { SubmitButton } from '../components/form/button';
 
+const loader: Loader = ({ session }) => {
+  if (session.get('userId')) {
+    return redirect('/');
+  }
+
+  return {};
+};
+
+const action: Action = async ({ session, request, context }) => {
+  const { prisma } = context as RemixContext;
+  const body = await parseFormBody(request);
+
+  const name = body.get('name') as string;
+  const email = body.get('email') as string;
+  const username = body.get('username') as string;
+  const password = body.get('password') as string;
+
+  try {
+    const hashedPassword = await hash(password);
+    const user = await prisma.user.create({
+      data: {
+        email,
+        name,
+        username,
+        hashedPassword,
+        teams: {
+          create: {
+            name: `${username}'s team`,
+            featureChannels: {
+              create: {
+                name: 'My first feature channel!',
+                slug: 'my-first-feature-channel',
+              },
+            },
+          },
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    session.set('userId', user.id);
+
+    return redirect('/');
+  } catch (error) {
+    console.error(error);
+    if (error instanceof Error) {
+      session.flash(flashTypes.error, `Something went wrong`);
+      session.flash(
+        flashTypes.errorDetails,
+        JSON.stringify({ name: error.name, message: error.message }, null, 2)
+      );
+    }
+    return redirect('/register');
+  }
+};
+
 function meta() {
   return {
     title: 'Register | Toggle',
@@ -77,64 +135,6 @@ function Register() {
     </div>
   );
 }
-
-const loader: Loader = ({ session }) => {
-  if (session.get('userId')) {
-    return redirect('/');
-  }
-
-  return {};
-};
-
-const action: Action = async ({ session, request, context }) => {
-  const { prisma } = context as RemixContext;
-  const body = await parseFormBody(request);
-
-  const name = body.get('name') as string;
-  const email = body.get('email') as string;
-  const username = body.get('username') as string;
-  const password = body.get('password') as string;
-
-  try {
-    const hashedPassword = await hash(password);
-    const user = await prisma.user.create({
-      data: {
-        email,
-        name,
-        username,
-        hashedPassword,
-        teams: {
-          create: {
-            name: `${username}'s team`,
-            featureChannels: {
-              create: {
-                name: 'My first feature channel!',
-                slug: 'my-first-feature-channel',
-              },
-            },
-          },
-        },
-      },
-      select: {
-        id: true,
-      },
-    });
-
-    session.set('userId', user.id);
-
-    return redirect('/');
-  } catch (error) {
-    console.error(error);
-    if (error instanceof Error) {
-      session.flash(flashTypes.error, `Something went wrong`);
-      session.flash(
-        flashTypes.errorDetails,
-        JSON.stringify({ name: error.name, message: error.message }, null, 2)
-      );
-    }
-    return redirect('/register');
-  }
-};
 
 export default Register;
 export { loader, action, Register, meta };

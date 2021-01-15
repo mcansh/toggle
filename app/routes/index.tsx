@@ -7,6 +7,43 @@ import { redirect } from '@remix-run/data';
 import type { RemixContext } from '../context';
 import PlusIcon from '../components/icons/solid/plus';
 
+const loader: Loader = async ({ session, context }) => {
+  const { prisma } = context as RemixContext;
+  const userId = session.get('userId');
+
+  if (!userId) {
+    session.set('returnTo', '/');
+    return redirect('/login');
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      teams: { select: { id: true } },
+    },
+  });
+
+  if (!user) {
+    session.unset('userId');
+    return redirect('/login');
+  }
+
+  const ids = user.teams.map(team => team.id);
+
+  const teams = await prisma.team.findMany({
+    where: {
+      id: { in: ids },
+    },
+    include: {
+      featureChannels: {
+        include: { flags: true },
+      },
+    },
+  });
+
+  return { teams, teamCount: teams.length };
+};
+
 function meta() {
   return {
     title: 'Toggle',
@@ -58,43 +95,6 @@ function Index() {
     </>
   );
 }
-
-const loader: Loader = async ({ session, context }) => {
-  const { prisma } = context as RemixContext;
-  const userId = session.get('userId');
-
-  if (!userId) {
-    session.set('returnTo', '/');
-    return redirect('/login');
-  }
-
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: {
-      teams: { select: { id: true } },
-    },
-  });
-
-  if (!user) {
-    session.unset('userId');
-    return redirect('/login');
-  }
-
-  const ids = user.teams.map(team => team.id);
-
-  const teams = await prisma.team.findMany({
-    where: {
-      id: { in: ids },
-    },
-    include: {
-      featureChannels: {
-        include: { flags: true },
-      },
-    },
-  });
-
-  return { teams, teamCount: teams.length };
-};
 
 export default Index;
 export { loader, meta };

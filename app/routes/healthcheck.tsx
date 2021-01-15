@@ -4,6 +4,27 @@ import type { Loader } from '@remix-run/data';
 
 import type { RemixContext } from '../context';
 
+const loader: Loader = async ({ context }) => {
+  const { prisma } = context as RemixContext;
+
+  try {
+    await prisma.flag.count();
+    return new Response(JSON.stringify({ ok: true }), {
+      status: 200,
+      headers: {
+        'content-type': 'application/json',
+      },
+    });
+  } catch (error) {
+    return new Response(JSON.stringify({ ok: false }), {
+      status: 500,
+      headers: {
+        'content-type': 'application/json',
+      },
+    });
+  }
+};
+
 function meta() {
   return {
     title: 'Health Check | Toggle',
@@ -29,27 +50,6 @@ function HealthCheckPage() {
     />
   );
 }
-
-const loader: Loader = async ({ context }) => {
-  const { prisma } = context as RemixContext;
-
-  try {
-    await prisma.flag.count();
-    return new Response(JSON.stringify({ ok: true }), {
-      status: 200,
-      headers: {
-        'content-type': 'application/json',
-      },
-    });
-  } catch (error) {
-    return new Response(JSON.stringify({ ok: false }), {
-      status: 500,
-      headers: {
-        'content-type': 'application/json',
-      },
-    });
-  }
-};
 
 export default HealthCheckPage;
 export { loader, meta };

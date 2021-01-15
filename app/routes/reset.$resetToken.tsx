@@ -11,44 +11,6 @@ import { SubmitButton } from '../components/form/button';
 import { Input } from '../components/form/input';
 import { Fieldset } from '../components/form/fieldset';
 
-function meta() {
-  return {
-    title: 'Reset Password | Toggle',
-  };
-}
-
-const ChangePasswordPage: React.VFC = () => {
-  const pendingForm = usePendingFormSubmit();
-  const { resetToken } = useRouteData<{ resetToken: string }>();
-
-  return (
-    <div className="grid h-full place-items-center">
-      <div className="w-full">
-        <h1 className="mb-4 text-3xl font-medium text-center">
-          Request Your Password
-        </h1>
-        <Form method="POST" action={`/reset/${resetToken}`}>
-          <Fieldset disabled={!!pendingForm}>
-            <Input
-              label="New Password"
-              type="password"
-              autoComplete="new-password"
-              name="password"
-            />
-            <Input
-              label="Confirm Password"
-              type="password"
-              autoComplete="new-password"
-              name="confirmPassword"
-            />
-            <SubmitButton type="submit">Change Password</SubmitButton>
-          </Fieldset>
-        </Form>
-      </div>
-    </div>
-  );
-};
-
 const loader: Loader = ({ params }) => ({ resetToken: params.resetToken });
 
 const action: Action = async ({ session, request, context, params }) => {
@@ -110,6 +72,44 @@ const action: Action = async ({ session, request, context, params }) => {
     );
     return redirect(pathname);
   }
+};
+
+function meta() {
+  return {
+    title: 'Reset Password | Toggle',
+  };
+}
+
+const ChangePasswordPage: React.VFC = () => {
+  const pendingForm = usePendingFormSubmit();
+  const { resetToken } = useRouteData<{ resetToken: string }>();
+
+  return (
+    <div className="grid h-full place-items-center">
+      <div className="w-full">
+        <h1 className="mb-4 text-3xl font-medium text-center">
+          Request Your Password
+        </h1>
+        <Form method="POST" action={`/reset/${resetToken}`}>
+          <Fieldset disabled={!!pendingForm}>
+            <Input
+              label="New Password"
+              type="password"
+              autoComplete="new-password"
+              name="password"
+            />
+            <Input
+              label="Confirm Password"
+              type="password"
+              autoComplete="new-password"
+              name="confirmPassword"
+            />
+            <SubmitButton type="submit">Change Password</SubmitButton>
+          </Fieldset>
+        </Form>
+      </div>
+    </div>
+  );
 };
 
 export default ChangePasswordPage;

@@ -15,6 +15,120 @@ import { Fieldset } from '../components/form/fieldset';
 import { Input, InputOnly, Label } from '../components/form/input';
 import { SubmitButton } from '../components/form/button';
 
+const loader: Loader = async ({ request, context, session, params }) => {
+  const { prisma } = context as RemixContext;
+
+  const { pathname } = new URL(request.url);
+
+  const userId = session.get('userId');
+
+  if (!userId) {
+    session.set('returnTo', pathname);
+    return redirect('/login');
+  }
+
+  const teamChannels = await prisma.team.findUnique({
+    where: { id: params.teamId },
+    select: { featureChannels: true },
+  });
+
+  const matchingChannel = teamChannels?.featureChannels.find(
+    c => c.slug === params.slug
+  );
+
+  if (matchingChannel) {
+    const channel = await prisma.featureChannel.findUnique({
+      where: { id: matchingChannel.id },
+      include: { flags: { orderBy: { updatedAt: 'desc' } } },
+    });
+
+    return { channel };
+  }
+
+  return new Response(JSON.stringify({ channel: undefined }), {
+    status: 404,
+    headers: {
+      'content-type': 'application/json',
+    },
+  });
+};
+
+const action: Action = async ({ context, params, request, session }) => {
+  // verify session
+  const userId = session.get('userId');
+
+  const { pathname } = new URL(request.url);
+
+  if (!userId) {
+    session.set('returnTo', pathname);
+    return redirect('/login');
+  }
+
+  const { prisma } = context as RemixContext;
+  const body = await parseFormBody(request);
+  const method: string = (body.get('_method') ?? request.method).toUpperCase();
+
+  try {
+    if (method === 'DELETE') {
+      const featureId = body.get('featureId') as string;
+      await prisma.flag.delete({ where: { id: featureId } });
+      return redirect(pathname);
+    }
+
+    if (method === 'POST') {
+      const channel = await prisma.featureChannel.findFirst({
+        where: {
+          teamId: params.teamId,
+          slug: params.slug,
+        },
+      });
+
+      if (!channel) {
+        session.flash(flashTypes.error, 'Something went wrong');
+        return redirect(pathname);
+      }
+
+      const featureName = body.get('name') as string;
+      const featureType = body.get('type') as FlagType;
+      const featureValue = body.get('value') as string;
+
+      await prisma.flag.create({
+        data: {
+          createdBy: {
+            connect: { id: userId },
+          },
+          lastUpdatedBy: {
+            connect: { id: userId },
+          },
+          feature: featureName.includes(' ')
+            ? pascalCase(featureName)
+            : featureName,
+          type: featureType,
+          value: featureValue,
+          team: {
+            connect: { id: params.teamId },
+          },
+          featureChannel: {
+            connect: { id: channel.id },
+          },
+        },
+      });
+
+      return redirect(pathname);
+    }
+  } catch (error) {
+    session.flash(flashTypes.error, 'Something went wrong');
+    session.flash(
+      flashTypes.errorDetails,
+      JSON.stringify({ name: error.name, message: error.message }, null, 2)
+    );
+    return redirect(pathname);
+  }
+
+  session.flash(flashTypes.error, `invalid request method "${method}"`);
+  return redirect(pathname);
+};
+
 function meta({ data }: { data: Data }) {
   if (!data.channel) {
     return {
@@ -217,120 +331,6 @@ const FeatureChannelPage: React.VFC = () => {
       </Form>
     </>
   );
-};
-
-const loader: Loader = async ({ request, context, session, params }) => {
-  const { prisma } = context as RemixContext;
-
-  const { pathname } = new URL(request.url);
-
-  const userId = session.get('userId');
-
-  if (!userId) {
-    session.set('returnTo', pathname);
-    return redirect('/login');
-  }
-
-  const teamChannels = await prisma.team.findUnique({
-    where: { id: params.teamId },
-    select: { featureChannels: true },
-  });
-
-  const matchingChannel = teamChannels?.featureChannels.find(
-    c => c.slug === params.slug
-  );
-
-  if (matchingChannel) {
-    const channel = await prisma.featureChannel.findUnique({
-      where: { id: matchingChannel.id },
-      include: { flags: { orderBy: { updatedAt: 'desc' } } },
-    });
-
-    return { channel };
-  }
-
-  return new Response(JSON.stringify({ channel: undefined }), {
-    status: 404,
-    headers: {
-      'content-type': 'application/json',
-    },
-  });
-};
-
-const action: Action = async ({ context, params, request, session }) => {
-  // verify session
-  const userId = session.get('userId');
-
-  const { pathname } = new URL(request.url);
-
-  if (!userId) {
-    session.set('returnTo', pathname);
-    return redirect('/login');
-  }
-
-  const { prisma } = context as RemixContext;
-  const body = await parseFormBody(request);
-  const method: string = (body.get('_method') ?? request.method).toUpperCase();
-
-  try {
-    if (method === 'DELETE') {
-      const featureId = body.get('featureId') as string;
-      await prisma.flag.delete({ where: { id: featureId } });
-      return redirect(pathname);
-    }
-
-    if (method === 'POST') {
-      const channel = await prisma.featureChannel.findFirst({
-        where: {
-          teamId: params.teamId,
-          slug: params.slug,
-        },
-      });
-
-      if (!channel) {
-        session.flash(flashTypes.error, 'Something went wrong');
-        return redirect(pathname);
-      }
-
-      const featureName = body.get('name') as string;
-      const featureType = body.get('type') as FlagType;
-      const featureValue = body.get('value') as string;
-
-      await prisma.flag.create({
-        data: {
-          createdBy: {
-            connect: { id: userId },
-          },
-          lastUpdatedBy: {
-            connect: { id: userId },
-          },
-          feature: featureName.includes(' ')
-            ? pascalCase(featureName)
-            : featureName,
-          type: featureType,
-          value: featureValue,
-          team: {
-            connect: { id: params.teamId },
-          },
-          featureChannel: {
-            connect: { id: channel.id },
-          },
-        },
-      });
-
-      return redirect(pathname);
-    }
-  } catch (error) {
-    session.flash(flashTypes.error, 'Something went wrong');
-    session.flash(
-      flashTypes.errorDetails,
-      JSON.stringify({ name: error.name, message: error.message }, null, 2)
-    );
-    return redirect(pathname);
-  }
-
-  session.flash(flashTypes.error, `invalid request method "${method}"`);
-  return redirect(pathname);
 };
 
 export default FeatureChannelPage;

@@ -15,69 +15,6 @@ import { Input } from '../components/form/input';
 import { SubmitButton } from '../components/form/button';
 import { Fieldset } from '../components/form/fieldset';
 
-function meta() {
-  return {
-    title: 'Login | Toggle',
-    description: 'Welcome to remix!',
-  };
-}
-
-function Login() {
-  const pendingForm = usePendingFormSubmit();
-
-  return (
-    <div className="grid h-full place-items-center">
-      <div className="w-full">
-        <h1 className="mb-4 text-3xl font-medium text-center">
-          Welcome Back to Feature Flags!
-        </h1>
-        <Form method="post" action="/login">
-          <Fieldset disabled={!!pendingForm}>
-            <Input
-              type="email"
-              label="Email"
-              name="email"
-              placeholder="jane@doe.com"
-              autoComplete="email"
-            />
-            <Input
-              type="password"
-              label="Password"
-              name="password"
-              autoComplete="current-password"
-              placeholder={`thequickbrownfoxjumpedoverthelazydog`
-                .split('')
-                .map(() => '•')
-                .join('')}
-            />
-            <SubmitButton type="submit">Login</SubmitButton>
-          </Fieldset>
-        </Form>
-
-        <div className="mt-4">
-          <h2>
-            Don&apos;t have an account yet? No sweat, you can{' '}
-            <Link
-              className="text-blue-500 transition duration-150 hover:text-blue-800 focus:text-blue-800 ease"
-              to="/register"
-            >
-              sign up
-            </Link>{' '}
-            here, or you can reset your password{' '}
-            <Link
-              className="text-blue-500 transition duration-150 hover:text-blue-800 focus:text-blue-800 ease"
-              to="/reset"
-            >
-              here
-            </Link>{' '}
-            if you forgot it.
-          </h2>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 const loader: Loader = ({ session }) => {
   if (session.get('userId')) {
     return redirect('/');
@@ -86,7 +23,6 @@ const loader: Loader = ({ session }) => {
   return {};
 };
 
-// eslint-disable-next-line max-statements
 const action: Action = async ({ session, request, context }) => {
   const { prisma } = context as RemixContext;
   const body = await parseFormBody(request);
@@ -182,5 +118,68 @@ const action: Action = async ({ session, request, context }) => {
   }
 };
 
-export default Login;
+function meta() {
+  return {
+    title: 'Login | Toggle',
+    description: 'Welcome to remix!',
+  };
+}
+
+function LoginPage() {
+  const pendingForm = usePendingFormSubmit();
+
+  return (
+    <div className="grid h-full place-items-center">
+      <div className="w-full">
+        <h1 className="mb-4 text-3xl font-medium text-center">
+          Welcome Back to Feature Flags!
+        </h1>
+        <Form method="post" action="/login">
+          <Fieldset disabled={!!pendingForm}>
+            <Input
+              type="email"
+              label="Email"
+              name="email"
+              placeholder="jane@doe.com"
+              autoComplete="email"
+            />
+            <Input
+              type="password"
+              label="Password"
+              name="password"
+              autoComplete="current-password"
+              placeholder={`thequickbrownfoxjumpedoverthelazydog`
+                .split('')
+                .map(() => '•')
+                .join('')}
+            />
+            <SubmitButton type="submit">Login</SubmitButton>
+          </Fieldset>
+        </Form>
+
+        <div className="mt-4">
+          <h2>
+            Don&apos;t have an account yet? No sweat, you can{' '}
+            <Link
+              className="text-blue-500 transition duration-150 hover:text-blue-800 focus:text-blue-800 ease"
+              to="/register"
+            >
+              sign up
+            </Link>{' '}
+            here, or you can reset your password{' '}
+            <Link
+              className="text-blue-500 transition duration-150 hover:text-blue-800 focus:text-blue-800 ease"
+              to="/reset"
+            >
+              here
+            </Link>{' '}
+            if you forgot it.
+          </h2>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default LoginPage;
 export { meta, loader, action };

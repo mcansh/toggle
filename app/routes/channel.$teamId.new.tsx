@@ -7,52 +7,6 @@ import slugify from 'slugify';
 import type { RemixContext } from '../context';
 import { flashTypes } from '../lib/flash';
 
-function meta() {
-  return {
-    title: `Create new Feature Channel | Toggle`,
-  };
-}
-
-const FeatureChannelPage: React.VFC = () => {
-  const pendingForm = usePendingFormSubmit();
-  const data = useRouteData<{ teamId: string }>();
-
-  return (
-    <>
-      <h1 className="py-2 text-2xl font-medium">
-        Create a new Feature Channel
-      </h1>
-
-      <Form
-        autoComplete="off"
-        method="post"
-        action={`/channel/${data.teamId}/new`}
-      >
-        <fieldset disabled={!!pendingForm} className="grid gap-6">
-          <label className="block">
-            <span>Name: </span>
-            <input
-              placeholder="My new channel"
-              className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-              type="text"
-              name="name"
-            />
-          </label>
-          <button
-            className="block w-full py-2 mt-1 leading-relaxed border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-            type="submit"
-          >
-            Create{' '}
-            <span role="img" aria-label="check mark">
-              ✅
-            </span>
-          </button>
-        </fieldset>
-      </Form>
-    </>
-  );
-};
-
 const loader: Loader = async ({ session, request, context, params }) => {
   const userId = session.get('userId');
 
@@ -123,6 +77,52 @@ const action: Action = async ({ session, request, context, params }) => {
     );
     return redirect(pathname);
   }
+};
+
+function meta() {
+  return {
+    title: `Create new Feature Channel | Toggle`,
+  };
+}
+
+const FeatureChannelPage: React.VFC = () => {
+  const pendingForm = usePendingFormSubmit();
+  const data = useRouteData<{ teamId: string }>();
+
+  return (
+    <>
+      <h1 className="py-2 text-2xl font-medium">
+        Create a new Feature Channel
+      </h1>
+
+      <Form
+        autoComplete="off"
+        method="post"
+        action={`/channel/${data.teamId}/new`}
+      >
+        <fieldset disabled={!!pendingForm} className="grid gap-6">
+          <label className="block">
+            <span>Name: </span>
+            <input
+              placeholder="My new channel"
+              className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              type="text"
+              name="name"
+            />
+          </label>
+          <button
+            className="block w-full py-2 mt-1 leading-relaxed border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+            type="submit"
+          >
+            Create{' '}
+            <span role="img" aria-label="check mark">
+              ✅
+            </span>
+          </button>
+        </fieldset>
+      </Form>
+    </>
+  );
 };
 
 export default FeatureChannelPage;

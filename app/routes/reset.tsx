@@ -13,34 +13,6 @@ import { Input } from '../components/form/input';
 import { SubmitButton } from '../components/form/button';
 import { Fieldset } from '../components/form/fieldset';
 
-const meta = () => ({ title: 'Request a password reset | Toggle' });
-
-const RequestPasswordReset: React.VFC = () => {
-  const pendingForm = usePendingLocation();
-
-  return (
-    <div className="grid h-full place-items-center">
-      <div className="w-full">
-        <h1 className="mb-4 text-3xl font-medium text-center">
-          Request a password reset
-        </h1>
-        <Form method="POST" action="/reset">
-          <Fieldset disabled={!!pendingForm}>
-            <Input
-              autoComplete="email"
-              label="Email"
-              type="email"
-              name="email"
-              placeholder="jane@doe.com"
-            />
-            <SubmitButton type="submit">Request Reset</SubmitButton>
-          </Fieldset>
-        </Form>
-      </div>
-    </div>
-  );
-};
-
 const action: Action = async ({ session, request, context }) => {
   const { prisma } = context as RemixContext;
   const body = await parseFormBody(request);
@@ -80,5 +52,33 @@ const action: Action = async ({ session, request, context }) => {
   }
 };
 
-export default RequestPasswordReset;
+const meta = () => ({ title: 'Request a password reset | Toggle' });
+
+const RequestPasswordResetPage: React.VFC = () => {
+  const pendingForm = usePendingLocation();
+
+  return (
+    <div className="grid h-full place-items-center">
+      <div className="w-full">
+        <h1 className="mb-4 text-3xl font-medium text-center">
+          Request a password reset
+        </h1>
+        <Form method="POST" action="/reset">
+          <Fieldset disabled={!!pendingForm}>
+            <Input
+              autoComplete="email"
+              label="Email"
+              type="email"
+              name="email"
+              placeholder="jane@doe.com"
+            />
+            <SubmitButton type="submit">Request Reset</SubmitButton>
+          </Fieldset>
+        </Form>
+      </div>
+    </div>
+  );
+};
+
+export default RequestPasswordResetPage;
 export { meta, action };
