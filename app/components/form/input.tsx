@@ -1,5 +1,6 @@
 import * as React from 'react';
 import type { Except, SetRequired } from 'type-fest';
+import clsx from 'clsx';
 
 type InputProps = React.DetailedHTMLProps<
   React.InputHTMLAttributes<HTMLInputElement>,
@@ -25,7 +26,10 @@ const Label: React.FC<{ label: string }> = ({ children, label }) => (
 
 const InputOnly: React.VFC<FinalInputProps> = ({ type = 'text', ...props }) => (
   <input
-    className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 disabled:bg-indigo-100"
+    className={clsx(
+      'w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 disabled:bg-indigo-100',
+      props.hidden ? undefined : 'block'
+    )}
     type={type}
     {...props}
   />
@@ -33,11 +37,7 @@ const InputOnly: React.VFC<FinalInputProps> = ({ type = 'text', ...props }) => (
 
 const Input: React.VFC<Props> = ({ type = 'text', label, ...props }) => (
   <Label label={label}>
-    <input
-      className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 disabled:bg-indigo-100"
-      type={type}
-      {...props}
-    />
+    <InputOnly type={type} {...props} />
   </Label>
 );
 
