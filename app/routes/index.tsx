@@ -77,15 +77,16 @@ function Index() {
               </Link>
             </div>
 
-            <ul className="pl-6 list-disc">
+            <ul className="pl-6 mt-1 space-y-2 list-disc">
               {team.featureChannels.map(channel => (
                 <li key={channel.id}>
-                  <div className="space-x-2">
-                    <Link to={`/channel/${team.id}/${channel.slug}`}>
-                      {channel.name} - {channel.flags.length} Flag
-                      {channel.flags.length === 1 ? '' : 's'}
-                    </Link>
-                  </div>
+                  <Link
+                    to={`/channel/${team.id}/${channel.slug}`}
+                    className="p-1 bg-yellow-300 rounded"
+                  >
+                    {channel.name} - {channel.flags.length} Flag
+                    {channel.flags.length === 1 ? '' : 's'}
+                  </Link>
                 </li>
               ))}
             </ul>
