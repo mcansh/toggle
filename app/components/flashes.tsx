@@ -1,19 +1,31 @@
 import * as React from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 
 import type { Flash } from '../lib/flash';
 
+import { useMessages } from './flash-context';
 import { FlashMessage } from './flash';
 
-interface Props {
-  messages: Array<{ type: Flash; message: string }>;
-}
+const FlashMessages: React.VFC = () => {
+  const { messages } = useMessages();
 
-const FlashMessages: React.VFC<Props> = ({ messages }) => (
-  <div className="absolute grid w-10/12 gap-2 mb-2 top-4">
-    {messages.map(({ message, type }) => (
-      <FlashMessage key={type} type={type as Flash} message={message} />
-    ))}
-  </div>
-);
+  return (
+    <motion.div
+      transition={{ staggerChildren: 1 }}
+      className="absolute grid w-10/12 gap-2 mb-2 top-4"
+    >
+      <AnimatePresence>
+        {messages.map(({ message, type, id }) => (
+          <FlashMessage
+            key={id}
+            id={id}
+            type={type as Flash}
+            message={message}
+          />
+        ))}
+      </AnimatePresence>
+    </motion.div>
+  );
+};
 
 export { FlashMessages };

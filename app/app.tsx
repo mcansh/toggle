@@ -2,10 +2,11 @@ import * as React from 'react';
 import { Meta, Scripts, Styles, Routes, useGlobalData } from '@remix-run/react';
 
 import type { Flash } from './lib/flash';
+import { FlashProvider } from './components/flash-context';
 import { FlashMessages } from './components/flashes';
 
 interface Data {
-  flash: Array<{ type: Flash; message: string }>;
+  flash: Array<{ type: Flash; message: string; id: string }>;
 }
 
 function App() {
@@ -31,8 +32,10 @@ function App() {
           <div className="mt-20" />
         </noscript>
         <div className="w-10/12 h-full mx-auto max-w-7xl">
-          {data.flash.length > 0 && <FlashMessages messages={data.flash} />}
-          <Routes />
+          <FlashProvider messages={data.flash}>
+            <FlashMessages />
+            <Routes />
+          </FlashProvider>
         </div>
         <Scripts />
       </body>

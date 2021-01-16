@@ -1,4 +1,5 @@
 import type { Loader } from '@remix-run/data';
+import { v4 as uuid } from '@lukeed/uuid';
 
 import { flashTypes } from './lib/flash';
 
@@ -9,7 +10,7 @@ export const loader: Loader = ({ session }) => {
     .map(key => {
       const message = session.get(key);
       if (!message) return undefined;
-      return { type: key, message };
+      return { type: key, message, id: uuid() };
     })
     .filter((Boolean as unknown) as ExcludesFalse);
 
