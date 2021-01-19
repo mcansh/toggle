@@ -325,7 +325,7 @@ const FeatureChannelPage: React.VFC = () => {
             )}
           </Label>
           <SubmitButton type="submit">
-            Creat{pendingForm ? 'ing' : 'e'} Feature Toggle
+            Creat{pendingForm?.method === 'post' ? 'ing' : 'e'} Feature Toggle
           </SubmitButton>
         </Fieldset>
       </Form>
