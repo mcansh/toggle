@@ -1,7 +1,7 @@
 import * as React from 'react';
 import type { FeatureChannel, Flag, FlagType } from '@prisma/client';
 import type { Action, Loader } from '@remix-run/data';
-import { parseFormBody, redirect } from '@remix-run/data';
+import { redirect } from '@remix-run/data';
 import { Form, usePendingFormSubmit, useRouteData } from '@remix-run/react';
 import type { Except } from 'type-fest';
 import { format, isToday, parseISO } from 'date-fns';
@@ -65,7 +65,8 @@ const action: Action = async ({ context, params, request, session }) => {
   }
 
   const { prisma } = context as RemixContext;
-  const body = await parseFormBody(request);
+  const requestBody = await request.text();
+  const body = new URLSearchParams(requestBody);
   const method: string = (body.get('_method') ?? request.method).toUpperCase();
 
   try {

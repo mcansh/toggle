@@ -1,6 +1,6 @@
 import * as React from 'react';
 import type { Loader, Action } from '@remix-run/data';
-import { parseFormBody, redirect } from '@remix-run/data';
+import { redirect } from '@remix-run/data';
 import { Form, usePendingFormSubmit, useRouteData } from '@remix-run/react';
 import { subHours } from 'date-fns';
 
@@ -21,7 +21,8 @@ const action: Action = async ({ session, request, context, params }) => {
   const { pathname } = new URL(request.url);
 
   try {
-    const body = await parseFormBody(request);
+    const requestBody = await request.text();
+    const body = new URLSearchParams(requestBody);
 
     // 1. find user with that reset token and make sure it's still valid
     const user = await prisma.user.findFirst({

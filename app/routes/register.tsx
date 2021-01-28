@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Form, Link, usePendingFormSubmit } from '@remix-run/react';
 import type { Action, Loader } from '@remix-run/data';
-import { parseFormBody, redirect } from '@remix-run/data';
+import { redirect } from '@remix-run/data';
 
 import type { RemixContext } from '../context';
 import { hash } from '../lib/auth';
@@ -20,7 +20,8 @@ const loader: Loader = ({ session }) => {
 
 const action: Action = async ({ session, request, context }) => {
   const { prisma } = context as RemixContext;
-  const body = await parseFormBody(request);
+  const requestBody = await request.text();
+  const body = new URLSearchParams(requestBody);
 
   const name = body.get('name') as string;
   const email = body.get('email') as string;

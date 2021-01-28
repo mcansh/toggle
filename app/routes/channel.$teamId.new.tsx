@@ -1,6 +1,6 @@
 import * as React from 'react';
 import type { Action, Loader } from '@remix-run/data';
-import { parseFormBody, redirect } from '@remix-run/data';
+import { redirect } from '@remix-run/data';
 import { Form, usePendingFormSubmit, useRouteData } from '@remix-run/react';
 import slugify from 'slugify';
 
@@ -56,7 +56,8 @@ const action: Action = async ({ session, request, context, params }) => {
   const { prisma } = context as RemixContext;
 
   try {
-    const body = await parseFormBody(request);
+    const requestBody = await request.text();
+    const body = new URLSearchParams(requestBody);
     const channelName = body.get('name') as string;
 
     const channel = await prisma.featureChannel.create({

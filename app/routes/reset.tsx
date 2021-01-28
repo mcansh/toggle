@@ -2,7 +2,7 @@ import { randomBytes } from 'crypto';
 
 import * as React from 'react';
 import type { Action } from '@remix-run/data';
-import { parseFormBody, redirect } from '@remix-run/data';
+import { redirect } from '@remix-run/data';
 import { Form, usePendingLocation } from '@remix-run/react';
 import { addHours } from 'date-fns';
 
@@ -15,7 +15,9 @@ import { Fieldset } from '../components/form/fieldset';
 
 const action: Action = async ({ session, request, context }) => {
   const { prisma } = context as RemixContext;
-  const body = await parseFormBody(request);
+  const requestBody = await request.text();
+  const body = new URLSearchParams(requestBody);
+
   const email = body.get('email') as string;
 
   const resetTokenBuffer = randomBytes(20);

@@ -3,7 +3,7 @@ import { randomBytes } from 'crypto';
 import * as React from 'react';
 import { Form, Link, usePendingFormSubmit } from '@remix-run/react';
 import type { Action, Loader } from '@remix-run/data';
-import { parseFormBody, redirect } from '@remix-run/data';
+import { redirect } from '@remix-run/data';
 import { addHours } from 'date-fns';
 import SecurePassword from 'secure-password';
 
@@ -25,7 +25,9 @@ const loader: Loader = ({ session }) => {
 
 const action: Action = async ({ session, request, context }) => {
   const { prisma } = context as RemixContext;
-  const body = await parseFormBody(request);
+  const requestBody = await request.text();
+
+  const body = new URLSearchParams(requestBody);
 
   const email = body.get('email') as string;
   const password = body.get('password') as string;
