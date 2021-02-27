@@ -3,12 +3,11 @@
 declare namespace NodeJS {
   interface ProcessEnv {
     readonly DATABASE_URL: string;
-    readonly REDIS_HOST: string;
-    readonly REDIS_PORT: string;
-    readonly REDIS_PASSWORD: string;
-    readonly REMIX_REGISTRY_TOKEN: string;
-    readonly SESSION_PASSWORD: string;
-    readonly POSTMARK_API_KEY: string;
     readonly FRONTEND_URL: string;
+    readonly POSTMARK_API_KEY: string;
+    readonly REMIX_REGISTRY_TOKEN: string;
+    readonly REDIS_URL: string;
+    readonly SENTRY_DSN: string;
+    readonly SESSION_PASSWORD: string;
   }
 }
