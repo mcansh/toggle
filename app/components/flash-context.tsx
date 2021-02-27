@@ -27,7 +27,7 @@ const FlashProvider: React.FC<Pick<Context, 'messages'>> = ({
     if (messages.length !== currentMessages.length) {
       setMessages(messages);
     }
-  }, [messages]);
+  }, [currentMessages.length, messages]);
 
   return (
     <FlashContext.Provider value={{ messages: currentMessages, removeMessage }}>

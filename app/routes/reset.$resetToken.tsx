@@ -10,10 +10,12 @@ import { flashTypes } from '../lib/flash';
 import { SubmitButton } from '../components/form/button';
 import { Input } from '../components/form/input';
 import { Fieldset } from '../components/form/fieldset';
+import { getSession } from '../sessions';
 
 const loader: Loader = ({ params }) => ({ resetToken: params.resetToken });
 
-const action: Action = async ({ session, request, context, params }) => {
+const action: Action = async ({ request, context, params }) => {
+  const session = await getSession(request.headers.get('Cookie'));
   const { prisma } = context as RemixContext;
   const { resetToken } = params;
   const returnTo = session.get('returnTo') as string;

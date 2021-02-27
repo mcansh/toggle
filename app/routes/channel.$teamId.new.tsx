@@ -6,8 +6,10 @@ import slugify from 'slugify';
 
 import type { RemixContext } from '../context';
 import { flashTypes } from '../lib/flash';
+import { getSession } from '../sessions';
 
-const loader: Loader = async ({ session, request, context, params }) => {
+const loader: Loader = async ({ request, context, params }) => {
+  const session = await getSession(request.headers.get('Cookie'));
   const userId = session.get('userId');
 
   const { pathname } = new URL(request.url);

@@ -1,9 +1,15 @@
 import type { Loader } from '@remix-run/data';
 import { redirect } from '@remix-run/data';
 
-const loader: Loader = async ({ session }) => {
-  await session.destroy();
-  return redirect('/login');
+import { destroySession, getSession } from '../sessions';
+
+const loader: Loader = async ({ request }) => {
+  const session = await getSession(request.headers.get('Cookie'));
+  return redirect('/login', {
+    headers: {
+      'Set-Cookie': await destroySession(session),
+    },
+  });
 };
 
 const LogoutPage = () =>

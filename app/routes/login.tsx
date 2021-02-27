@@ -5,7 +5,6 @@ import { Form, Link, usePendingFormSubmit } from '@remix-run/react';
 import type { Action, Loader } from '@remix-run/data';
 import { redirect } from '@remix-run/data';
 import { addHours } from 'date-fns';
-import SecurePassword from 'secure-password';
 
 import type { RemixContext } from '../context';
 import { makeANiceEmail, client } from '../lib/mail';
@@ -14,16 +13,25 @@ import { flashTypes } from '../lib/flash';
 import { Input } from '../components/form/input';
 import { SubmitButton } from '../components/form/button';
 import { Fieldset } from '../components/form/fieldset';
+import { commitSession, getSession } from '../sessions';
 
-const loader: Loader = ({ session }) => {
+const loader: Loader = async ({ request }) => {
+  const session = await getSession(request.headers.get('Cookie'));
   if (session.get('userId')) {
-    return redirect('/');
+    return redirect('/', {
+      headers: {
+        'Set-Cookie': await commitSession(session),
+      },
+    });
   }
 
   return {};
 };
 
-const action: Action = async ({ session, request, context }) => {
+// eslint-disable-next-line max-statements
+const action: Action = async ({ request, context }) => {
+  const SecurePassword = await import('secure-password');
+  const session = await getSession(request.headers.get('Cookie'));
   const { prisma } = context as RemixContext;
   const requestBody = await request.text();
 
@@ -38,7 +46,11 @@ const action: Action = async ({ session, request, context }) => {
     if (!user) {
       session.unset('userId');
       session.flash(flashTypes.error, `Invalid credentials`);
-      return redirect('/login');
+      return redirect('/login', {
+        headers: {
+          'Set-Cookie': await commitSession(session),
+        },
+      });
     }
 
     if (user.hashedPassword === '""') {
@@ -66,7 +78,11 @@ const action: Action = async ({ session, request, context }) => {
         flashTypes.success,
         `check your email to finish resetting your password`
       );
-      return redirect('/login');
+      return redirect('/login', {
+        headers: {
+          'Set-Cookie': await commitSession(session),
+        },
+      });
     }
 
     const result = await verify(user.hashedPassword, password);
@@ -78,10 +94,18 @@ const action: Action = async ({ session, request, context }) => {
         const returnTo = session.get('returnTo');
 
         if (returnTo) {
-          return redirect(returnTo);
+          return redirect(returnTo, {
+            headers: {
+              'Set-Cookie': await commitSession(session),
+            },
+          });
         }
 
-        return redirect('/');
+        return redirect('/', {
+          headers: {
+            'Set-Cookie': await commitSession(session),
+          },
+        });
       }
 
       case SecurePassword.VALID_NEEDS_REHASH: {
@@ -96,15 +120,27 @@ const action: Action = async ({ session, request, context }) => {
         const returnTo = session.get('returnTo');
 
         if (returnTo) {
-          return redirect(returnTo);
+          return redirect(returnTo, {
+            headers: {
+              'Set-Cookie': await commitSession(session),
+            },
+          });
         }
 
-        return redirect('/');
+        return redirect('/', {
+          headers: {
+            'Set-Cookie': await commitSession(session),
+          },
+        });
       }
 
       default: {
         session.flash(flashTypes.error, `Invalid credentials`);
-        return redirect('/login');
+        return redirect('/login', {
+          headers: {
+            'Set-Cookie': await commitSession(session),
+          },
+        });
       }
     }
   } catch (error) {
@@ -116,7 +152,11 @@ const action: Action = async ({ session, request, context }) => {
         JSON.stringify({ name: error.name, message: error.message }, null, 2)
       );
     }
-    return redirect('/login');
+    return redirect('/login', {
+      headers: {
+        'Set-Cookie': await commitSession(session),
+      },
+    });
   }
 };
 

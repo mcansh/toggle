@@ -4,9 +4,9 @@ node_modules
 
 # various build directories and artifacts
 .cache
-/app-build
+/build
+/server-build
 /public/build
 /app/components/icons/**/*.tsx
 
 .env
-.vercel

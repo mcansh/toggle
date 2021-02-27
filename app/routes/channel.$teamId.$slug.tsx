@@ -4,18 +4,21 @@ import type { Action, Loader } from '@remix-run/data';
 import { redirect } from '@remix-run/data';
 import { Form, usePendingFormSubmit, useRouteData } from '@remix-run/react';
 import type { Except } from 'type-fest';
-import { format, isToday, parseISO } from 'date-fns';
 import { Switch } from '@headlessui/react';
 import clsx from 'clsx';
 import { pascalCase } from 'change-case';
+import { useTable } from 'react-table';
+import { ago } from 'time-ago';
 
 import type { RemixContext } from '../context';
 import { flashTypes } from '../lib/flash';
 import { Fieldset } from '../components/form/fieldset';
 import { Input, InputOnly, Label } from '../components/form/input';
 import { SubmitButton } from '../components/form/button';
+import { commitSession, getSession } from '../sessions';
 
-const loader: Loader = async ({ request, context, session, params }) => {
+const loader: Loader = async ({ request, context, params }) => {
+  const session = await getSession(request.headers.get('Cookie'));
   const { prisma } = context as RemixContext;
 
   const { pathname } = new URL(request.url);
@@ -24,59 +27,110 @@ const loader: Loader = async ({ request, context, session, params }) => {
 
   if (!userId) {
     session.set('returnTo', pathname);
-    return redirect('/login');
-  }
-
-  const teamChannels = await prisma.team.findUnique({
-    where: { id: params.teamId },
-    select: { featureChannels: true },
-  });
-
-  const matchingChannel = teamChannels?.featureChannels.find(
-    c => c.slug === params.slug
-  );
-
-  if (matchingChannel) {
-    const channel = await prisma.featureChannel.findUnique({
-      where: { id: matchingChannel.id },
-      include: { flags: { orderBy: { updatedAt: 'desc' } } },
+    return redirect('/login', {
+      headers: {
+        'Set-Cookie': await commitSession(session),
+      },
     });
-
-    return { channel };
   }
 
-  return new Response(JSON.stringify({ channel: undefined }), {
-    status: 404,
-    headers: {
-      'content-type': 'application/json',
+  const channel = await prisma.featureChannel.findFirst({
+    where: {
+      AND: [{ teamId: params.teamId }, { slug: params.slug }],
+    },
+    include: {
+      flags: {
+        orderBy: { updatedAt: 'desc' },
+        select: {
+          updatedAt: true,
+          feature: true,
+          type: true,
+          value: true,
+        },
+      },
     },
   });
+
+  if (!channel) {
+    return new Response(JSON.stringify({ channel: undefined }), {
+      status: 404,
+      headers: {
+        'Content-Type': 'application/json',
+        'Set-Cookie': await commitSession(session),
+      },
+    });
+  }
+
+  const channelColumns = [
+    {
+      Header: 'Feature',
+      accessor: 'feature',
+    },
+    {
+      Header: 'Type',
+      accessor: 'type',
+    },
+    {
+      Header: 'Updated',
+      accessor: 'updated',
+    },
+    {
+      Header: 'Value',
+      accessor: 'value',
+    },
+  ];
+
+  const channelData = channel.flags.map(flag => {
+    const updated = ago(flag.updatedAt);
+    return {
+      feature: flag.feature,
+      type: flag.type,
+      updated,
+      value: flag.value,
+    };
+  });
+
+  return new Response(
+    JSON.stringify({ channel, channelColumns, channelData }),
+    {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Set-Cookie': await commitSession(session),
+      },
+    }
+  );
 };
 
-const action: Action = async ({ context, params, request, session }) => {
+const action: Action = async ({ context, params, request }) => {
   // verify session
+  const session = await getSession(request.headers.get('Cookie'));
   const userId = session.get('userId');
 
   const { pathname } = new URL(request.url);
 
   if (!userId) {
     session.set('returnTo', pathname);
-    return redirect('/login');
+    return redirect('/login', {
+      headers: {
+        'Set-Cookie': await commitSession(session),
+      },
+    });
   }
 
   const { prisma } = context as RemixContext;
   const requestBody = await request.text();
   const body = new URLSearchParams(requestBody);
-  const method: string = (body.get('_method') ?? request.method).toUpperCase();
+  const method: string = (body.get('_method') ?? request.method).toLowerCase();
 
   try {
-    if (method === 'DELETE') {
+    if (method === 'delete') {
       const featureId = body.get('featureId') as string;
       await prisma.flag.delete({ where: { id: featureId } });
       return redirect(pathname);
     }
 
-    if (method === 'POST') {
+    if (method === 'post') {
       const channel = await prisma.featureChannel.findFirst({
         where: {
           teamId: params.teamId,
@@ -86,7 +140,11 @@ const action: Action = async ({ context, params, request, session }) => {
 
       if (!channel) {
         session.flash(flashTypes.error, 'Something went wrong');
-        return redirect(pathname);
+        return redirect(pathname, {
+          headers: {
+            'Set-Cookie': await commitSession(session),
+          },
+        });
       }
 
       const featureName = body.get('name') as string;
@@ -115,7 +173,11 @@ const action: Action = async ({ context, params, request, session }) => {
         },
       });
 
-      return redirect(pathname);
+      return redirect(pathname, {
+        headers: {
+          'Set-Cookie': await commitSession(session),
+        },
+      });
     }
   } catch (error) {
     session.flash(flashTypes.error, 'Something went wrong');
@@ -123,11 +185,19 @@ const action: Action = async ({ context, params, request, session }) => {
       flashTypes.errorDetails,
       JSON.stringify({ name: error.name, message: error.message }, null, 2)
     );
-    return redirect(pathname);
+    return redirect(pathname, {
+      headers: {
+        'Set-Cookie': await commitSession(session),
+      },
+    });
   }
 
   session.flash(flashTypes.error, `invalid request method "${method}"`);
-  return redirect(pathname);
+  return redirect(pathname, {
+    headers: {
+      'Set-Cookie': await commitSession(session),
+    },
+  });
 };
 
 function meta({ data }: { data: Data }) {
@@ -149,6 +219,8 @@ type StringDateFlag = Except<Flag, 'createdAt' | 'updatedAt'> & {
 
 interface Data {
   channel: (FeatureChannel & { flags: Array<StringDateFlag> }) | undefined;
+  channelColumns: Array<{ Header: string; accessor: string }>;
+  channelData: Array<any>;
 }
 
 interface BooleanForm {
@@ -180,6 +252,14 @@ const FeatureChannelPage: React.VFC = () => {
     value: '',
   });
 
+  const {
+    getTableProps,
+    getTableBodyProps,
+    headerGroups,
+    rows,
+    prepareRow,
+  } = useTable({ columns: data.channelColumns, data: data.channelData });
+
   if (!data.channel) {
     return <h1>Channel not found</h1>;
   }
@@ -199,40 +279,67 @@ const FeatureChannelPage: React.VFC = () => {
         {data.channel.name} Feature Flags
       </h1>
       {data.channel.flags.length > 0 ? (
-        <table className="w-full border rounded-md table-auto">
+        <table
+          {...getTableProps()}
+          style={{ border: 'solid 1px blue', borderSpacing: 0 }}
+          className="block max-w-full"
+        >
           <thead>
-            <tr className="text-left border-b divide-x">
-              <th>Feature</th>
-              <th>Type</th>
-              <th>Value</th>
-              <th>Updated At</th>
-              <th>Delete</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y">
-            {data.channel.flags.map(flag => {
-              const flagUpdatedDate = parseISO(flag.updatedAt);
-              const createdToday = isToday(flagUpdatedDate);
+            {headerGroups.map(headerGroup => {
+              const headerGroupProps = headerGroup.getHeaderGroupProps();
               return (
-                <tr key={flag.id} className="divide-x">
-                  <td>{flag.feature}</td>
-                  <td>{flag.type}</td>
-                  <td>{flag.value}</td>
-                  <td>
-                    <time dateTime={flag.updatedAt}>
-                      {format(flagUpdatedDate, createdToday ? 'p' : 'P')}
-                    </time>
-                  </td>
-                  <td>
-                    <Form
-                      className="text-center"
-                      action={`/channel/${data.channel?.teamId}/${data.channel?.slug}`}
-                      method="delete"
+                <tr
+                  {...headerGroupProps}
+                  key={headerGroupProps.key}
+                  className=""
+                >
+                  {headerGroup.headers.map(column => {
+                    const columnProps = column.getHeaderProps();
+                    return (
+                      <th
+                        className="p-2 border-b border-r"
+                        {...columnProps}
+                        key={columnProps.key}
+                      >
+                        {column.render('Header')}
+                      </th>
+                    );
+                  })}
+                  <th className="p-2 border-b border-r">Delete</th>
+                </tr>
+              );
+            })}
+          </thead>
+
+          <tbody {...getTableBodyProps()}>
+            {rows.map(row => {
+              prepareRow(row);
+              const rowProps = row.getRowProps();
+              return (
+                <tr {...rowProps} key={rowProps.key} className="text-center">
+                  {row.cells.map(cell => {
+                    const cellProps = cell.getCellProps();
+                    return (
+                      <td
+                        {...cellProps}
+                        key={cellProps.key}
+                        className="p-2 border-b border-r"
+                        style={{ width: '1%' }}
+                      >
+                        {cell.render('Cell')}
+                      </td>
+                    );
+                  })}
+                  <td className="p-2 border-b border-r" style={{ width: '1%' }}>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        // eslint-disable-next-line no-alert
+                        alert('flag deletion is temporarily disabled')
+                      }
                     >
-                      <input type="hidden" name="_method" value="DELETE" />
-                      <input type="hidden" name="featureId" value={flag.id} />
-                      <button type="submit">&times;</button>
-                    </Form>
+                      &times;
+                    </button>
                   </td>
                 </tr>
               );
@@ -245,7 +352,7 @@ const FeatureChannelPage: React.VFC = () => {
 
       <Form
         autoComplete="off"
-        method="POST"
+        method="post"
         action={`/channel/${data.channel.teamId}/${data.channel.slug}`}
         className="pt-6"
       >

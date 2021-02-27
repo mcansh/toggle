@@ -6,14 +6,20 @@ import { redirect } from '@remix-run/data';
 
 import type { RemixContext } from '../context';
 import PlusIcon from '../components/icons/solid/plus';
+import { commitSession, getSession } from '../sessions';
 
-const loader: Loader = async ({ session, context }) => {
+const loader: Loader = async ({ request, context }) => {
+  const session = await getSession(request.headers.get('Cookie'));
   const { prisma } = context as RemixContext;
   const userId = session.get('userId');
 
   if (!userId) {
     session.set('returnTo', '/');
-    return redirect('/login');
+    return redirect('/login', {
+      headers: {
+        'Set-Cookie': await commitSession(session),
+      },
+    });
   }
 
   const user = await prisma.user.findUnique({
@@ -25,7 +31,11 @@ const loader: Loader = async ({ session, context }) => {
 
   if (!user) {
     session.unset('userId');
-    return redirect('/login');
+    return redirect('/login', {
+      headers: {
+        'Set-Cookie': await commitSession(session),
+      },
+    });
   }
 
   const ids = user.teams.map(team => team.id);

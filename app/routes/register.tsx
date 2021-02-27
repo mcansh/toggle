@@ -9,8 +9,10 @@ import { flashTypes } from '../lib/flash';
 import { Fieldset } from '../components/form/fieldset';
 import { Input } from '../components/form/input';
 import { SubmitButton } from '../components/form/button';
+import { commitSession, getSession } from '../sessions';
 
-const loader: Loader = ({ session }) => {
+const loader: Loader = async ({ request }) => {
+  const session = await getSession(request.headers.get('Cookie'));
   if (session.get('userId')) {
     return redirect('/');
   }
@@ -18,7 +20,8 @@ const loader: Loader = ({ session }) => {
   return {};
 };
 
-const action: Action = async ({ session, request, context }) => {
+const action: Action = async ({ request, context }) => {
+  const session = await getSession(request.headers.get('Cookie'));
   const { prisma } = context as RemixContext;
   const requestBody = await request.text();
   const body = new URLSearchParams(requestBody);
@@ -55,7 +58,11 @@ const action: Action = async ({ session, request, context }) => {
 
     session.set('userId', user.id);
 
-    return redirect('/');
+    return redirect('/', {
+      headers: {
+        'Set-Cookie': await commitSession(session),
+      },
+    });
   } catch (error) {
     console.error(error);
     if (error instanceof Error) {
@@ -65,7 +72,11 @@ const action: Action = async ({ session, request, context }) => {
         JSON.stringify({ name: error.name, message: error.message }, null, 2)
       );
     }
-    return redirect('/register');
+    return redirect('/register', {
+      headers: {
+        'Set-Cookie': await commitSession(session),
+      },
+    });
   }
 };
 

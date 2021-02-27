@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Meta, Scripts, Styles, useRouteData } from '@remix-run/react';
+import type { LinksFunction } from '@remix-run/react';
+import { Meta, Scripts, Links, useRouteData } from '@remix-run/react';
 import type { Loader } from '@remix-run/data';
 import { v4 as uuid } from '@lukeed/uuid';
 import { Outlet } from 'react-router-dom';
@@ -8,10 +9,16 @@ import type { Flash } from './lib/flash';
 import { FlashProvider } from './components/flash-context';
 import { FlashMessages } from './components/flashes';
 import { flashTypes } from './lib/flash';
+import { commitSession, getSession } from './sessions';
+
+// eslint-disable-next-line import/extensions, import/no-unresolved, import/order
+import globalCSS from 'css:./styles/global.css';
 
 type ExcludesFalse = <T>(x: T | false) => x is T;
 
-const loader: Loader = ({ session }) => {
+const loader: Loader = async ({ request }) => {
+  const session = await getSession(request.headers.get('Cookie'));
+
   const messages = Object.keys(flashTypes)
     .map(key => {
       const message = session.get(key);
@@ -20,10 +27,18 @@ const loader: Loader = ({ session }) => {
     })
     .filter((Boolean as unknown) as ExcludesFalse);
 
-  return {
-    flash: messages,
-  };
+  const body = JSON.stringify({ flash: messages });
+
+  return new Response(body, {
+    status: 200,
+    headers: {
+      'Content-Type': 'application/json',
+      'Set-Cookie': await commitSession(session),
+    },
+  });
 };
+
+const links: LinksFunction = () => [{ rel: 'stylesheet', href: globalCSS }];
 
 interface Data {
   flash: Array<{ type: Flash; message: string; id: string }>;
@@ -38,7 +53,7 @@ function App() {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <Meta />
-        <Styles />
+        <Links />
       </head>
       <body>
         <noscript>
@@ -64,4 +79,4 @@ function App() {
 }
 
 export default App;
-export { loader };
+export { links, loader };
