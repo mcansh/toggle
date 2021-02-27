@@ -6,7 +6,7 @@ import slugify from 'slugify';
 
 import type { RemixContext } from '../context';
 import { flashTypes } from '../lib/flash';
-import { getSession } from '../sessions';
+import { commitSession, getSession } from '../sessions';
 
 const loader: Loader = async ({ request, context, params }) => {
   const session = await getSession(request.headers.get('Cookie'));
@@ -16,7 +16,11 @@ const loader: Loader = async ({ request, context, params }) => {
 
   if (!userId) {
     session.set('returnTo', pathname);
-    return redirect('/login');
+    return redirect('/login', {
+      headers: {
+        'Set-Cookie': await commitSession(session),
+      },
+    });
   }
 
   const { prisma } = context as RemixContext;
@@ -30,7 +34,11 @@ const loader: Loader = async ({ request, context, params }) => {
 
   if (!user) {
     session.set('returnTo', pathname);
-    return redirect('/login');
+    return redirect('/login', {
+      headers: {
+        'Set-Cookie': await commitSession(session),
+      },
+    });
   }
 
   const teamIds = user.teams.map(t => t.id);
@@ -40,19 +48,29 @@ const loader: Loader = async ({ request, context, params }) => {
   if (!userBelongsToTeam) {
     session.set('returnTo', pathname);
     session.flash(flashTypes.error, `You do not belong to that team`);
-    return redirect('/login');
+    return redirect('/login', {
+      headers: {
+        'Set-Cookie': await commitSession(session),
+      },
+    });
   }
 
   return { teamId: params.teamId };
 };
 
-const action: Action = async ({ session, request, context, params }) => {
+const action: Action = async ({ request, context, params }) => {
+  const session = await getSession(request.headers.get('Cookie'));
   const userId = session.get('userId');
 
   const { pathname } = new URL(request.url);
 
   if (!userId) {
     session.set('returnTo', pathname);
+    return redirect('/login', {
+      headers: {
+        'Set-Cookie': await commitSession(session),
+      },
+    });
   }
 
   const { prisma } = context as RemixContext;
@@ -78,7 +96,11 @@ const action: Action = async ({ session, request, context, params }) => {
       flashTypes.errorDetails,
       JSON.stringify({ name: error.name, message: error.message }, null, 2)
     );
-    return redirect(pathname);
+    return redirect(pathname, {
+      headers: {
+        'Set-Cookie': await commitSession(session),
+      },
+    });
   }
 };
 

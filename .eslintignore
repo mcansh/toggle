@@ -5,7 +5,7 @@ node_modules
 # various build directories and artifacts
 .cache
 /build
-/server-build
+/app-build
 /public/build
 /app/components/icons/**/*.tsx
 

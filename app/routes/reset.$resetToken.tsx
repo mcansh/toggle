@@ -10,7 +10,7 @@ import { flashTypes } from '../lib/flash';
 import { SubmitButton } from '../components/form/button';
 import { Input } from '../components/form/input';
 import { Fieldset } from '../components/form/fieldset';
-import { getSession } from '../sessions';
+import { commitSession, getSession } from '../sessions';
 
 const loader: Loader = ({ params }) => ({ resetToken: params.resetToken });
 
@@ -42,7 +42,11 @@ const action: Action = async ({ request, context, params }) => {
         flashTypes.error,
         'This token is either invalid or expired!'
       );
-      return redirect('/login');
+      return redirect('/login', {
+        headers: {
+          'Set-Cookie': await commitSession(session),
+        },
+      });
     }
 
     const password = body.get('password') as string;
@@ -51,7 +55,11 @@ const action: Action = async ({ request, context, params }) => {
     // 3. verify new password matches
     if (password !== confirmPassword) {
       session.set('flash', 'password do not match');
-      return redirect(pathname);
+      return redirect(pathname, {
+        headers: {
+          'Set-Cookie': await commitSession(session),
+        },
+      });
     }
 
     // 4. hash their new password
@@ -65,7 +73,15 @@ const action: Action = async ({ request, context, params }) => {
 
     session.set('userId', user.id);
 
-    return redirect(returnTo ?? '/');
+    if (returnTo) {
+      session.unset('returnTo');
+    }
+
+    return redirect(returnTo ?? '/', {
+      headers: {
+        'Set-Cookie': await commitSession(session),
+      },
+    });
   } catch (error) {
     console.error(error);
     session.flash(flashTypes.error, `Something went wrong`);
@@ -73,7 +89,11 @@ const action: Action = async ({ request, context, params }) => {
       flashTypes.errorDetails,
       JSON.stringify({ name: error.name, message: error.message }, null, 2)
     );
-    return redirect(pathname);
+    return redirect(pathname, {
+      headers: {
+        'Set-Cookie': await commitSession(session),
+      },
+    });
   }
 };
 

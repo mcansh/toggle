@@ -94,6 +94,7 @@ const action: Action = async ({ request, context }) => {
         const returnTo = session.get('returnTo');
 
         if (returnTo) {
+          session.unset('returnTo');
           return redirect(returnTo, {
             headers: {
               'Set-Cookie': await commitSession(session),
