@@ -47,7 +47,6 @@
   },
   "devDependencies": {
     "@mcansh/eslint-config": "3.0.1",
-    "@prisma/cli": "2.17.0",
     "@svgr/core": "5.5.0",
     "@tailwindcss/forms": "0.2.1",
     "@types/ioredis": "4.22.0",
@@ -68,6 +67,7 @@
     "pm2": "4.5.5",
     "postcss": "8.2.6",
     "prettier": "2.2.1",
+    "prisma": "2.17.0",
     "shell-quote": "1.7.2",
     "tailwindcss": "2.0.3",
     "typescript": "4.2.2"
