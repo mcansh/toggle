@@ -4,7 +4,7 @@
   "description": "a feature flag platform",
   "main": "remix.config.js",
   "scripts": {
-    "postinstall": "husky install && npm run build:icons",
+    "postinstall": "husky install && npm run build:icons && prisma generate",
     "build:icons": "node scripts/convert-herocions.js",
     "prebuild": "npm run clean && npm run build:icons",
     "build": "remix build",
