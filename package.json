@@ -9,7 +9,7 @@
     "prebuild": "npm run clean && npm run build:icons",
     "build": "NODE_ENV=production remix build",
     "dev": "pm2-dev pm2.config.js",
-    "start": "node server-build/index.js",
+    "start": "node index.js",
     "clean": "del app-build public/build app/components/icons",
     "lint": "eslint --cache --ext js,jsx,ts,tsx,mdx ."
   },
