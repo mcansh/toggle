@@ -1,9 +1,12 @@
 module.exports = {
   apps: [
     {
-      name: 'Vercel',
-      script: 'vc dev',
-      ignore_watch: ['.'],
+      name: 'Express',
+      script: 'index.js',
+      watch: ['remix.config.js', 'app'],
+      watch_options: {
+        followSymlinks: false,
+      },
       env: {
         NODE_ENV: 'development',
       },

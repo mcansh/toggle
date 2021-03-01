@@ -1,12 +1,25 @@
-import { createRequestHandler } from '@remix-run/vercel';
-import { PrismaClient } from '@prisma/client';
+const express = require('express');
+const { createRequestHandler } = require('@remix-run/express');
+const { PrismaClient } = require('@prisma/client');
+
+const app = express();
 
 const prisma = new PrismaClient();
 
-export { prisma };
+app.use(express.static('public'));
 
-module.exports = createRequestHandler({
-  getLoadContext() {
-    return { prisma };
-  },
+app.all(
+  '*',
+  createRequestHandler({
+    getLoadContext() {
+      return { prisma };
+    },
+  })
+);
+
+const port = process.env.PORT || 3000;
+
+app.listen(port, () => {
+  // eslint-disable-next-line no-console
+  console.log(`Express server started on http://localhost:${port}`);
 });
