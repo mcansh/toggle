@@ -7,7 +7,7 @@
     "postinstall": "husky install && npm run build:icons && prisma generate",
     "build:icons": "node scripts/convert-herocions.js",
     "prebuild": "npm run clean && npm run build:icons",
-    "build": "remix build",
+    "build": "NODE_ENV=production remix build",
     "dev": "pm2-dev pm2.config.js",
     "start": "node server-build/index.js",
     "clean": "del app-build public/build app/components/icons",
