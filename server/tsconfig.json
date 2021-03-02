@@ -3,9 +3,10 @@
   "compilerOptions": {
     "esModuleInterop": true,
     "moduleResolution": "node",
-    "target": "es2019",
+    "target": "ES5",
+    "module": "CommonJS",
     "strict": true,
     "skipLibCheck": true,
-    "noEmit": true
+    "outDir": "../server-build"
   }
 }
