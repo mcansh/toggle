@@ -2,7 +2,8 @@ module.exports = {
   apps: [
     {
       name: 'Express',
-      script: 'tsc --project server && node server-build/server',
+      script:
+        'tsc --project server && node -r dotenv/config server-build/server',
       watch: ['remix.config.js', 'app', 'server'],
       watch_options: {
         followSymlinks: false,
