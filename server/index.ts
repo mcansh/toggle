@@ -8,97 +8,101 @@ import { convertFlagsArrayToObject } from './utils';
 
 const app = express();
 
+const allowAPIForUsers = new Set([
+  'ckjnabahm0025raispjnm0lfa',
+  'ckjp27llc039728r9pew5ibpp',
+  'cklmjgcsa0000n8isz3smllpx',
+]);
+
 const prisma = new PrismaClient();
 
 app.use(express.static('public'));
 
-app.get('/api', async (req, res) => {
-  const allowAPIForUsers = new Set([
-    'ckjnabahm0025raispjnm0lfa',
-    'ckjp27llc039728r9pew5ibpp',
-    'cklmjgcsa0000n8isz3smllpx',
-  ]);
+interface Params {
+  channel: string;
+}
 
-  const session = await getSession(req.headers.cookie);
-  const { channelId, makeObject } = req.query;
+interface Query {
+  raw: string;
+}
 
-  const userId = session.get('userId');
+type Result =
+  | { message: string }
+  | {
+      flags: {
+        [key: string]: string | number | boolean;
+      };
+      id: string;
+      name: string;
+      updatedAt: Date;
+      createdAt: Date;
+    }
+  | {
+      id: string;
+      name: string;
+      updatedAt: Date;
+      createdAt: Date;
+      flags: Array<{
+        feature: string;
+        type: string;
+        id: string;
+        value: string;
+      }>;
+    };
 
-  if (!userId) {
-    return res.status(401).json({ message: 'Unauthorized' });
-  }
+app.get<Params, Result, any, Query>(
+  '/api/channel/:channel',
+  async (req, res) => {
+    const { channel } = req.params;
+    const { raw } = req.query;
+    const session = await getSession(req.headers.cookie);
+    const userId = session.get('userId');
+    if (!userId) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
 
-  if (!allowAPIForUsers.has(userId)) {
-    return res.status(501).json({
-      message: "our api isn't quite ready for you yet",
-    });
-  }
+    if (!allowAPIForUsers.has(userId)) {
+      return res.status(501).json({
+        message: "our api isn't quite ready for you yet",
+      });
+    }
 
-  if (!channelId) {
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        teams: {
-          select: {
-            featureChannels: {
-              select: {
-                id: true,
-                name: true,
-                flags: {
-                  select: {
-                    feature: true,
-                    id: true,
-                    type: true,
-                    value: true,
-                  },
-                },
-              },
-            },
+    const result = await prisma.featureChannel.findFirst({
+      where: {
+        id: channel,
+        team: {
+          members: {
+            some: { id: userId },
           },
         },
-        username: true,
+      },
+      select: {
+        flags: {
+          select: {
+            feature: true,
+            id: true,
+            type: true,
+            value: true,
+          },
+        },
+        id: true,
+        name: true,
+        updatedAt: true,
+        createdAt: true,
       },
     });
 
-    return res.status(200).json(user);
+    if (!result) return res.status(404).end();
+
+    if (raw === 'true') {
+      return res.status(200).json(result);
+    }
+
+    const flagObject = convertFlagsArrayToObject(result.flags);
+
+    return res.status(200).json({ ...result, flags: flagObject });
   }
-
-  const channel = await prisma.featureChannel.findFirst({
-    where: {
-      id: Array.isArray(channelId) ? channelId[0] : channelId,
-      team: {
-        members: {
-          some: { id: userId },
-        },
-      },
-    },
-    select: {
-      flags: {
-        select: {
-          feature: true,
-          id: true,
-          type: true,
-          value: true,
-        },
-      },
-      id: true,
-      name: true,
-      updatedAt: true,
-      createdAt: true,
-    },
-  });
-
-  if (!channel) return res.status(404).end();
-
-  if (makeObject) {
-    const flagObject = convertFlagsArrayToObject(channel.flags);
-
-    return res.status(200).json({ ...channel, flags: flagObject });
-  }
-
-  return res.status(200).json(channel);
-});
+);
 
 app.all(
   '*',
