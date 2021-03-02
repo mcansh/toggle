@@ -9,9 +9,8 @@ import { addHours } from 'date-fns';
 import { makeANiceEmail, client } from '../lib/mail';
 import type { RemixContext } from '../context';
 import { flashTypes } from '../lib/flash';
-import { Input } from '../components/form/input';
-import { SubmitButton } from '../components/form/button';
-import { Fieldset } from '../components/form/fieldset';
+import { Input } from '../components/input';
+import { Button } from '../components/button';
 import { commitSession, getSession } from '../sessions';
 
 const action: Action = async ({ request, context }) => {
@@ -71,8 +70,11 @@ const RequestPasswordResetPage: React.VFC = () => {
         <h1 className="mb-4 text-3xl font-medium text-center">
           Request a password reset
         </h1>
-        <Form method="POST" action="/reset">
-          <Fieldset disabled={!!pendingForm}>
+        <Form method="post" action="/reset">
+          <fieldset
+            disabled={!!pendingForm}
+            className="flex flex-col p-5 my-4 space-y-4 text-sm text-gray-900 bg-gray-100 border border-gray-200 border-solid rounded"
+          >
             <Input
               autoComplete="email"
               label="Email"
@@ -80,8 +82,8 @@ const RequestPasswordResetPage: React.VFC = () => {
               name="email"
               placeholder="jane@doe.com"
             />
-            <SubmitButton type="submit">Request Reset</SubmitButton>
-          </Fieldset>
+            <Button type="submit">Request Reset</Button>
+          </fieldset>
         </Form>
       </div>
     </div>

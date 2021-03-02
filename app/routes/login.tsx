@@ -10,9 +10,8 @@ import type { RemixContext } from '../context';
 import { makeANiceEmail, client } from '../lib/mail';
 import { hash, verify } from '../lib/auth';
 import { flashTypes } from '../lib/flash';
-import { Input } from '../components/form/input';
-import { SubmitButton } from '../components/form/button';
-import { Fieldset } from '../components/form/fieldset';
+import { Input } from '../components/input';
+import { Button } from '../components/button';
 import { commitSession, getSession } from '../sessions';
 
 const loader: Loader = async ({ request }) => {
@@ -175,10 +174,13 @@ function LoginPage() {
     <div className="grid h-full place-items-center">
       <div className="w-full">
         <h1 className="mb-4 text-3xl font-medium text-center">
-          Welcome Back to Feature Flags!
+          Sign in to Toggle
         </h1>
         <Form method="post" action="/login">
-          <Fieldset disabled={!!pendingForm}>
+          <fieldset
+            disabled={!!pendingForm}
+            className="flex flex-col p-5 my-4 space-y-4 text-sm text-gray-900 bg-gray-100 border border-gray-200 border-solid rounded"
+          >
             <Input
               type="email"
               label="Email"
@@ -196,28 +198,18 @@ function LoginPage() {
                 .map(() => '•')
                 .join('')}
             />
-            <SubmitButton type="submit">Login</SubmitButton>
-          </Fieldset>
+            <Button type="submit">Login</Button>
+          </fieldset>
         </Form>
 
-        <div className="mt-4">
-          <h2>
-            Don&apos;t have an account yet? No sweat, you can{' '}
-            <Link
-              className="text-blue-500 transition duration-150 hover:text-blue-800 focus:text-blue-800 ease"
-              to="/register"
-            >
-              sign up
-            </Link>{' '}
-            here, or you can reset your password{' '}
-            <Link
-              className="text-blue-500 transition duration-150 hover:text-blue-800 focus:text-blue-800 ease"
-              to="/reset"
-            >
-              here
-            </Link>{' '}
-            if you forgot it.
-          </h2>
+        <div className="px-3 py-2 text-sm border border-gray-300 rounded-md">
+          <p>
+            New to Toggle?{' '}
+            <Link className="text-blue-600 hover:underline" to="/join">
+              Create an account
+            </Link>
+            .
+          </p>
         </div>
       </div>
     </div>

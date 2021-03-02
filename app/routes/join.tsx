@@ -1,14 +1,13 @@
 import * as React from 'react';
-import { Form, Link, usePendingFormSubmit } from '@remix-run/react';
+import { Form, usePendingFormSubmit } from '@remix-run/react';
 import type { Action, Loader } from '@remix-run/data';
 import { redirect } from '@remix-run/data';
 
 import type { RemixContext } from '../context';
 import { hash } from '../lib/auth';
 import { flashTypes } from '../lib/flash';
-import { Fieldset } from '../components/form/fieldset';
-import { Input } from '../components/form/input';
-import { SubmitButton } from '../components/form/button';
+import { Input } from '../components/input';
+import { Button } from '../components/button';
 import { commitSession, getSession } from '../sessions';
 
 const loader: Loader = async ({ request }) => {
@@ -26,10 +25,22 @@ const action: Action = async ({ request, context }) => {
   const requestBody = await request.text();
   const body = new URLSearchParams(requestBody);
 
-  const name = body.get('name') as string;
-  const email = body.get('email') as string;
-  const username = body.get('username') as string;
-  const password = body.get('password') as string;
+  const name = body.get('name');
+  const email = body.get('email');
+  const username = body.get('username');
+  const password = body.get('password');
+
+  if (!name || !email || !username || !password) {
+    session.flash(
+      flashTypes.error,
+      JSON.stringify({ message: 'missing required field' })
+    );
+    return redirect('/join', {
+      headers: {
+        'Set-Cookie': await commitSession(session),
+      },
+    });
+  }
 
   try {
     const hashedPassword = await hash(password);
@@ -72,7 +83,7 @@ const action: Action = async ({ request, context }) => {
         JSON.stringify({ name: error.name, message: error.message }, null, 2)
       );
     }
-    return redirect('/register', {
+    return redirect('/join', {
       headers: {
         'Set-Cookie': await commitSession(session),
       },
@@ -82,12 +93,12 @@ const action: Action = async ({ request, context }) => {
 
 function meta() {
   return {
-    title: 'Register | Toggle',
+    title: 'Join Toggle | Toggle',
     description: 'Welcome to Toggle',
   };
 }
 
-function Register() {
+function JoinPage() {
   const pendingForm = usePendingFormSubmit();
 
   return (
@@ -97,8 +108,11 @@ function Register() {
           Welcome to Feature Flags!
         </h1>
 
-        <Form method="post" action="/register">
-          <Fieldset disabled={!!pendingForm}>
+        <Form method="post" action="/join">
+          <fieldset
+            disabled={!!pendingForm}
+            className="flex flex-col p-5 my-4 space-y-4 text-sm text-gray-900 bg-gray-100 border border-gray-200 border-solid rounded"
+          >
             <Input
               label="Full Name"
               type="text"
@@ -127,26 +141,13 @@ function Register() {
               placeholder="password"
               name="password"
             />
-            <SubmitButton type="submit">Register</SubmitButton>
-          </Fieldset>
+            <Button type="submit">Register</Button>
+          </fieldset>
         </Form>
-
-        <div className="mt-4">
-          <h2>
-            Already have an account yet? Awesome, you can{' '}
-            <Link
-              className="text-blue-500 transition duration-150 hover:text-blue-800 focus:text-blue-800 ease"
-              to="/login"
-            >
-              log in
-            </Link>{' '}
-            here
-          </h2>
-        </div>
       </div>
     </div>
   );
 }
 
-export default Register;
-export { loader, action, Register, meta };
+export default JoinPage;
+export { loader, action, JoinPage, meta };
