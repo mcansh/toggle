@@ -1,19 +1,24 @@
-import type { NowApiHandler } from '@vercel/node';
+import express from 'express';
+import { createRequestHandler } from '@remix-run/express';
 import { PrismaClient } from '@prisma/client';
 
 import { getSession } from '../app/sessions';
 
-import { convertFlagsArrayToObject } from './_utils';
+import { convertFlagsArrayToObject } from './utils';
+
+const app = express();
 
 const prisma = new PrismaClient();
 
-const allowAPIForUsers = new Set([
-  'ckjnabahm0025raispjnm0lfa',
-  'ckjp27llc039728r9pew5ibpp',
-  'cklmjgcsa0000n8isz3smllpx',
-]);
+app.use(express.static('public'));
 
-const handler: NowApiHandler = async (req, res) => {
+app.get('/api', async (req, res) => {
+  const allowAPIForUsers = new Set([
+    'ckjnabahm0025raispjnm0lfa',
+    'ckjp27llc039728r9pew5ibpp',
+    'cklmjgcsa0000n8isz3smllpx',
+  ]);
+
   const session = await getSession(req.headers.cookie);
   const { channelId, makeObject } = req.query;
 
@@ -93,6 +98,20 @@ const handler: NowApiHandler = async (req, res) => {
   }
 
   return res.status(200).json(channel);
-};
+});
 
-export default handler;
+app.all(
+  '*',
+  createRequestHandler({
+    getLoadContext() {
+      return { prisma };
+    },
+  })
+);
+
+const port = process.env.PORT ?? 3000;
+
+app.listen(port, () => {
+  // eslint-disable-next-line no-console
+  console.log(`Express server started on http://localhost:${port}`);
+});
