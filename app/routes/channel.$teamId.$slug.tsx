@@ -12,10 +12,9 @@ import { ago } from 'time-ago';
 
 import type { RemixContext } from '../context';
 import { flashTypes } from '../lib/flash';
-import { Fieldset } from '../components/form/fieldset';
-import { Input, InputOnly, Label } from '../components/form/input';
-import { SubmitButton } from '../components/form/button';
 import { commitSession, getSession } from '../sessions';
+import { Button } from '../components/button';
+import { BaseInput, Input, InputLabel } from '../components/input';
 
 const loader: Loader = async ({ request, context, params }) => {
   const session = await getSession(request.headers.get('Cookie'));
@@ -159,9 +158,7 @@ const action: Action = async ({ context, params, request }) => {
           lastUpdatedBy: {
             connect: { id: userId },
           },
-          feature: featureName.includes(' ')
-            ? pascalCase(featureName)
-            : featureName,
+          feature: pascalCase(featureName),
           type: featureType,
           value: featureValue,
           team: {
@@ -356,7 +353,10 @@ const FeatureChannelPage: React.VFC = () => {
         action={`/channel/${data.channel.teamId}/${data.channel.slug}`}
         className="pt-6"
       >
-        <Fieldset disabled={!!pendingForm}>
+        <fieldset
+          disabled={!!pendingForm}
+          className="flex flex-col p-5 my-4 space-y-4 text-sm text-gray-900 bg-gray-100 border border-gray-200 border-solid rounded"
+        >
           <Input
             name="name"
             label="Name"
@@ -365,19 +365,20 @@ const FeatureChannelPage: React.VFC = () => {
             value={form.name}
             onChange={handleFormChange}
           />
-          <Label label="Type">
+          <InputLabel id="type" label="Type">
             <select
               className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
               name="type"
               value={form.type}
               onChange={handleFormChange}
+              id="type"
             >
               <option value="string">String</option>
               <option value="boolean">Boolean</option>
               <option value="number">Number</option>
             </select>
-          </Label>
-          <Label label="Value">
+          </InputLabel>
+          <InputLabel id="value" label="Value">
             {form.type === 'boolean' ? (
               <>
                 <Switch
@@ -404,7 +405,7 @@ const FeatureChannelPage: React.VFC = () => {
                     )}
                   />
                 </Switch>
-                <InputOnly
+                <BaseInput
                   type="text"
                   hidden
                   name="value"
@@ -413,7 +414,7 @@ const FeatureChannelPage: React.VFC = () => {
                 />
               </>
             ) : form.type === 'number' ? (
-              <InputOnly
+              <BaseInput
                 placeholder="25"
                 type="text"
                 name="value"
@@ -423,7 +424,7 @@ const FeatureChannelPage: React.VFC = () => {
                 pattern="[0-9]*"
               />
             ) : (
-              <InputOnly
+              <BaseInput
                 placeholder="http://someapi.ff.io"
                 type="text"
                 name="value"
@@ -431,11 +432,11 @@ const FeatureChannelPage: React.VFC = () => {
                 onChange={handleFormChange}
               />
             )}
-          </Label>
-          <SubmitButton type="submit">
+          </InputLabel>
+          <Button variant="primary" type="submit">
             Creat{pendingForm?.method === 'post' ? 'ing' : 'e'} Feature Toggle
-          </SubmitButton>
-        </Fieldset>
+          </Button>
+        </fieldset>
       </Form>
     </>
   );

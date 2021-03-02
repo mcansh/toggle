@@ -7,9 +7,8 @@ import { subHours } from 'date-fns';
 import type { RemixContext } from '../context';
 import { hash } from '../lib/auth';
 import { flashTypes } from '../lib/flash';
-import { SubmitButton } from '../components/form/button';
-import { Input } from '../components/form/input';
-import { Fieldset } from '../components/form/fieldset';
+import { Button } from '../components/button';
+import { Input } from '../components/input';
 import { commitSession, getSession } from '../sessions';
 
 const loader: Loader = ({ params }) => ({ resetToken: params.resetToken });
@@ -113,8 +112,11 @@ const ChangePasswordPage: React.VFC = () => {
         <h1 className="mb-4 text-3xl font-medium text-center">
           Request Your Password
         </h1>
-        <Form method="POST" action={`/reset/${resetToken}`}>
-          <Fieldset disabled={!!pendingForm}>
+        <Form method="post" action={`/reset/${resetToken}`}>
+          <fieldset
+            disabled={!!pendingForm}
+            className="flex flex-col p-5 my-4 space-y-4 text-sm text-gray-900 bg-gray-100 border border-gray-200 border-solid rounded"
+          >
             <Input
               label="New Password"
               type="password"
@@ -127,8 +129,8 @@ const ChangePasswordPage: React.VFC = () => {
               autoComplete="new-password"
               name="confirmPassword"
             />
-            <SubmitButton type="submit">Change Password</SubmitButton>
-          </Fieldset>
+            <Button type="submit">Change Password</Button>
+          </fieldset>
         </Form>
       </div>
     </div>
