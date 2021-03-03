@@ -59,7 +59,7 @@ const action: Action = async ({ request, context }) => {
   }
 };
 
-const meta = () => ({ title: 'Request a password reset | Toggle' });
+const meta = () => ({ title: 'Forgot your password? • Toggle' });
 
 const RequestPasswordResetPage: React.VFC = () => {
   const pendingForm = usePendingLocation();

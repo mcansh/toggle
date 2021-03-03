@@ -1,6 +1,6 @@
 import * as React from 'react';
-import type { FeatureChannel, Flag, FlagType } from '@prisma/client';
-import type { Action, Loader } from '@remix-run/data';
+import type { FeatureChannel, Flag, FlagType, Team } from '@prisma/client';
+import type { Action } from '@remix-run/data';
 import { redirect } from '@remix-run/data';
 import { Form, usePendingFormSubmit, useRouteData } from '@remix-run/react';
 import type { Except } from 'type-fest';
@@ -10,13 +10,37 @@ import { pascalCase } from 'change-case';
 import { useTable } from 'react-table';
 import { ago } from 'time-ago';
 
-import type { RemixContext } from '../context';
+import type { RemixContext, RemixLoader } from '../context';
 import { flashTypes } from '../lib/flash';
 import { commitSession, getSession } from '../sessions';
 import { Button } from '../components/button';
 import { BaseInput, Input, InputLabel } from '../components/input';
 
-const loader: Loader = async ({ request, context, params }) => {
+type StringDateFlag = Except<Flag, 'createdAt' | 'updatedAt'> & {
+  createdAt: string;
+  updatedAt: string;
+};
+
+interface RouteData {
+  channel:
+    | (FeatureChannel & {
+        flags: Array<StringDateFlag>;
+        team: {
+          slug: Pick<Team, 'name'>;
+        };
+      })
+    | undefined;
+  channelColumns: Array<{ Header: string; accessor: string }>;
+  channelData: Array<any>;
+}
+
+type Params = { teamId: string; slug: string };
+
+const loader: RemixLoader<RouteData, Params> = async ({
+  request,
+  context,
+  params,
+}) => {
   const session = await getSession(request.headers.get('Cookie'));
   const { prisma } = context as RemixContext;
 
@@ -38,6 +62,11 @@ const loader: Loader = async ({ request, context, params }) => {
       AND: [{ teamId: params.teamId }, { slug: params.slug }],
     },
     include: {
+      team: {
+        select: {
+          slug: true,
+        },
+      },
       flags: {
         orderBy: { updatedAt: 'desc' },
         select: {
@@ -197,7 +226,7 @@ const action: Action = async ({ context, params, request }) => {
   });
 };
 
-function meta({ data }: { data: Data }) {
+function meta({ data }: { data: RouteData }) {
   if (!data.channel) {
     return {
       title: 'Toggle',
@@ -205,19 +234,8 @@ function meta({ data }: { data: Data }) {
   }
 
   return {
-    title: `${data.channel.name} | Toggle`,
+    title: `${data.channel.team.slug}/${data.channel.slug}`,
   };
-}
-
-type StringDateFlag = Except<Flag, 'createdAt' | 'updatedAt'> & {
-  createdAt: string;
-  updatedAt: string;
-};
-
-interface Data {
-  channel: (FeatureChannel & { flags: Array<StringDateFlag> }) | undefined;
-  channelColumns: Array<{ Header: string; accessor: string }>;
-  channelData: Array<any>;
 }
 
 interface BooleanForm {
@@ -241,7 +259,7 @@ interface StringForm {
 type FormState = BooleanForm | NumberForm | StringForm;
 
 const FeatureChannelPage: React.VFC = () => {
-  const data = useRouteData<Data>();
+  const data = useRouteData<RouteData>();
   const pendingForm = usePendingFormSubmit();
   const [form, setForm] = React.useState<FormState>({
     name: '',

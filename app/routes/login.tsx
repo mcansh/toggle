@@ -162,7 +162,7 @@ const action: Action = async ({ request, context }) => {
 
 function meta() {
   return {
-    title: 'Login | Toggle',
+    title: 'Sign in to Toggle • Toggle',
     description: 'Welcome to remix!',
   };
 }

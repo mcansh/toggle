@@ -27,7 +27,7 @@ const loader: Loader = async ({ context }) => {
 
 function meta() {
   return {
-    title: 'Health Check | Toggle',
+    title: 'Health Check • Toggle',
   };
 }
 

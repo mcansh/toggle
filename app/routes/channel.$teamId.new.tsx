@@ -106,7 +106,7 @@ const action: Action = async ({ request, context, params }) => {
 
 function meta() {
   return {
-    title: `Create new Feature Channel | Toggle`,
+    title: `Create new Feature Channel`,
   };
 }
 

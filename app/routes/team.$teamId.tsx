@@ -75,8 +75,8 @@ const action: RemixAction<Params> = async ({ request, params, context }) => {
   return redirect(pathname);
 };
 
-const meta: MetaFunction = () => ({
-  title: 'Hello World!',
+const meta: MetaFunction = ({ data }: { data: RouteData }) => ({
+  title: data.team ? data.team.name : 'Team not found',
 });
 
 const TeamPage: React.VFC = () => {

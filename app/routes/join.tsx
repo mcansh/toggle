@@ -93,7 +93,7 @@ const action: Action = async ({ request, context }) => {
 
 function meta() {
   return {
-    title: 'Join Toggle | Toggle',
+    title: 'Join Toggle • Toggle',
     description: 'Welcome to Toggle',
   };
 }

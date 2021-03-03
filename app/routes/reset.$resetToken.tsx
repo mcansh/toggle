@@ -98,7 +98,7 @@ const action: Action = async ({ request, context, params }) => {
 
 function meta() {
   return {
-    title: 'Reset Password | Toggle',
+    title: 'Reset Password • Toggle',
   };
 }
 
