@@ -14,6 +14,27 @@ import { commitSession, getSession } from './sessions';
 // eslint-disable-next-line import/extensions, import/no-unresolved, import/order
 import globalCSS from 'css:./styles/global.css';
 
+const links: LinksFunction = () => [
+  { rel: 'stylesheet', href: globalCSS },
+  { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+  { rel: 'alternate icon', href: '/favicon.ico' },
+  { rel: 'mask-icon', href: '/flag.svg', color: '#6d28d9' },
+  { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' },
+  {
+    rel: 'icon',
+    type: 'image/png',
+    sizes: '32x32',
+    href: '/favicon-32x32.png',
+  },
+  {
+    rel: 'icon',
+    type: 'image/png',
+    sizes: '16x16',
+    href: '/favicon-16x16.png',
+  },
+  { rel: 'manifest', href: '/site.webmanifest' },
+];
+
 type ExcludesFalse = <T>(x: T | false) => x is T;
 
 const loader: Loader = async ({ request }) => {
@@ -37,8 +58,6 @@ const loader: Loader = async ({ request }) => {
     },
   });
 };
-
-const links: LinksFunction = () => [{ rel: 'stylesheet', href: globalCSS }];
 
 interface Data {
   flash: Array<{ type: Flash; message: string; id: string }>;
