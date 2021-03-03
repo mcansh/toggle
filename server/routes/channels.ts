@@ -26,40 +26,48 @@ const getUserChannels: RequestHandler<null, Result> = async (req, res) => {
   const session = await getSession(req.headers.cookie);
   const userId = session.get('userId');
 
-  const result = await prisma.user.findUnique({
-    where: { id: userId },
-    select: {
-      teams: {
-        select: {
-          id: true,
-          name: true,
-          featureChannels: {
-            select: {
-              id: true,
-              name: true,
-              slug: true,
-              flags: true,
+  if (!userId) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  try {
+    const result = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        teams: {
+          select: {
+            id: true,
+            name: true,
+            featureChannels: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+                flags: true,
+              },
             },
           },
         },
       },
-    },
-  });
+    });
 
-  if (!result) {
-    return res.status(404).end();
-  }
+    if (!result) {
+      return res.status(404).json({ message: `User not found` });
+    }
 
-  return res.status(200).json({
-    ...result,
-    teams: result.teams.map(team => ({
-      ...team,
-      featureChannels: team.featureChannels.map(channel => ({
-        ...channel,
-        flags: channel.flags.length,
+    return res.status(200).json({
+      ...result,
+      teams: result.teams.map(team => ({
+        ...team,
+        featureChannels: team.featureChannels.map(channel => ({
+          ...channel,
+          flags: channel.flags.length,
+        })),
       })),
-    })),
-  });
+    });
+  } catch (error) {
+    return res.status(500).send(error);
+  }
 };
 
 export { getUserChannels };
