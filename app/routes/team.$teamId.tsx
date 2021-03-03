@@ -15,7 +15,15 @@ interface RouteData {
   };
 }
 
-const loader: RemixLoader = async ({ request, context, params }) => {
+type Params = {
+  teamId: string;
+};
+
+const loader: RemixLoader<RouteData, Params> = async ({
+  request,
+  context,
+  params,
+}) => {
   const session = await getSession(request.headers.get('Cookie'));
   const userId = session.get('userId');
   if (!userId) {
@@ -44,7 +52,7 @@ const loader: RemixLoader = async ({ request, context, params }) => {
   return { team };
 };
 
-const action: RemixAction = async ({ request, params, context }) => {
+const action: RemixAction<Params> = async ({ request, params, context }) => {
   // const session = await getSession(request.headers.get('Cookie'));
   // const req = await request.text();
   // const body = new URLSearchParams(req);
