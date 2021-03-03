@@ -278,23 +278,18 @@ const FeatureChannelPage: React.VFC = () => {
       {data.channel.flags.length > 0 ? (
         <table
           {...getTableProps()}
-          style={{ border: 'solid 1px blue', borderSpacing: 0 }}
-          className="block max-w-full"
+          className="min-w-full divide-y divide-gray-200"
         >
-          <thead>
+          <thead className="bg-gray-50">
             {headerGroups.map(headerGroup => {
               const headerGroupProps = headerGroup.getHeaderGroupProps();
               return (
-                <tr
-                  {...headerGroupProps}
-                  key={headerGroupProps.key}
-                  className=""
-                >
+                <tr {...headerGroupProps} key={headerGroupProps.key}>
                   {headerGroup.headers.map(column => {
                     const columnProps = column.getHeaderProps();
                     return (
                       <th
-                        className="p-2 border-b border-r"
+                        className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase"
                         {...columnProps}
                         key={columnProps.key}
                       >
@@ -302,40 +297,45 @@ const FeatureChannelPage: React.VFC = () => {
                       </th>
                     );
                   })}
-                  <th className="p-2 border-b border-r">Delete</th>
+                  <th className="relative px-6 py-3">
+                    <span className="sr-only">Delete</span>
+                  </th>
                 </tr>
               );
             })}
           </thead>
 
-          <tbody {...getTableBodyProps()}>
+          <tbody
+            {...getTableBodyProps()}
+            className="bg-white divide-y divide-gray-200"
+          >
             {rows.map(row => {
               prepareRow(row);
               const rowProps = row.getRowProps();
               return (
-                <tr {...rowProps} key={rowProps.key} className="text-center">
+                <tr {...rowProps} key={rowProps.key} className="">
                   {row.cells.map(cell => {
                     const cellProps = cell.getCellProps();
                     return (
                       <td
                         {...cellProps}
                         key={cellProps.key}
-                        className="p-2 border-b border-r"
-                        style={{ width: '1%' }}
+                        className="px-6 py-4 whitespace-nowrap"
                       >
                         {cell.render('Cell')}
                       </td>
                     );
                   })}
-                  <td className="p-2 border-b border-r" style={{ width: '1%' }}>
+                  <td className="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">
                     <button
                       type="button"
                       onClick={() =>
                         // eslint-disable-next-line no-alert
                         alert('flag deletion is temporarily disabled')
                       }
+                      className="text-indigo-600 hover:text-indigo-900"
                     >
-                      &times;
+                      Delete
                     </button>
                   </td>
                 </tr>
