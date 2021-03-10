@@ -21,9 +21,11 @@ app.all(
   })
 );
 
-const port = process.env.PORT ?? 3000;
+const { PORT = 3000 } = process.env;
 
-app.listen(port, () => {
+app.listen(PORT, () => {
   // eslint-disable-next-line no-console
-  console.log(`Express server started on http://localhost:${port}`);
+  console.log(
+    `ready - started server on 0.0.0.0:${PORT}, url: http://localhost:${PORT}`
+  );
 });
