@@ -16,27 +16,40 @@ model User {
   email          String   @unique
   username       String   @unique
   hashedPassword String   @default("")
-  teams          Team[]
   createdAt      DateTime @default(now())
   updatedAt      DateTime @default(now()) @updatedAt
-  createdFlags   Flag[]   @relation(name: "createdByUser")
-  updatedFlags   Flag[]   @relation(name: "lastUpdatedByUser")
+
+  // Teams you've created and _last_ updated
+  createdFlags Flag[] @relation(name: "createdByUser")
+  updatedFlags Flag[] @relation(name: "lastUpdatedByUser")
+
+  // Teams you belong to
+  teams Team[]
 
   // Password reset fields
   resetToken       String?   @unique
   resetTokenExpiry DateTime?
+
+  // Teams you've created - allows for only creator to delete the team
+  createdTeams Team[] @relation("teamCreatedBy")
 }
 
 model Team {
-  id              String           @id @default(cuid())
-  name            String           @unique
-  slug            String           @unique
+  id           String   @id @default(cuid())
+  name         String   @unique
+  slug         String   @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
+  accessTokens String[] @unique
+
+  // Users in the team
   members         User[]
-  flags           Flag[]
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @default(now()) @updatedAt
+  // Feature Channels in the team
   featureChannels FeatureChannel[]
-  accessTokens    String[]         @unique
+
+  // Who created the team
+  createdBy       User   @relation(name: "teamCreatedBy", fields: [createdByUserId], references: [id])
+  createdByUserId String
 }
 
 enum FlagType {
@@ -46,7 +59,6 @@ enum FlagType {
 }
 
 model Flag {
-  // normal flag properties
   id        String   @id @default(cuid())
   feature   String   @unique
   type      FlagType
@@ -54,22 +66,18 @@ model Flag {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  // relate a flag to it's creator
+  // Relate a flag to it's creator
   createdBy User   @relation(name: "createdByUser", fields: [userId], references: [id])
   userId    String
 
-  // relate a flag to the last person who updated it
+  // Relate a flag to the last person who updated it
   lastUpdatedBy     User   @relation(name: "lastUpdatedByUser", fields: [lastUpdatedByUser], references: [id])
   lastUpdatedByUser String
 
-
-  // relate a flag to a team
-  team   Team   @relation(fields: [teamId], references: [id])
-  teamId String
-
-  // make flags unique per team
+  // Make flags unique per team
   featureChannel   FeatureChannel @relation(fields: [featureChannelId], references: [id])
   featureChannelId String
+
   @@unique([feature, featureChannelId], name: "UniqueFlagNamePerChannel")
 }
 
