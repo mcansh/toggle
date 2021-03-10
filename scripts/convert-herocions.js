@@ -2,6 +2,7 @@ const path = require('path');
 const { promises: fs, constants } = require('fs');
 
 const svgr = require('@svgr/core');
+const { pascalCase } = require('change-case');
 
 const HEROCIONS_PATH = path.join(process.cwd(), 'node_modules/heroicons');
 const HEROCIONS_SOLID_PATH = path.join(HEROCIONS_PATH, 'solid');
@@ -24,9 +25,14 @@ async function compileIcon(inputPath, outputDir) {
   const ext = path.extname(inputPath);
   const base = path.basename(inputPath, ext);
   const content = await fs.readFile(inputPath, 'utf-8');
+  const outputPath = path.join(outputDir, `${base}.tsx`);
 
-  const jsx = await svgr.default(content, { icon: true, typescript: true });
-  return fs.writeFile(path.join(outputDir, `${base}.tsx`), jsx);
+  const jsx = await svgr.default(
+    content,
+    { icon: true, typescript: true },
+    { componentName: `${pascalCase(base)}Icon` }
+  );
+  return fs.writeFile(outputPath, jsx);
 }
 
 async function compile() {
