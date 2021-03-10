@@ -3,11 +3,9 @@ import type { FeatureChannel, Flag, FlagType, Team } from '@prisma/client';
 import type { Action } from '@remix-run/data';
 import { redirect } from '@remix-run/data';
 import { Form, usePendingFormSubmit, useRouteData } from '@remix-run/react';
-import type { Except } from 'type-fest';
 import { Switch } from '@headlessui/react';
 import clsx from 'clsx';
 import { pascalCase } from 'change-case';
-import { useTable } from 'react-table';
 import { ago } from 'time-ago';
 
 import type { RemixContext, RemixLoader } from '../context';
@@ -16,22 +14,19 @@ import { commitSession, getSession } from '../sessions';
 import { Button } from '../components/button';
 import { BaseInput, Input, InputLabel } from '../components/input';
 
-type StringDateFlag = Except<Flag, 'createdAt' | 'updatedAt'> & {
-  createdAt: string;
-  updatedAt: string;
-};
-
 interface RouteData {
-  channel:
-    | (FeatureChannel & {
-        flags: Array<StringDateFlag>;
-        team: {
-          slug: Pick<Team, 'name'>;
-        };
-      })
-    | undefined;
-  channelColumns: Array<{ Header: string; accessor: string }>;
-  channelData: Array<any>;
+  channel: FeatureChannel & {
+    team: {
+      slug: Team['slug'];
+    };
+    flags: Array<{
+      feature: Flag['feature'];
+      type: Flag['type'];
+      updated: string;
+      value: Flag['value'];
+      id: Flag['id'];
+    }>;
+  };
 }
 
 type Params = { teamId: string; slug: string };
@@ -74,6 +69,7 @@ const loader: RemixLoader<RouteData, Params> = async ({
           feature: true,
           type: true,
           value: true,
+          id: true,
         },
       },
     },
@@ -89,25 +85,6 @@ const loader: RemixLoader<RouteData, Params> = async ({
     });
   }
 
-  const channelColumns = [
-    {
-      Header: 'Feature',
-      accessor: 'feature',
-    },
-    {
-      Header: 'Type',
-      accessor: 'type',
-    },
-    {
-      Header: 'Updated',
-      accessor: 'updated',
-    },
-    {
-      Header: 'Value',
-      accessor: 'value',
-    },
-  ];
-
   const channelData = channel.flags.map(flag => {
     const updated = ago(flag.updatedAt);
     return {
@@ -115,11 +92,12 @@ const loader: RemixLoader<RouteData, Params> = async ({
       type: flag.type,
       updated,
       value: flag.value,
+      id: flag.id,
     };
   });
 
   return new Response(
-    JSON.stringify({ channel, channelColumns, channelData }),
+    JSON.stringify({ channel: { ...channel, flags: channelData } }),
     {
       status: 200,
       headers: {
@@ -165,16 +143,14 @@ const action: Action = async ({ context, params, request }) => {
           slug: params.slug,
         },
       });
-
       if (!channel) {
-        session.flash(flashTypes.error, 'Something went wrong');
-        return redirect(pathname, {
+        session.flash(flashTypes.error, "That channel doesn't exist");
+        return redirect('/', {
           headers: {
             'Set-Cookie': await commitSession(session),
           },
         });
       }
-
       const featureName = body.get('name') as string;
       const featureType = body.get('type') as FlagType;
       const featureValue = body.get('value') as string;
@@ -207,7 +183,16 @@ const action: Action = async ({ context, params, request }) => {
         },
       });
     }
+
+    session.flash(flashTypes.error, `invalid request method "${method}"`);
+    return redirect(pathname, {
+      headers: {
+        'Set-Cookie': await commitSession(session),
+      },
+    });
   } catch (error) {
+    console.error(error);
+
     session.flash(flashTypes.error, 'Something went wrong');
     session.flash(
       flashTypes.errorDetails,
@@ -219,13 +204,6 @@ const action: Action = async ({ context, params, request }) => {
       },
     });
   }
-
-  session.flash(flashTypes.error, `invalid request method "${method}"`);
-  return redirect(pathname, {
-    headers: {
-      'Set-Cookie': await commitSession(session),
-    },
-  });
 };
 
 function meta({ data }: { data: RouteData }) {
@@ -269,14 +247,6 @@ const FeatureChannelPage: React.VFC = () => {
     value: '',
   });
 
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    rows,
-    prepareRow,
-  } = useTable({ columns: data.channelColumns, data: data.channelData });
-
   if (!data.channel) {
     return <h1>Channel not found</h1>;
   }
@@ -296,73 +266,87 @@ const FeatureChannelPage: React.VFC = () => {
         {data.channel.name} Feature Flags
       </h1>
       {data.channel.flags.length > 0 ? (
-        <table
-          {...getTableProps()}
-          className="min-w-full divide-y divide-gray-200"
-        >
-          <thead className="bg-gray-50">
-            {headerGroups.map(headerGroup => {
-              const headerGroupProps = headerGroup.getHeaderGroupProps();
-              return (
-                <tr {...headerGroupProps} key={headerGroupProps.key}>
-                  {headerGroup.headers.map(column => {
-                    const columnProps = column.getHeaderProps();
-                    return (
-                      <th
-                        className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase"
-                        {...columnProps}
-                        key={columnProps.key}
-                      >
-                        {column.render('Header')}
-                      </th>
-                    );
-                  })}
-                  <th className="relative px-6 py-3">
-                    <span className="sr-only">Delete</span>
-                  </th>
-                </tr>
-              );
-            })}
-          </thead>
-
-          <tbody
-            {...getTableBodyProps()}
-            className="bg-white divide-y divide-gray-200"
-          >
-            {rows.map(row => {
-              prepareRow(row);
-              const rowProps = row.getRowProps();
-              return (
-                <tr {...rowProps} key={rowProps.key} className="">
-                  {row.cells.map(cell => {
-                    const cellProps = cell.getCellProps();
-                    return (
-                      <td
-                        {...cellProps}
-                        key={cellProps.key}
-                        className="px-6 py-4 whitespace-nowrap"
-                      >
-                        {cell.render('Cell')}
-                      </td>
-                    );
-                  })}
+        <div className="w-full overflow-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase"
+                >
+                  Feature
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase"
+                >
+                  Type
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase"
+                >
+                  Value
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase"
+                >
+                  Updated
+                </th>
+                <th scope="col" className="relative px-6 py-3">
+                  <span className="sr-only">Delete</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {data.channel.flags.map(flag => (
+                <tr key={flag.id}>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className="text-sm font-medium text-gray-900">
+                      {flag.feature}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className="inline-flex px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full">
+                      {flag.type}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{flag.type}</div>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+                    {flag.value}
+                  </td>
                   <td className="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        // eslint-disable-next-line no-alert
-                        alert('flag deletion is temporarily disabled')
-                      }
-                      className="text-indigo-600 hover:text-indigo-900"
-                    >
-                      Delete
-                    </button>
+                    <Form method="delete">
+                      <input
+                        type="text"
+                        hidden
+                        readOnly
+                        value={flag.id}
+                        name="featureId"
+                      />
+                      <input
+                        type="text"
+                        hidden
+                        readOnly
+                        name="_method"
+                        value="delete"
+                      />
+                      <button
+                        type="submit"
+                        className="text-indigo-600 hover:text-indigo-900"
+                      >
+                        Delete
+                      </button>
+                    </Form>
                   </td>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
+              ))}
+            </tbody>
+          </table>
+        </div>
       ) : (
         <p>Your team hasn&apos;t created any flags yet</p>
       )}
