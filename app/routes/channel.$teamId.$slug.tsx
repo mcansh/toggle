@@ -181,17 +181,19 @@ const action: Action = async ({ context, params, request }) => {
 
       await prisma.flag.create({
         data: {
+          feature: pascalCase(featureName),
+          type: featureType,
+          value:
+            featureType === 'boolean'
+              ? !featureValue
+                ? 'false'
+                : 'true'
+              : featureValue,
           createdBy: {
             connect: { id: userId },
           },
           lastUpdatedBy: {
             connect: { id: userId },
-          },
-          feature: pascalCase(featureName),
-          type: featureType,
-          value: featureValue,
-          team: {
-            connect: { id: params.teamId },
           },
           featureChannel: {
             connect: { id: channel.id },
