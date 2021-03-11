@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Form, usePendingFormSubmit } from '@remix-run/react';
 import type { Action, Loader } from '@remix-run/data';
 import { redirect } from '@remix-run/data';
+import slugify from 'slugify';
 
 import type { RemixContext } from '../context';
 import { hash } from '../lib/auth';
@@ -9,6 +10,7 @@ import { flashTypes } from '../lib/flash';
 import { Input } from '../components/input';
 import { Button } from '../components/button';
 import { commitSession, getSession } from '../sessions';
+import { generateName } from '../lib/name-generator';
 
 const loader: Loader = async ({ request }) => {
   const session = await getSession(request.headers.get('Cookie'));
@@ -44,26 +46,32 @@ const action: Action = async ({ request, context }) => {
 
   try {
     const hashedPassword = await hash(password);
+    const newTeamName = generateName();
+
     const user = await prisma.user.create({
+      select: { id: true },
       data: {
         email,
         name,
         username,
         hashedPassword,
-        teams: {
-          create: {
-            name: `${username}'s team`,
-            featureChannels: {
-              create: {
-                name: 'My first feature channel!',
-                slug: 'my-first-feature-channel',
-              },
-            },
+      },
+    });
+
+    await prisma.team.create({
+      data: {
+        name: newTeamName,
+        slug: slugify(newTeamName, { lower: true }),
+        members: {
+          connect: {
+            id: user.id,
           },
         },
-      },
-      select: {
-        id: true,
+        createdBy: {
+          connect: {
+            id: user.id,
+          },
+        },
       },
     });
 
