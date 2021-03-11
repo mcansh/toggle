@@ -312,11 +312,11 @@ const FeatureChannelPage: React.VFC = () => {
                       {flag.type}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{flag.type}</div>
+                  <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">
+                    {flag.value}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                    {flag.value}
+                    {flag.updated}
                   </td>
                   <td className="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">
                     <Form method="delete">
