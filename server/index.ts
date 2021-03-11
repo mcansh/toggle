@@ -15,6 +15,7 @@ app.get('/api/channel/:channel', getChannel);
 app.all(
   '*',
   createRequestHandler({
+    build: require('../../build'),
     getLoadContext() {
       return { prisma };
     },
