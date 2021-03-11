@@ -1,14 +1,24 @@
 import * as React from 'react';
+import type { RouteComponent } from '@remix-run/react';
 import { Link, useRouteData } from '@remix-run/react';
-import type { FeatureChannel, Flag, Team } from '@prisma/client';
-import type { Loader } from '@remix-run/data';
+import type { FeatureChannel, Team } from '@prisma/client';
 import { redirect } from '@remix-run/data';
 
-import type { RemixContext } from '../context';
-import PlusIcon from '../components/icons/solid/plus';
+import type { RemixContext, RemixLoader } from '../context';
 import { commitSession, getSession } from '../sessions';
 
-const loader: Loader = async ({ request, context }) => {
+interface RouteData {
+  user: {
+    teams: Array<{
+      id: Team['id'];
+      name: Team['name'];
+      slug: Team['slug'];
+      featureChannels: Array<FeatureChannel>;
+    }>;
+  };
+}
+
+const loader: RemixLoader<RouteData> = async ({ request, context }) => {
   const session = await getSession(request.headers.get('Cookie'));
   const { prisma } = context as RemixContext;
   const userId = session.get('userId');
@@ -25,7 +35,14 @@ const loader: Loader = async ({ request, context }) => {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: {
-      teams: { select: { id: true } },
+      teams: {
+        select: {
+          name: true,
+          slug: true,
+          id: true,
+          featureChannels: true,
+        },
+      },
     },
   });
 
@@ -38,20 +55,7 @@ const loader: Loader = async ({ request, context }) => {
     });
   }
 
-  const ids = user.teams.map(team => team.id);
-
-  const teams = await prisma.team.findMany({
-    where: {
-      id: { in: ids },
-    },
-    include: {
-      featureChannels: {
-        include: { flags: true },
-      },
-    },
-  });
-
-  return { teams, teamCount: teams.length };
+  return { user };
 };
 
 function meta() {
@@ -61,53 +65,44 @@ function meta() {
   };
 }
 
-interface Data {
-  teams: Array<
-    Team & { featureChannels: Array<FeatureChannel & { flags: Array<Flag> }> }
-  >;
-  teamCount: number;
-}
-
-function Index() {
-  const data = useRouteData<Data>();
+const IndexPage: RouteComponent = () => {
+  const data = useRouteData<RouteData>();
 
   return (
-    <>
-      <h1>Your Team&apos;s Feature Channels</h1>
-      {data.teamCount === 0 ? (
-        <p>Your team hasn&apos;t created any channels yet</p>
-      ) : (
-        data.teams.map(team => (
-          <div key={team.id}>
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl">
+    <div>
+      <h1>Teams</h1>
+
+      {data.user.teams.length > 0 ? (
+        <ul>
+          {data.user.teams.map(team => (
+            <li key={team.id}>
+              <div>
                 <Link to={`/team/${team.id}`}>{team.name}</Link>
-              </h2>
-              <Link to={`/channel/${team.id}/new`}>
-                <span className="sr-only">Create new Channel</span>
-                <PlusIcon className="text-black" />
-              </Link>
-            </div>
-
-            <ul className="pl-6 mt-1 space-y-2 list-disc">
-              {team.featureChannels.map(channel => (
-                <li key={channel.id}>
-                  <Link
-                    to={`/channel/${team.id}/${channel.slug}`}
-                    className="p-1 bg-yellow-300 rounded"
-                  >
-                    {channel.name} - {channel.flags.length} Flag
-                    {channel.flags.length === 1 ? '' : 's'}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))
+                <ul>
+                  {team.featureChannels.map(channel => (
+                    <li key={channel.id}>
+                      <Link to={`/channel/${team.id}/${channel.slug}`}>
+                        {channel.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+                <Link className="pl-4 text-indigo-500" to="/channels/create">
+                  {'> '}Create a new channel
+                </Link>
+              </div>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>
+          You don&apos;t belong to any teams,{' '}
+          <Link to="/teams/new">create a new one</Link>
+        </p>
       )}
-    </>
+    </div>
   );
-}
+};
 
-export default Index;
+export default IndexPage;
 export { loader, meta };

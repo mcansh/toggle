@@ -1,5 +1,7 @@
 import * as React from 'react';
 import { motion } from 'framer-motion';
+import type { Except } from 'type-fest';
+import clsx from 'clsx';
 
 import { flashTypes } from '../lib/flash';
 
@@ -37,14 +39,17 @@ class Timer {
   }
 }
 
-const FlashMessage: React.VFC<Message> = ({ message, type, id }) => {
+const DetailsFlashMessage: React.VFC<Except<Message, 'type'>> = ({
+  message,
+  id,
+}) => {
   const { removeMessage } = useMessages();
-  const ref = React.useRef<HTMLDivElement | HTMLDetailsElement>(null);
+  const detailsRef = React.useRef<HTMLDetailsElement>(null);
 
   React.useEffect(() => {
     const timer = new Timer(() => removeMessage(id), 5000);
 
-    const target = ref.current;
+    const target = detailsRef.current;
 
     if (target) {
       target.addEventListener('mouseenter', () => timer.pause());
@@ -60,64 +65,69 @@ const FlashMessage: React.VFC<Message> = ({ message, type, id }) => {
     };
   }, [id, removeMessage]);
 
+  return (
+    <motion.details
+      className="px-4 py-2 font-mono text-white bg-blue-700 rounded-lg"
+      ref={detailsRef}
+      initial={{ y: '-200%', opacity: 0 }}
+      animate={{ y: '0%', opacity: 1 }}
+      exit={{ y: '-200%', opacity: 0 }}
+    >
+      <summary>Error Details</summary>
+      <pre className="max-w-full overflow-scroll">{message}</pre>
+    </motion.details>
+  );
+};
+
+const DefaultFlashMessage: React.VFC<Message> = ({ message, type, id }) => {
+  const { removeMessage } = useMessages();
+  const detailsRef = React.useRef<HTMLDetailsElement>(null);
+  const divRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const timer = new Timer(() => removeMessage(id), 5000);
+
+    const target = divRef.current ?? detailsRef.current;
+
+    if (target) {
+      target.addEventListener('mouseenter', () => timer.pause());
+      target.addEventListener('mouseleave', () => timer.resume());
+    }
+
+    return () => {
+      timer.clear();
+      if (target) {
+        target.removeEventListener('mouseenter', () => timer.pause());
+        target.removeEventListener('mouseleave', () => timer.resume());
+      }
+    };
+  }, [id, removeMessage]);
+
+  return (
+    <motion.div
+      className={clsx('px-4 py-2 text-white rounded-lg', {
+        'bg-red-500': type === flashTypes.error,
+        'bg-indigo-500': type === flashTypes.info,
+        'bg-green-400': type === flashTypes.success,
+      })}
+      ref={divRef}
+      initial={{ y: '-200%', opacity: 0 }}
+      animate={{ y: '0%', opacity: 1 }}
+      exit={{ y: '-200%', opacity: 0 }}
+    >
+      {message}
+    </motion.div>
+  );
+};
+
+const FlashMessage: React.VFC<Message> = ({ message, type, id }) => {
   switch (type) {
     case flashTypes.errorDetails: {
-      return (
-        <motion.details
-          className="px-4 py-2 font-mono text-white bg-blue-700 rounded-lg"
-          ref={ref}
-          initial={{ y: '-200%', opacity: 0 }}
-          animate={{ y: '0%', opacity: 1 }}
-          exit={{ y: '-200%', opacity: 0 }}
-        >
-          <summary>Error Details</summary>
-          <pre className="max-w-full overflow-scroll">{message}</pre>
-        </motion.details>
-      );
-    }
-
-    case flashTypes.error: {
-      return (
-        <motion.div
-          className="px-4 py-2 text-white bg-red-500 rounded-lg"
-          ref={ref}
-          initial={{ y: '-200%', opacity: 0 }}
-          animate={{ y: '0%', opacity: 1 }}
-          exit={{ y: '-200%', opacity: 0 }}
-        >
-          {message}
-        </motion.div>
-      );
-    }
-    case flashTypes.info: {
-      return (
-        <motion.div
-          className="px-4 py-2 text-white bg-indigo-500 rounded-lg"
-          ref={ref}
-          initial={{ y: '-200%', opacity: 0 }}
-          animate={{ y: '0%', opacity: 1 }}
-          exit={{ y: '-200%', opacity: 0 }}
-        >
-          {message}
-        </motion.div>
-      );
-    }
-
-    case flashTypes.success: {
-      return (
-        <motion.div
-          className="px-4 py-2 text-white bg-green-400 rounded-lg"
-          initial={{ y: '-200%' }}
-          animate={{ y: '0%' }}
-          exit={{ y: '-200%' }}
-        >
-          {message}
-        </motion.div>
-      );
+      return <DetailsFlashMessage id={id} message={message} />;
     }
 
     default: {
-      throw new Error(`Unhandled Flash Message type "${type}"`);
+      return <DefaultFlashMessage id={id} message={message} type={type} />;
     }
   }
 };
