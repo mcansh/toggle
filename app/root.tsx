@@ -4,14 +4,12 @@ import { Form, Meta, Scripts, Links, useRouteData } from '@remix-run/react';
 import { v4 as uuid } from '@lukeed/uuid';
 import { Outlet } from 'react-router-dom';
 
+import globalCSS from 'css:./styles/global.css';
 import type { Flash } from './lib/flash';
 import { FlashProvider } from './components/flash-context';
 import { FlashMessages } from './components/flashes';
 import { flashTypes } from './lib/flash';
 import { commitSession, getSession } from './sessions';
-
-// eslint-disable-next-line import/extensions, import/no-unresolved, import/order
-import globalCSS from 'css:./styles/global.css';
 import XIcon from './components/icons/solid/x';
 
 const links: LinksFunction = () => [

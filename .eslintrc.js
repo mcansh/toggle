@@ -8,4 +8,27 @@ module.exports = {
       path.join(process.cwd(), 'server/tsconfig.json'),
     ],
   },
+  rules: {
+    'import/extensions': ['error', { css: 'always' }],
+    'import/no-unresolved': ['error', { ignore: ['.css$'] }],
+    'import/order': [
+      'error',
+      {
+        pathGroups: [
+          {
+            pattern: 'img:*',
+            group: 'internal',
+          },
+          {
+            pattern: 'url:*',
+            group: 'internal',
+          },
+          {
+            pattern: 'css:*',
+            group: 'internal',
+          },
+        ],
+      },
+    ],
+  },
 };
