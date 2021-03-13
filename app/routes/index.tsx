@@ -1,5 +1,5 @@
 import * as React from 'react';
-import type { RouteComponent } from '@remix-run/react';
+import type { MetaFunction, RouteComponent } from '@remix-run/react';
 import { Link, useRouteData } from '@remix-run/react';
 import type { FeatureChannel, Team } from '@prisma/client';
 import { redirect } from '@remix-run/data';
@@ -58,12 +58,10 @@ const loader: RemixLoader<RouteData> = async ({ request, context }) => {
   return { user };
 };
 
-function meta() {
-  return {
-    title: 'Toggle',
-    description: 'Welcome to Toggle!',
-  };
-}
+const meta: MetaFunction = () => ({
+  title: 'Toggle',
+  description: 'Welcome to Toggle!',
+});
 
 const IndexPage: RouteComponent = () => {
   const data = useRouteData<RouteData>();
