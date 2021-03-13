@@ -2,6 +2,7 @@ import * as React from 'react';
 import type { FeatureChannel, Flag, FlagType, Team } from '@prisma/client';
 import type { Action } from '@remix-run/data';
 import { redirect } from '@remix-run/data';
+import type { MetaFunction } from '@remix-run/react';
 import { Form, usePendingFormSubmit, useRouteData } from '@remix-run/react';
 import { Switch } from '@headlessui/react';
 import clsx from 'clsx';
@@ -13,6 +14,7 @@ import { flashTypes } from '../lib/flash';
 import { commitSession, getSession } from '../sessions';
 import { Button } from '../components/button';
 import { BaseInput, Input, InputLabel } from '../components/input';
+import FourOhFour, { meta as fourOhFourMeta } from './404';
 
 interface RouteData {
   channel: FeatureChannel & {
@@ -155,6 +157,15 @@ const action: Action = async ({ context, params, request }) => {
       const featureType = body.get('type') as FlagType;
       const featureValue = body.get('value') as string;
 
+      if (!featureName || !featureType || !featureValue) {
+        session.flash(flashTypes.error, 'Missing required feature field');
+        return redirect(pathname, {
+          headers: {
+            'Set-Cookie': await commitSession(session),
+          },
+        });
+      }
+
       await prisma.flag.create({
         data: {
           feature: pascalCase(featureName),
@@ -206,17 +217,15 @@ const action: Action = async ({ context, params, request }) => {
   }
 };
 
-function meta({ data }: { data: RouteData }) {
+const meta: MetaFunction = ({ data }: { data: RouteData }) => {
   if (!data.channel) {
-    return {
-      title: 'Toggle',
-    };
+    return fourOhFourMeta();
   }
 
   return {
     title: `${data.channel.team.slug}/${data.channel.slug}`,
   };
-}
+};
 
 interface BooleanForm {
   name: string;
@@ -248,7 +257,7 @@ const FeatureChannelPage: React.VFC = () => {
   });
 
   if (!data.channel) {
-    return <h1>Channel not found</h1>;
+    return <FourOhFour />;
   }
 
   function handleFormChange(
@@ -359,7 +368,7 @@ const FeatureChannelPage: React.VFC = () => {
       >
         <fieldset
           disabled={!!pendingForm}
-          className="flex flex-col p-5 my-4 space-y-4 text-sm text-gray-900 bg-gray-100 border border-gray-200 border-solid rounded"
+          className="flex flex-col p-5 my-4 space-y-4 text-sm text-gray-900 bg-gray-100 border border-gray-200 border-solid rounded disabled:opacity-70"
         >
           <Input
             name="name"
