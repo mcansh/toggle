@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { useRouteData } from '@remix-run/react';
-import type { Loader } from '@remix-run/data';
+import type { LoaderFunction } from '@remix-run/node';
 
 import type { RemixContext } from '../context';
 
-const loader: Loader = async ({ context }) => {
+const loader: LoaderFunction = async ({ context }) => {
   const { prisma } = context as RemixContext;
 
   try {

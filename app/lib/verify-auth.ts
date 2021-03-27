@@ -1,5 +1,5 @@
 import type { User } from '@prisma/client';
-import { redirect } from '@remix-run/data';
+import { redirect } from '@remix-run/node';
 
 import type { ActionArgs, LoaderArgs } from '../context';
 import { commitSession, getSession } from '../sessions';

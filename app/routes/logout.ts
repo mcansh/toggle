@@ -1,9 +1,9 @@
-import type { Loader } from '@remix-run/data';
-import { redirect } from '@remix-run/data';
+import type { LoaderFunction } from '@remix-run/node';
+import { redirect } from '@remix-run/node';
 
 import { destroySession, getSession } from '../sessions';
 
-const loader: Loader = async ({ request }) => {
+const loader: LoaderFunction = async ({ request }) => {
   const session = await getSession(request.headers.get('Cookie'));
   return redirect('/login', {
     headers: {
