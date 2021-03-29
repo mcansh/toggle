@@ -7,6 +7,5 @@ node_modules
 /build
 /app-build
 /public/build
-/app/components/icons/**/*.tsx
 
 .env
