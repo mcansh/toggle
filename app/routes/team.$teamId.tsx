@@ -1,8 +1,8 @@
 import { randomBytes } from 'crypto';
 
 import * as React from 'react';
-import type { MetaFunction } from '@remix-run/core';
-import { redirect } from '@remix-run/data';
+import type { MetaFunction } from '@remix-run/node';
+import { redirect } from '@remix-run/node';
 import { Form, useRouteData } from '@remix-run/react';
 
 import { getSession } from '../sessions';

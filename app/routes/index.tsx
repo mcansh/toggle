@@ -2,7 +2,7 @@ import * as React from 'react';
 import type { MetaFunction, RouteComponent } from '@remix-run/react';
 import { Link, useRouteData } from '@remix-run/react';
 import type { FeatureChannel, Team } from '@prisma/client';
-import { redirect } from '@remix-run/data';
+import { redirect } from '@remix-run/node';
 
 import type { RemixContext, RemixLoader } from '../context';
 import { commitSession, getSession } from '../sessions';

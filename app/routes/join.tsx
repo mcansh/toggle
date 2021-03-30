@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Form, usePendingFormSubmit } from '@remix-run/react';
-import type { Action, Loader } from '@remix-run/data';
-import { redirect } from '@remix-run/data';
+import type { ActionFunction, LoaderFunction } from '@remix-run/node';
+import { redirect } from '@remix-run/node';
 import slugify from 'slugify';
 
 import type { RemixContext } from '../context';
@@ -12,7 +12,7 @@ import { Button } from '../components/button';
 import { commitSession, getSession } from '../sessions';
 import { generateName } from '../lib/name-generator';
 
-const loader: Loader = async ({ request }) => {
+const loader: LoaderFunction = async ({ request }) => {
   const session = await getSession(request.headers.get('Cookie'));
   if (session.get('userId')) {
     return redirect('/');
@@ -21,7 +21,7 @@ const loader: Loader = async ({ request }) => {
   return {};
 };
 
-const action: Action = async ({ request, context }) => {
+const action: ActionFunction = async ({ request, context }) => {
   const session = await getSession(request.headers.get('Cookie'));
   const { prisma } = context as RemixContext;
   const requestBody = await request.text();

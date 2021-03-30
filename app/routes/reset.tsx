@@ -1,8 +1,8 @@
 import { randomBytes } from 'crypto';
 
 import * as React from 'react';
-import type { Action } from '@remix-run/data';
-import { redirect } from '@remix-run/data';
+import type { ActionFunction } from '@remix-run/node';
+import { redirect } from '@remix-run/node';
 import { Form, usePendingLocation } from '@remix-run/react';
 import { addHours } from 'date-fns';
 
@@ -13,7 +13,7 @@ import { Input } from '../components/input';
 import { Button } from '../components/button';
 import { commitSession, getSession } from '../sessions';
 
-const action: Action = async ({ request, context }) => {
+const action: ActionFunction = async ({ request, context }) => {
   const session = await getSession(request.headers.get('Cookie'));
   const { prisma } = context as RemixContext;
   const requestBody = await request.text();

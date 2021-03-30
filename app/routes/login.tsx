@@ -2,8 +2,8 @@ import { randomBytes } from 'crypto';
 
 import * as React from 'react';
 import { Form, Link, usePendingFormSubmit } from '@remix-run/react';
-import type { Action, Loader } from '@remix-run/data';
-import { redirect } from '@remix-run/data';
+import type { ActionFunction, LoaderFunction } from '@remix-run/node';
+import { redirect } from '@remix-run/node';
 import { addHours } from 'date-fns';
 
 import type { RemixContext } from '../context';
@@ -14,7 +14,7 @@ import { Input } from '../components/input';
 import { Button } from '../components/button';
 import { commitSession, getSession } from '../sessions';
 
-const loader: Loader = async ({ request }) => {
+const loader: LoaderFunction = async ({ request }) => {
   const session = await getSession(request.headers.get('Cookie'));
   if (session.get('userId')) {
     return redirect('/', {
@@ -28,7 +28,7 @@ const loader: Loader = async ({ request }) => {
 };
 
 // eslint-disable-next-line max-statements
-const action: Action = async ({ request, context }) => {
+const action: ActionFunction = async ({ request, context }) => {
   const SecurePassword = await import('secure-password');
   const session = await getSession(request.headers.get('Cookie'));
   const { prisma } = context as RemixContext;

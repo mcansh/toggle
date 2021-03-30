@@ -1,6 +1,6 @@
 import * as React from 'react';
-import type { MetaFunction, RouteComponent } from '@remix-run/core';
-import { redirect } from '@remix-run/data';
+import type { MetaFunction, RouteComponent } from '@remix-run/node';
+import { redirect } from '@remix-run/node';
 import { Form, usePendingFormSubmit, useRouteData } from '@remix-run/react';
 import slugify from 'slugify';
 import type { Team } from '@prisma/client';

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import type { FeatureChannel, Flag, FlagType, Team } from '@prisma/client';
-import type { Action } from '@remix-run/data';
-import { redirect } from '@remix-run/data';
+import type { ActionFunction } from '@remix-run/node';
+import { redirect } from '@remix-run/node';
 import type { MetaFunction } from '@remix-run/react';
 import { Form, usePendingFormSubmit, useRouteData } from '@remix-run/react';
 import { Switch } from '@headlessui/react';
@@ -110,7 +110,7 @@ const loader: RemixLoader<RouteData, Params> = async ({
   );
 };
 
-const action: Action = async ({ context, params, request }) => {
+const action: ActionFunction = async ({ context, params, request }) => {
   // verify session
   const session = await getSession(request.headers.get('Cookie'));
   const userId = session.get('userId');

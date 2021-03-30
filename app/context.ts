@@ -1,5 +1,5 @@
 import type { PrismaClient } from '@prisma/client';
-import type { ActionFunction, LoaderFunction } from '@remix-run/core';
+import type { ActionFunction, LoaderFunction } from '@remix-run/node';
 import type { Except } from 'type-fest';
 
 export interface RemixContext {

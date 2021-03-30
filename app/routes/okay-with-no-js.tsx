@@ -1,6 +1,6 @@
 import type * as React from 'react';
-import type { ActionFunction, LoaderFunction } from '@remix-run/core';
-import { redirect } from '@remix-run/core';
+import type { ActionFunction, LoaderFunction } from '@remix-run/node';
+import { redirect } from '@remix-run/node';
 
 import { commitSession, getSession } from '../sessions';
 
