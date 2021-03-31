@@ -5,7 +5,7 @@
   "main": "remix.config.js",
   "sideEffects": false,
   "scripts": {
-    "postinstall": "husky install && prisma generate && npm run build:remix",
+    "postinstall": "husky install && prisma generate && npm run build",
     "prebuild": "npm run clean",
     "build:css": "postcss styles --base styles --dir app/styles --env production",
     "build:remix": "NODE_ENV=production remix build2",
