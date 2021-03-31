@@ -47,7 +47,7 @@ const action: ActionFunction = async ({ request, context }) => {
       });
     }
 
-    const valid = await verify(user.hashedPassword, password);
+    const valid = await verify(password, user.hashedPassword);
 
     if (!valid) {
       session.flash(flashTypes.error, `Invalid credentials`);
