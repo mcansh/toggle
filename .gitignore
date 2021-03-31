@@ -7,7 +7,7 @@ node_modules
 /build
 /server-build
 /public/build
-/app/styles/dist
+/app/styles/**/*.css
 
 .env
 .vercel

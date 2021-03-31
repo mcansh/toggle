@@ -14,7 +14,7 @@ module.exports = {
     },
     {
       name: 'Remix',
-      script: 'remix run',
+      script: 'remix run2',
       ignore_watch: ['.'],
       env: {
         NODE_ENV: 'development',
@@ -22,7 +22,7 @@ module.exports = {
     },
     {
       name: 'CSS',
-      script: 'postcss app/styles --base app/styles --dir app/styles/dist -w',
+      script: 'postcss styles --base styles --dir app/styles -w',
       ignore_watch: ['.'],
       env: {
         NODE_ENV: 'development',

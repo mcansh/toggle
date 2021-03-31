@@ -3,9 +3,10 @@ import type { LinksFunction, LoaderFunction } from '@remix-run/react';
 import { Form, Meta, Scripts, Links, useRouteData } from '@remix-run/react';
 import { v4 as uuid } from '@lukeed/uuid';
 import { Outlet } from 'react-router-dom';
-
-import globalCSS from 'url:./styles/dist/global.css';
 import { XIcon } from '@heroicons/react/solid';
+
+import globalCSS from '../styles/global.css';
+
 import type { Flash } from './lib/flash';
 import { FlashProvider } from './components/flash-context';
 import { FlashMessages } from './components/flashes';
