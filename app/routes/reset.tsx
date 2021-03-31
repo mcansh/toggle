@@ -1,5 +1,3 @@
-import { randomBytes } from 'crypto';
-
 import * as React from 'react';
 import type { ActionFunction } from '@remix-run/node';
 import { redirect } from '@remix-run/node';
@@ -14,6 +12,7 @@ import { Button } from '../components/button';
 import { commitSession, getSession } from '../sessions';
 
 const action: ActionFunction = async ({ request, context }) => {
+  const crypto = await import('crypto');
   const session = await getSession(request.headers.get('Cookie'));
   const { prisma } = context as RemixContext;
   const requestBody = await request.text();
@@ -21,7 +20,7 @@ const action: ActionFunction = async ({ request, context }) => {
 
   const email = body.get('email') as string;
 
-  const resetTokenBuffer = randomBytes(20);
+  const resetTokenBuffer = crypto.randomBytes(20);
   const resetToken = resetTokenBuffer.toString('hex');
   const resetTokenExpiry = addHours(Date.now(), 1);
 

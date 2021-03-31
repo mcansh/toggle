@@ -5,12 +5,12 @@ import { redirect } from '@remix-run/node';
 import slugify from 'slugify';
 
 import type { RemixContext } from '../context';
-import { hash } from '../lib/auth';
 import { flashTypes } from '../lib/flash';
 import { Input } from '../components/input';
 import { Button } from '../components/button';
 import { commitSession, getSession } from '../sessions';
 import { generateName } from '../lib/name-generator';
+import { hash } from '../lib/auth';
 
 const loader: LoaderFunction = async ({ request }) => {
   const session = await getSession(request.headers.get('Cookie'));

@@ -1,23 +1,25 @@
-import SecurePassword from 'secure-password';
+async function hash(password: string): Promise<string> {
+  const crypto = await import('crypto');
+  return new Promise((resolve, reject) => {
+    // generate random 16 bytes long salt
+    const salt = crypto.randomBytes(16).toString('hex');
 
-const pwd = new SecurePassword();
-
-async function hash(password: string) {
-  const buffer = Buffer.from(password);
-  const hashedBuffer = await pwd.hash(buffer);
-  return hashedBuffer.toString('base64');
+    crypto.scrypt(password, salt, 64, (err, derivedKey) => {
+      if (err) reject(err);
+      resolve(`${salt}:${derivedKey.toString('hex')}`);
+    });
+  });
 }
 
-async function verify(hashedPassword: string, password: string) {
-  try {
-    const passwordBuffer = Buffer.from(password);
-    const hashedPasswordBuffer = Buffer.from(hashedPassword, 'base64');
-    const result = await pwd.verify(passwordBuffer, hashedPasswordBuffer);
-    return result;
-  } catch (error) {
-    console.error(error);
-    return undefined;
-  }
+async function verify(password: string, hashed: string): Promise<boolean> {
+  const crypto = await import('crypto');
+  return new Promise((resolve, reject) => {
+    const [salt, key] = hashed.split(':');
+    crypto.scrypt(password, salt, 64, (err, derivedKey) => {
+      if (err) reject(err);
+      resolve(key === derivedKey.toString('hex'));
+    });
+  });
 }
 
-export { pwd, hash, verify };
+export { hash, verify };

@@ -1,8 +1,6 @@
-import { randomBytes } from 'crypto';
-
 import * as React from 'react';
 import type { MetaFunction } from '@remix-run/node';
-import { redirect } from '@remix-run/node';
+import { json, redirect } from '@remix-run/node';
 import { Form, useRouteData } from '@remix-run/react';
 
 import { getSession } from '../sessions';
@@ -41,24 +39,20 @@ const loader: RemixLoader<RouteData, Params> = async ({
   });
 
   if (!team) {
-    return new Response(JSON.stringify({}), {
-      status: 404,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    return json(null, { status: 404 });
   }
 
   return { team };
 };
 
 const action: RemixAction<Params> = async ({ request, params, context }) => {
+  const crypto = await import('crypto');
   // const session = await getSession(request.headers.get('Cookie'));
   // const req = await request.text();
   // const body = new URLSearchParams(req);
   const { pathname } = new URL(request.url);
 
-  const accessTokenBuffer = randomBytes(20);
+  const accessTokenBuffer = crypto.randomBytes(20);
   const token = accessTokenBuffer.toString('hex');
 
   const team = await context.prisma.team.findUnique({

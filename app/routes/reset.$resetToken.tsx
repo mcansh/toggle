@@ -5,11 +5,11 @@ import { Form, usePendingFormSubmit, useRouteData } from '@remix-run/react';
 import { subHours } from 'date-fns';
 
 import type { RemixContext } from '../context';
-import { hash } from '../lib/auth';
 import { flashTypes } from '../lib/flash';
 import { Button } from '../components/button';
 import { Input } from '../components/input';
 import { commitSession, getSession } from '../sessions';
+import { hash } from '../lib/auth';
 
 const loader: LoaderFunction = ({ params }) => ({
   resetToken: params.resetToken,
