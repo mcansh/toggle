@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "a feature flag platform",
   "main": "remix.config.js",
+  "sideEffects": false,
   "scripts": {
     "postinstall": "husky install && prisma generate && npm run build:remix",
     "prebuild": "npm run clean",
