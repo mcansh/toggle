@@ -9,7 +9,6 @@
     "prebuild": "npm run clean",
     "build:css": "postcss styles --base styles --dir app/styles --env production",
     "build:remix": "NODE_ENV=production remix build2",
-    "build:server": "NODE_ENV=production tsc --project server",
     "build": "run-s build:*",
     "predev": "npm run build",
     "dev": "pm2-dev pm2.config.js",
