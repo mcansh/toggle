@@ -2,9 +2,8 @@ module.exports = {
   apps: [
     {
       name: 'Express',
-      script:
-        'tsc --project server && node -r dotenv/config server-build/server',
-      watch: ['build/assets.json', 'server'],
+      script: 'node -r dotenv/config index.js',
+      watch: ['build/assets.json', 'index.js'],
       watch_options: {
         followSymlinks: false,
       },
