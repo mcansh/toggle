@@ -13,7 +13,7 @@
     "build": "run-s build:*",
     "predev": "npm run build",
     "dev": "pm2-dev pm2.config.js",
-    "start": "node server-build/server",
+    "start": "node index.js",
     "clean": "del .cache build public/build app/styles",
     "lint": "eslint --cache --ext js,jsx,ts,tsx,mdx ."
   },
