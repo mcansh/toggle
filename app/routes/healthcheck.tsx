@@ -1,12 +1,10 @@
 import * as React from 'react';
-import { useRouteData } from '@remix-run/react';
-import type { LoaderFunction } from '@remix-run/node';
+import { useRouteData } from 'remix';
+import type { LoaderFunction } from 'remix';
 
-import type { RemixContext } from '../context';
+import { prisma } from '../db';
 
-const loader: LoaderFunction = async ({ context }) => {
-  const { prisma } = context as RemixContext;
-
+const loader: LoaderFunction = async () => {
   try {
     await prisma.flag.count();
     return new Response(JSON.stringify({ ok: true }), {

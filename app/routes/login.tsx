@@ -1,14 +1,13 @@
 import * as React from 'react';
-import { Form, Link, usePendingFormSubmit } from '@remix-run/react';
-import type { ActionFunction, LoaderFunction } from '@remix-run/node';
-import { redirect } from '@remix-run/node';
+import { Form, Link, usePendingFormSubmit, redirect } from 'remix';
+import type { ActionFunction, LoaderFunction } from 'remix';
 
-import type { RemixContext } from '../context';
 import { flashTypes } from '../lib/flash';
 import { Input } from '../components/input';
 import { Button } from '../components/button';
 import { commitSession, getSession } from '../sessions';
 import { verify } from '../lib/auth';
+import { prisma } from '../db';
 
 const loader: LoaderFunction = async ({ request }) => {
   const session = await getSession(request.headers.get('Cookie'));
@@ -23,10 +22,8 @@ const loader: LoaderFunction = async ({ request }) => {
   return {};
 };
 
-// eslint-disable-next-line max-statements
-const action: ActionFunction = async ({ request, context }) => {
+const action: ActionFunction = async ({ request }) => {
   const session = await getSession(request.headers.get('Cookie'));
-  const { prisma } = context as RemixContext;
   const requestBody = await request.text();
 
   const body = new URLSearchParams(requestBody);

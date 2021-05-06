@@ -1,23 +1,23 @@
 import * as React from 'react';
 import type { FeatureChannel, Flag, FlagType, Team } from '@prisma/client';
-import type { ActionFunction } from '@remix-run/node';
-import { redirect } from '@remix-run/node';
-import type { MetaFunction } from '@remix-run/react';
-import { Form, usePendingFormSubmit, useRouteData } from '@remix-run/react';
+import type { ActionFunction, LoaderFunction, MetaFunction } from 'remix';
+import { redirect, Form, usePendingFormSubmit, useRouteData } from 'remix';
 import { Switch } from '@headlessui/react';
 import clsx from 'clsx';
 import { pascalCase } from 'change-case';
 import { ago } from 'time-ago';
+import { json } from 'remix-utils';
 
-import type { RemixContext, RemixLoader } from '../context';
 import { flashTypes } from '../lib/flash';
 import { commitSession, getSession } from '../sessions';
 import { Button } from '../components/button';
 import { BaseInput, Input, InputLabel } from '../components/input';
+import { prisma } from '../db';
+
 import FourOhFour, { meta as fourOhFourMeta } from './404';
 
 interface RouteData {
-  channel: FeatureChannel & {
+  channel?: FeatureChannel & {
     team: {
       slug: Team['slug'];
     };
@@ -31,15 +31,8 @@ interface RouteData {
   };
 }
 
-type Params = { teamId: string; slug: string };
-
-const loader: RemixLoader<RouteData, Params> = async ({
-  request,
-  context,
-  params,
-}) => {
+const loader: LoaderFunction = async ({ request, params }) => {
   const session = await getSession(request.headers.get('Cookie'));
-  const { prisma } = context as RemixContext;
 
   const { pathname } = new URL(request.url);
 
@@ -78,13 +71,16 @@ const loader: RemixLoader<RouteData, Params> = async ({
   });
 
   if (!channel) {
-    return new Response(JSON.stringify({ channel: undefined }), {
-      status: 404,
-      headers: {
-        'Content-Type': 'application/json',
-        'Set-Cookie': await commitSession(session),
-      },
-    });
+    return json<RouteData>(
+      { channel: undefined },
+      {
+        status: 404,
+        headers: {
+          'Content-Type': 'application/json',
+          'Set-Cookie': await commitSession(session),
+        },
+      }
+    );
   }
 
   const channelData = channel.flags.map(flag => {
@@ -98,8 +94,8 @@ const loader: RemixLoader<RouteData, Params> = async ({
     };
   });
 
-  return new Response(
-    JSON.stringify({ channel: { ...channel, flags: channelData } }),
+  return json<RouteData>(
+    { channel: { ...channel, flags: channelData } },
     {
       status: 200,
       headers: {
@@ -110,7 +106,7 @@ const loader: RemixLoader<RouteData, Params> = async ({
   );
 };
 
-const action: ActionFunction = async ({ context, params, request }) => {
+const action: ActionFunction = async ({ params, request }) => {
   // verify session
   const session = await getSession(request.headers.get('Cookie'));
   const userId = session.get('userId');
@@ -126,7 +122,6 @@ const action: ActionFunction = async ({ context, params, request }) => {
     });
   }
 
-  const { prisma } = context as RemixContext;
   const requestBody = await request.text();
   const body = new URLSearchParams(requestBody);
   const method: string = (body.get('_method') ?? request.method).toLowerCase();

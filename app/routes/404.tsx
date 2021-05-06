@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Link } from '@remix-run/react';
+import { Link } from 'remix';
 
 function meta() {
   return { title: "Ain't nothing here" };

@@ -1,20 +1,18 @@
 import * as React from 'react';
-import type { ActionFunction } from '@remix-run/node';
-import { redirect } from '@remix-run/node';
-import { Form, usePendingLocation } from '@remix-run/react';
+import type { ActionFunction } from 'remix';
+import { redirect, Form, usePendingLocation } from 'remix';
 import { addHours } from 'date-fns';
 
 import { makeANiceEmail, client } from '../lib/mail';
-import type { RemixContext } from '../context';
 import { flashTypes } from '../lib/flash';
 import { Input } from '../components/input';
 import { Button } from '../components/button';
 import { commitSession, getSession } from '../sessions';
+import { prisma } from '../db';
 
-const action: ActionFunction = async ({ request, context }) => {
+const action: ActionFunction = async ({ request }) => {
   const crypto = await import('crypto');
   const session = await getSession(request.headers.get('Cookie'));
-  const { prisma } = context as RemixContext;
   const requestBody = await request.text();
   const body = new URLSearchParams(requestBody);
 

@@ -1,20 +1,14 @@
 const express = require('express');
 const { createRequestHandler } = require('@remix-run/express');
-const { PrismaClient } = require('@prisma/client');
 
 const app = express();
 
 app.use(express.static('public'));
 
-const prisma = new PrismaClient();
-
 app.all(
   '*',
   createRequestHandler({
     build: require('./build'),
-    getLoadContext() {
-      return { prisma };
-    },
   })
 );
 

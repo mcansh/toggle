@@ -1,9 +1,10 @@
 import * as React from 'react';
-import type { LinksFunction, LoaderFunction } from '@remix-run/react';
-import { Form, Meta, Scripts, Links, useRouteData } from '@remix-run/react';
+import type { LinksFunction, LoaderFunction } from 'remix';
+import { Form, Meta, Scripts, Links, useRouteData } from 'remix';
 import { v4 as uuid } from '@lukeed/uuid';
 import { Outlet } from 'react-router-dom';
 import { XIcon } from '@heroicons/react/solid';
+import { json } from 'remix-utils';
 
 import globalCSS from './styles/global.css';
 import type { Flash } from './lib/flash';
@@ -53,15 +54,15 @@ const loader: LoaderFunction = async ({ request }) => {
     })
     .filter((Boolean as unknown) as ExcludesFalse);
 
-  const body = JSON.stringify({ flash: messages, OkayWithNoJs });
-
-  return new Response(body, {
-    status: 200,
-    headers: {
-      'Content-Type': 'application/json',
-      'Set-Cookie': await commitSession(session),
-    },
-  });
+  return json<RouteData>(
+    { flash: messages as any, OkayWithNoJs },
+    {
+      status: 200,
+      headers: {
+        'Set-Cookie': await commitSession(session),
+      },
+    }
+  );
 };
 
 function App() {

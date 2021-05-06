@@ -1,11 +1,11 @@
 import * as React from 'react';
-import type { MetaFunction, RouteComponent } from '@remix-run/react';
-import { Link, useRouteData } from '@remix-run/react';
+import type { MetaFunction, RouteComponent, LoaderFunction } from 'remix';
+import { Link, useRouteData, redirect } from 'remix';
 import type { FeatureChannel, Team } from '@prisma/client';
-import { redirect } from '@remix-run/node';
+import { json } from 'remix-utils';
 
-import type { RemixContext, RemixLoader } from '../context';
 import { commitSession, getSession } from '../sessions';
+import { prisma } from '../db';
 
 interface RouteData {
   user: {
@@ -18,9 +18,9 @@ interface RouteData {
   };
 }
 
-const loader: RemixLoader<RouteData> = async ({ request, context }) => {
+const loader: LoaderFunction = async ({ request }) => {
   const session = await getSession(request.headers.get('Cookie'));
-  const { prisma } = context as RemixContext;
+
   const userId = session.get('userId');
 
   if (!userId) {
@@ -55,7 +55,7 @@ const loader: RemixLoader<RouteData> = async ({ request, context }) => {
     });
   }
 
-  return { user };
+  return json<RouteData>({ user });
 };
 
 const meta: MetaFunction = () => ({

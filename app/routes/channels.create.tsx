@@ -1,15 +1,20 @@
 import * as React from 'react';
-import type { MetaFunction, RouteComponent } from '@remix-run/node';
-import { redirect } from '@remix-run/node';
-import { Form, usePendingFormSubmit, useRouteData } from '@remix-run/react';
+import type {
+  ActionFunction,
+  LoaderFunction,
+  MetaFunction,
+  RouteComponent,
+} from 'remix';
+import { redirect, Form, usePendingFormSubmit, useRouteData } from 'remix';
 import slugify from 'slugify';
 import type { Team } from '@prisma/client';
+import { json } from 'remix-utils';
 
-import { verifyAuth } from '../lib/verify-auth';
-import type { RemixAction, RemixLoader } from '../context';
 import { Button } from '../components/button';
 import { Input, InputLabel } from '../components/input';
 import { generateName } from '../lib/name-generator';
+import { getSession } from '../sessions';
+import { prisma } from '../db';
 
 interface RouteData {
   teams: Array<{
@@ -18,22 +23,32 @@ interface RouteData {
   }>;
 }
 
-const loader: RemixLoader<RouteData> = async args => {
-  const user = await verifyAuth(args);
-  const userWithTeams = await args.context.prisma.user.findUnique({
-    where: { id: user.id },
+const loader: LoaderFunction = async ({ request }) => {
+  const session = await getSession(request.headers.get('Cookie'));
+  const userId = session.get('userId');
+
+  if (!userId) {
+    return redirect('/login');
+  }
+
+  const userWithTeams = await prisma.user.findUnique({
+    where: { id: userId },
     select: {
       teams: { select: { name: true, id: true } },
     },
   });
 
-  if (!userWithTeams) return { teams: [] };
-  return { teams: userWithTeams.teams };
+  if (!userWithTeams) return json<RouteData>({ teams: [] });
+  return json<RouteData>({ teams: userWithTeams.teams });
 };
 
-const action: RemixAction = async args => {
-  const { request, context } = args;
-  const user = await verifyAuth(args);
+const action: ActionFunction = async ({ request }) => {
+  const session = await getSession(request.headers.get('Cookie'));
+  const userId = session.get('userId');
+
+  if (!userId) {
+    return redirect('/login');
+  }
 
   const req = await request.text();
   const body = new URLSearchParams(req);
@@ -49,7 +64,7 @@ const action: RemixAction = async args => {
 
   const possibleNewTeamName = generateName();
 
-  await context.prisma.featureChannel.create({
+  await prisma.featureChannel.create({
     data: {
       name,
       slug,
@@ -63,12 +78,12 @@ const action: RemixAction = async args => {
             slug: slugify(possibleNewTeamName, { lower: true }),
             createdBy: {
               connect: {
-                id: user.id,
+                id: userId,
               },
             },
             members: {
               connect: {
-                id: user.id,
+                id: userId,
               },
             },
           },

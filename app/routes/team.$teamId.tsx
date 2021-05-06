@@ -1,34 +1,27 @@
 import * as React from 'react';
-import type { MetaFunction } from '@remix-run/node';
-import { json, redirect } from '@remix-run/node';
-import { Form, useRouteData } from '@remix-run/react';
+import type { ActionFunction, LoaderFunction, MetaFunction } from 'remix';
+import { redirect, Form, useRouteData } from 'remix';
+import { json } from 'remix-utils';
 
 import { getSession } from '../sessions';
-import type { RemixAction, RemixLoader } from '../context';
+import { prisma } from '../db';
 
 interface RouteData {
-  team: {
+  team?: {
     name: string;
     accessTokens: Array<string>;
   };
 }
 
-type Params = {
-  teamId: string;
-};
-
-const loader: RemixLoader<RouteData, Params> = async ({
-  request,
-  context,
-  params,
-}) => {
+const loader: LoaderFunction = async ({ request, params }) => {
   const session = await getSession(request.headers.get('Cookie'));
   const userId = session.get('userId');
+
   if (!userId) {
     return redirect('/login');
   }
 
-  const team = await context.prisma.team.findFirst({
+  const team = await prisma.team.findFirst({
     where: {
       AND: [{ id: params.teamId }, { members: { some: { id: userId } } }],
     },
@@ -39,13 +32,13 @@ const loader: RemixLoader<RouteData, Params> = async ({
   });
 
   if (!team) {
-    return json(null, { status: 404 });
+    return json<RouteData>({}, { status: 404 });
   }
 
-  return { team };
+  return json<RouteData>({ team });
 };
 
-const action: RemixAction<Params> = async ({ request, params, context }) => {
+const action: ActionFunction = async ({ request, params }) => {
   const crypto = await import('crypto');
   // const session = await getSession(request.headers.get('Cookie'));
   // const req = await request.text();
@@ -55,15 +48,9 @@ const action: RemixAction<Params> = async ({ request, params, context }) => {
   const accessTokenBuffer = crypto.randomBytes(20);
   const token = accessTokenBuffer.toString('hex');
 
-  const team = await context.prisma.team.findUnique({
+  await prisma.team.update({
     where: { id: params.teamId },
-    select: { accessTokens: true },
-    rejectOnNotFound: true,
-  });
-
-  await context.prisma.team.update({
-    where: { id: params.teamId },
-    data: { accessTokens: { set: [...team?.accessTokens, token] } },
+    data: { accessTokens: { push: token } },
   });
 
   return redirect(pathname);

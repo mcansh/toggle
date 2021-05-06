@@ -1,23 +1,21 @@
 import * as React from 'react';
-import type { LoaderFunction, ActionFunction } from '@remix-run/node';
-import { redirect } from '@remix-run/node';
-import { Form, usePendingFormSubmit, useRouteData } from '@remix-run/react';
+import type { LoaderFunction, ActionFunction } from 'remix';
+import { redirect, Form, usePendingFormSubmit, useRouteData } from 'remix';
 import { subHours } from 'date-fns';
 
-import type { RemixContext } from '../context';
 import { flashTypes } from '../lib/flash';
 import { Button } from '../components/button';
 import { Input } from '../components/input';
 import { commitSession, getSession } from '../sessions';
 import { hash } from '../lib/auth';
+import { prisma } from '../db';
 
 const loader: LoaderFunction = ({ params }) => ({
   resetToken: params.resetToken,
 });
 
-const action: ActionFunction = async ({ request, context, params }) => {
+const action: ActionFunction = async ({ request, params }) => {
   const session = await getSession(request.headers.get('Cookie'));
-  const { prisma } = context as RemixContext;
   const { resetToken } = params;
   const returnTo = session.get('returnTo') as string;
 
