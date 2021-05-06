@@ -1,8 +1,13 @@
 import { createSessionStorage } from 'remix';
 import Redis from 'ioredis';
 import cuid from 'cuid';
+import { addWeeks, differenceInMilliseconds } from 'date-fns';
 
-function createRedisSessionStorage({ cookie }: any) {
+function createRedisSessionStorage({
+  cookie,
+}: {
+  cookie: Parameters<typeof createSessionStorage>['0']['cookie'];
+}) {
   const redis = new Redis(process.env.REDIS_URL, {
     keyPrefix: 'toggle:',
   });
@@ -15,8 +20,11 @@ function createRedisSessionStorage({ cookie }: any) {
       // automatically purge this record from your database.
       const id = cuid();
 
-      const diff =
-        (expires ? expires.getTime() : Date.now() + 86400 * 14) - Date.now();
+      const now = new Date();
+
+      const diff = expires
+        ? differenceInMilliseconds(expires, now)
+        : addWeeks(now, 2).getTime();
 
       await redis.set(id, JSON.stringify(data), 'px', diff);
 
@@ -29,8 +37,11 @@ function createRedisSessionStorage({ cookie }: any) {
       return data;
     },
     async updateData(id, data, expires) {
-      const diff =
-        (expires ? expires.getTime() : Date.now() + 86400 * 14) - Date.now();
+      const now = new Date();
+
+      const diff = expires
+        ? differenceInMilliseconds(expires, now)
+        : addWeeks(now, 2).getTime();
 
       await redis.set(id, JSON.stringify(data), 'px', diff);
     },
