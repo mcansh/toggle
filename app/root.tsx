@@ -8,8 +8,6 @@ import { json } from 'remix-utils';
 
 import globalCSS from './styles/global.css';
 import type { Flash } from './lib/flash';
-import { FlashProvider } from './components/flash-context';
-import { FlashMessages } from './components/flashes';
 import { flashTypes } from './lib/flash';
 import { withSession } from './lib/with-session';
 
@@ -87,12 +85,7 @@ function App() {
             <div className="mt-20" />
           </noscript>
         )}
-        <div className="w-10/12 h-full mx-auto max-w-7xl">
-          <FlashProvider messages={data.flash}>
-            <FlashMessages />
-            <Outlet />
-          </FlashProvider>
-        </div>
+        <Outlet />
         <Scripts />
       </body>
     </html>

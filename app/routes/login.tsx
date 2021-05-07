@@ -3,11 +3,10 @@ import { Form, Link, usePendingFormSubmit, redirect } from 'remix';
 import type { ActionFunction, LoaderFunction } from 'remix';
 
 import { flashTypes } from '../lib/flash';
-import { Input } from '../components/input';
-import { Button } from '../components/button';
 import { withSession } from '../lib/with-session';
 import { verify } from '../lib/auth';
 import { prisma } from '../db';
+import { loginSchema } from '../lib/schemas/login';
 
 const loader: LoaderFunction = ({ request }) =>
   withSession(request, session => {
@@ -24,11 +23,18 @@ const action: ActionFunction = ({ request }) =>
 
     const body = new URLSearchParams(requestBody);
 
-    const email = body.get('email') as string;
-    const password = body.get('password') as string;
+    const email = body.get('email');
+    const password = body.get('password');
 
     try {
-      const user = await prisma.user.findUnique({ where: { email } });
+      const valid = await loginSchema.validate({
+        email,
+        password,
+      });
+
+      const user = await prisma.user.findUnique({
+        where: { email: valid.email },
+      });
 
       if (!user) {
         session.unset('userId');
@@ -36,9 +42,9 @@ const action: ActionFunction = ({ request }) =>
         return redirect('/login');
       }
 
-      const valid = await verify(password, user.hashedPassword);
+      const isValidPassword = await verify(valid.password, user.hashedPassword);
 
-      if (!valid) {
+      if (!isValidPassword) {
         session.flash(flashTypes.error, `Invalid credentials`);
         return redirect('/login');
       }
@@ -77,45 +83,81 @@ function LoginPage() {
   const pendingForm = usePendingFormSubmit();
 
   return (
-    <div className="grid h-full place-items-center">
-      <div className="w-full">
-        <h1 className="mb-4 text-3xl font-medium text-center">
+    <div className="flex flex-col justify-center min-h-screen py-12 bg-gray-50 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <img
+          className="w-auto h-12 mx-auto"
+          src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg"
+          alt="Workflow"
+        />
+        <h2 className="mt-6 text-3xl font-extrabold text-center text-gray-900">
           Sign in to Toggle
-        </h1>
-        <Form method="post" action="/login">
-          <fieldset
-            disabled={!!pendingForm}
-            className="flex flex-col p-5 my-4 space-y-4 text-sm text-gray-900 bg-gray-100 border border-gray-200 border-solid rounded"
-          >
-            <Input
-              type="email"
-              label="Email"
-              name="email"
-              placeholder="jane@doe.com"
-              autoComplete="email"
-            />
-            <Input
-              type="password"
-              label="Password"
-              name="password"
-              autoComplete="current-password"
-              placeholder={`thequickbrownfoxjumpedoverthelazydog`
-                .split('')
-                .map(() => '•')
-                .join('')}
-            />
-            <Button type="submit">Login</Button>
-          </fieldset>
-        </Form>
+        </h2>
+      </div>
 
-        <div className="px-3 py-2 text-sm border border-gray-300 rounded-md">
-          <p>
-            New to Toggle?{' '}
-            <Link className="text-blue-600 hover:underline" to="/join">
-              Create an account
-            </Link>
-            .
-          </p>
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="px-4 py-8 bg-white shadow sm:rounded-lg sm:px-10">
+          <Form method="post">
+            <fieldset className="space-y-6" disabled={!!pendingForm}>
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Email address
+                </label>
+                <div className="mt-1">
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    className="block w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm appearance-none focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Password
+                </label>
+                <div className="mt-1">
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    autoComplete="current-password"
+                    required
+                    className="block w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm appearance-none focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end">
+                <div className="text-sm">
+                  <Link
+                    to="/reset"
+                    className="font-medium text-indigo-600 hover:text-indigo-500"
+                  >
+                    Forgot your password?
+                  </Link>
+                </div>
+              </div>
+
+              <div>
+                <button
+                  type="submit"
+                  className="flex justify-center w-full px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                  Sign in
+                </button>
+              </div>
+            </fieldset>
+          </Form>
         </div>
       </div>
     </div>

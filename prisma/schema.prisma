@@ -12,7 +12,9 @@ generator client {
 
 model User {
   id             String   @id @default(cuid())
-  name           String
+  givenName      String
+  familyName     String
+  fullName       String
   email          String   @unique
   username       String   @unique
   hashedPassword String
