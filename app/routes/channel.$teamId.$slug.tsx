@@ -10,7 +10,7 @@ import { ago } from 'time-ago';
 import { json } from 'remix-utils';
 
 import { flashTypes } from '../lib/flash';
-import { commitSession, getSession } from '../sessions';
+import { withSession } from '../lib/with-session';
 import { Button } from '../components/button';
 import { BaseInput, Input, InputLabel } from '../components/input';
 import { prisma } from '../db';
@@ -48,186 +48,141 @@ interface RouteData {
   };
 }
 
-const loader: LoaderFunction = async ({ request, params }) => {
-  const session = await getSession(request.headers.get('Cookie'));
+const loader: LoaderFunction = ({ request, params }) =>
+  withSession(request, async session => {
+    const { pathname } = new URL(request.url);
 
-  const { pathname } = new URL(request.url);
+    const userId = session.get('userId');
 
-  const userId = session.get('userId');
-
-  if (!userId) {
-    session.set('returnTo', pathname);
-    return redirect('/login', {
-      headers: {
-        'Set-Cookie': await commitSession(session),
-      },
-    });
-  }
-
-  const channel = await prisma.featureChannel.findFirst({
-    where: {
-      AND: [{ teamId: params.teamId }, { slug: params.slug }],
-    },
-    include: {
-      team: {
-        select: {
-          slug: true,
-        },
-      },
-      flags: {
-        orderBy: { updatedAt: 'desc' },
-        select: {
-          updatedAt: true,
-          feature: true,
-          type: true,
-          value: true,
-          id: true,
-        },
-      },
-    },
-  });
-
-  if (!channel) {
-    return json<RouteData>(
-      { channel: undefined },
-      {
-        status: 404,
-        headers: {
-          'Content-Type': 'application/json',
-          'Set-Cookie': await commitSession(session),
-        },
-      }
-    );
-  }
-
-  const channelData = channel.flags.map(flag => {
-    const updated = ago(flag.updatedAt);
-    return {
-      feature: flag.feature,
-      type: flag.type,
-      updated,
-      value: flag.value,
-      id: flag.id,
-    };
-  });
-
-  return json<RouteData>(
-    { channel: { ...channel, flags: channelData } },
-    {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Set-Cookie': await commitSession(session),
-      },
+    if (!userId) {
+      session.set('returnTo', pathname);
+      return redirect('/login');
     }
-  );
-};
 
-const action: ActionFunction = async ({ params, request }) => {
-  // verify session
-  const session = await getSession(request.headers.get('Cookie'));
-  const userId = session.get('userId');
-
-  const { pathname } = new URL(request.url);
-
-  if (!userId) {
-    session.set('returnTo', pathname);
-    return redirect('/login', {
-      headers: {
-        'Set-Cookie': await commitSession(session),
+    const channel = await prisma.featureChannel.findFirst({
+      where: {
+        AND: [{ teamId: params.teamId }, { slug: params.slug }],
+      },
+      include: {
+        team: {
+          select: {
+            slug: true,
+          },
+        },
+        flags: {
+          orderBy: { updatedAt: 'desc' },
+          select: {
+            updatedAt: true,
+            feature: true,
+            type: true,
+            value: true,
+            id: true,
+          },
+        },
       },
     });
-  }
 
-  const requestBody = await request.text();
-  const body = new URLSearchParams(requestBody);
-  const method: string = (body.get('_method') ?? request.method).toLowerCase();
+    if (!channel) {
+      return json<RouteData>({ channel: undefined }, { status: 404 });
+    }
 
-  try {
-    if (method === 'delete') {
-      const featureId = body.get('featureId') as string;
-      await prisma.flag.delete({ where: { id: featureId } });
+    const channelData = channel.flags.map(flag => {
+      const updated = ago(flag.updatedAt);
+      return {
+        feature: flag.feature,
+        type: flag.type,
+        updated,
+        value: flag.value,
+        id: flag.id,
+      };
+    });
+
+    return json<RouteData>({ channel: { ...channel, flags: channelData } });
+  });
+
+const action: ActionFunction = ({ params, request }) =>
+  withSession(request, async session => {
+    // verify session
+    const userId = session.get('userId');
+
+    const { pathname } = new URL(request.url);
+
+    if (!userId) {
+      session.set('returnTo', pathname);
+      return redirect('/login');
+    }
+
+    const requestBody = await request.text();
+    const body = new URLSearchParams(requestBody);
+    const method: string = (
+      body.get('_method') ?? request.method
+    ).toLowerCase();
+
+    try {
+      if (method === 'delete') {
+        const featureId = body.get('featureId') as string;
+        await prisma.flag.delete({ where: { id: featureId } });
+        return redirect(pathname);
+      }
+
+      if (method === 'post') {
+        const channel = await prisma.featureChannel.findFirst({
+          where: {
+            teamId: params.teamId,
+            slug: params.slug,
+          },
+        });
+        if (!channel) {
+          session.flash(flashTypes.error, "That channel doesn't exist");
+          return redirect('/');
+        }
+        const featureName = body.get('name') as string;
+        const featureType = body.get('type') as FlagType;
+        const featureValue = body.get('value') as string;
+
+        if (!featureName || !featureType || !featureValue) {
+          session.flash(flashTypes.error, 'Missing required feature field');
+          return redirect(pathname);
+        }
+
+        await prisma.flag.create({
+          data: {
+            feature: pascalCase(featureName),
+            type: featureType,
+            value:
+              featureType === 'boolean'
+                ? !featureValue
+                  ? 'false'
+                  : 'true'
+                : featureValue,
+            createdBy: {
+              connect: { id: userId },
+            },
+            lastUpdatedBy: {
+              connect: { id: userId },
+            },
+            featureChannel: {
+              connect: { id: channel.id },
+            },
+          },
+        });
+
+        return redirect(pathname);
+      }
+
+      session.flash(flashTypes.error, `invalid request method "${method}"`);
+      return redirect(pathname);
+    } catch (error) {
+      console.error(error);
+
+      session.flash(flashTypes.error, 'Something went wrong');
+      session.flash(
+        flashTypes.errorDetails,
+        JSON.stringify({ name: error.name, message: error.message }, null, 2)
+      );
       return redirect(pathname);
     }
-
-    if (method === 'post') {
-      const channel = await prisma.featureChannel.findFirst({
-        where: {
-          teamId: params.teamId,
-          slug: params.slug,
-        },
-      });
-      if (!channel) {
-        session.flash(flashTypes.error, "That channel doesn't exist");
-        return redirect('/', {
-          headers: {
-            'Set-Cookie': await commitSession(session),
-          },
-        });
-      }
-      const featureName = body.get('name') as string;
-      const featureType = body.get('type') as FlagType;
-      const featureValue = body.get('value') as string;
-
-      if (!featureName || !featureType || !featureValue) {
-        session.flash(flashTypes.error, 'Missing required feature field');
-        return redirect(pathname, {
-          headers: {
-            'Set-Cookie': await commitSession(session),
-          },
-        });
-      }
-
-      await prisma.flag.create({
-        data: {
-          feature: pascalCase(featureName),
-          type: featureType,
-          value:
-            featureType === 'boolean'
-              ? !featureValue
-                ? 'false'
-                : 'true'
-              : featureValue,
-          createdBy: {
-            connect: { id: userId },
-          },
-          lastUpdatedBy: {
-            connect: { id: userId },
-          },
-          featureChannel: {
-            connect: { id: channel.id },
-          },
-        },
-      });
-
-      return redirect(pathname, {
-        headers: {
-          'Set-Cookie': await commitSession(session),
-        },
-      });
-    }
-
-    session.flash(flashTypes.error, `invalid request method "${method}"`);
-    return redirect(pathname, {
-      headers: {
-        'Set-Cookie': await commitSession(session),
-      },
-    });
-  } catch (error) {
-    console.error(error);
-
-    session.flash(flashTypes.error, 'Something went wrong');
-    session.flash(
-      flashTypes.errorDetails,
-      JSON.stringify({ name: error.name, message: error.message }, null, 2)
-    );
-    return redirect(pathname, {
-      headers: {
-        'Set-Cookie': await commitSession(session),
-      },
-    });
-  }
-};
+  });
 
 const meta: MetaFunction = ({ data }: { data: RouteData }) => {
   if (!data.channel) {

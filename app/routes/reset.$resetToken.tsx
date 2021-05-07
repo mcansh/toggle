@@ -7,7 +7,7 @@ import { json } from 'remix-utils';
 import { flashTypes } from '../lib/flash';
 import { Button } from '../components/button';
 import { Input } from '../components/input';
-import { commitSession, getSession } from '../sessions';
+import { withSession } from '../lib/with-session';
 import { hash } from '../lib/auth';
 import { prisma } from '../db';
 
@@ -18,87 +18,71 @@ interface RouteData {
 const loader: LoaderFunction = ({ params }) =>
   json<RouteData>({ resetToken: params.resetToken });
 
-const action: ActionFunction = async ({ request, params }) => {
-  const session = await getSession(request.headers.get('Cookie'));
-  const { resetToken } = params;
-  const returnTo = session.get('returnTo') as string;
+const action: ActionFunction = ({ request, params }) =>
+  withSession(request, async session => {
+    const { resetToken } = params;
+    const returnTo = session.get('returnTo') as string;
 
-  const { pathname } = new URL(request.url);
+    const { pathname } = new URL(request.url);
 
-  try {
-    const requestBody = await request.text();
-    const body = new URLSearchParams(requestBody);
+    try {
+      const requestBody = await request.text();
+      const body = new URLSearchParams(requestBody);
 
-    // 1. find user with that reset token and make sure it's still valid
-    const user = await prisma.user.findFirst({
-      where: {
-        resetToken,
-        resetTokenExpiry: {
-          gte: subHours(Date.now(), 1),
+      // 1. find user with that reset token and make sure it's still valid
+      const user = await prisma.user.findFirst({
+        where: {
+          resetToken,
+          resetTokenExpiry: {
+            gte: subHours(Date.now(), 1),
+          },
         },
-      },
-    });
+      });
 
-    // 2. check we got a user back
-    if (!user) {
+      // 2. check we got a user back
+      if (!user) {
+        session.flash(
+          flashTypes.error,
+          'This token is either invalid or expired!'
+        );
+        return redirect('/login');
+      }
+
+      const password = body.get('password') as string;
+      const confirmPassword = body.get('confirmPassword') as string;
+
+      // 3. verify new password matches
+      if (password !== confirmPassword) {
+        session.set('flash', 'password do not match');
+        return redirect(pathname);
+      }
+
+      // 4. hash their new password
+      const hashedPassword = await hash(password);
+
+      // 5. update the user's password and remove resetToken fields
+      await prisma.user.update({
+        data: { hashedPassword, resetToken: null, resetTokenExpiry: null },
+        where: { id: user.id },
+      });
+
+      session.set('userId', user.id);
+
+      if (returnTo) {
+        session.unset('returnTo');
+      }
+
+      return redirect(returnTo ?? '/');
+    } catch (error) {
+      console.error(error);
+      session.flash(flashTypes.error, `Something went wrong`);
       session.flash(
-        flashTypes.error,
-        'This token is either invalid or expired!'
+        flashTypes.errorDetails,
+        JSON.stringify({ name: error.name, message: error.message }, null, 2)
       );
-      return redirect('/login', {
-        headers: {
-          'Set-Cookie': await commitSession(session),
-        },
-      });
+      return redirect(pathname);
     }
-
-    const password = body.get('password') as string;
-    const confirmPassword = body.get('confirmPassword') as string;
-
-    // 3. verify new password matches
-    if (password !== confirmPassword) {
-      session.set('flash', 'password do not match');
-      return redirect(pathname, {
-        headers: {
-          'Set-Cookie': await commitSession(session),
-        },
-      });
-    }
-
-    // 4. hash their new password
-    const hashedPassword = await hash(password);
-
-    // 5. update the user's password and remove resetToken fields
-    await prisma.user.update({
-      data: { hashedPassword, resetToken: null, resetTokenExpiry: null },
-      where: { id: user.id },
-    });
-
-    session.set('userId', user.id);
-
-    if (returnTo) {
-      session.unset('returnTo');
-    }
-
-    return redirect(returnTo ?? '/', {
-      headers: {
-        'Set-Cookie': await commitSession(session),
-      },
-    });
-  } catch (error) {
-    console.error(error);
-    session.flash(flashTypes.error, `Something went wrong`);
-    session.flash(
-      flashTypes.errorDetails,
-      JSON.stringify({ name: error.name, message: error.message }, null, 2)
-    );
-    return redirect(pathname, {
-      headers: {
-        'Set-Cookie': await commitSession(session),
-      },
-    });
-  }
-};
+  });
 
 function meta() {
   return {

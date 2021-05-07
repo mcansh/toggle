@@ -7,54 +7,50 @@ import { makeANiceEmail, client } from '../lib/mail';
 import { flashTypes } from '../lib/flash';
 import { Input } from '../components/input';
 import { Button } from '../components/button';
-import { commitSession, getSession } from '../sessions';
+import { withSession } from '../lib/with-session';
 import { prisma } from '../db';
 
-const action: ActionFunction = async ({ request }) => {
-  const crypto = await import('crypto');
-  const session = await getSession(request.headers.get('Cookie'));
-  const requestBody = await request.text();
-  const body = new URLSearchParams(requestBody);
+const action: ActionFunction = ({ request }) =>
+  withSession(request, async session => {
+    const crypto = await import('crypto');
+    const requestBody = await request.text();
+    const body = new URLSearchParams(requestBody);
 
-  const email = body.get('email') as string;
+    const email = body.get('email') as string;
 
-  const resetTokenBuffer = crypto.randomBytes(20);
-  const resetToken = resetTokenBuffer.toString('hex');
-  const resetTokenExpiry = addHours(Date.now(), 1);
+    const resetTokenBuffer = crypto.randomBytes(20);
+    const resetToken = resetTokenBuffer.toString('hex');
+    const resetTokenExpiry = addHours(Date.now(), 1);
 
-  const user = await prisma.user.update({
-    where: { email },
-    data: {
-      resetToken,
-      resetTokenExpiry,
-    },
-  });
-
-  try {
-    await client.sendEmail({
-      From: 'Toggle Team <toggle@mcan.sh>',
-      To: `${user.name} <${user.email}>`,
-      Subject: 'Your Password Reset Token',
-      HtmlBody: makeANiceEmail(`Your Password Reset Token is here!
-        \n\n
-        <a href="${process.env.FRONTEND_URL}/reset/${resetToken}">Click Here to Reset</a>`),
-    });
-
-    session.flash(
-      flashTypes.info,
-      'check your email to finish resetting your password'
-    );
-    return redirect('/reset', {
-      headers: {
-        'Set-Cookie': await commitSession(session),
+    const user = await prisma.user.update({
+      where: { email },
+      data: {
+        resetToken,
+        resetTokenExpiry,
       },
     });
-  } catch (error) {
-    console.error(error);
 
-    return redirect('/reset');
-  }
-};
+    try {
+      await client.sendEmail({
+        From: 'Toggle Team <toggle@mcan.sh>',
+        To: `${user.name} <${user.email}>`,
+        Subject: 'Your Password Reset Token',
+        HtmlBody: makeANiceEmail(`Your Password Reset Token is here!
+        \n\n
+        <a href="${process.env.FRONTEND_URL}/reset/${resetToken}">Click Here to Reset</a>`),
+      });
+
+      session.flash(
+        flashTypes.info,
+        'check your email to finish resetting your password'
+      );
+      return redirect('/reset');
+    } catch (error) {
+      console.error(error);
+
+      return redirect('/reset');
+    }
+  });
 
 const meta = () => ({ title: 'Forgot your password? • Toggle' });
 

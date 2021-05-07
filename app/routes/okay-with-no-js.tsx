@@ -2,19 +2,15 @@ import type * as React from 'react';
 import type { ActionFunction, LoaderFunction } from 'remix';
 import { redirect } from 'remix';
 
-import { commitSession, getSession } from '../sessions';
+import { withSession } from '../lib/with-session';
 
 const loader: LoaderFunction = () => redirect('/');
 
-const action: ActionFunction = async ({ request }) => {
-  const session = await getSession(request.headers.get('Cookie'));
-  session.set('OkayWithNoJs', 'true');
-  return redirect('/', {
-    headers: {
-      'Set-Cookie': await commitSession(session),
-    },
+const action: ActionFunction = ({ request }) =>
+  withSession(request, session => {
+    session.set('OkayWithNoJs', 'true');
+    return redirect('/');
   });
-};
 
 const OkayWithNoJsPage: React.VFC = () => null;
 

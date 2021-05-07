@@ -6,96 +6,84 @@ import slugify from 'slugify';
 import { flashTypes } from '../lib/flash';
 import { Input } from '../components/input';
 import { Button } from '../components/button';
-import { commitSession, getSession } from '../sessions';
+import { withSession } from '../lib/with-session';
 import { generateName } from '../lib/name-generator';
 import { hash } from '../lib/auth';
 import { prisma } from '../db';
 
-const loader: LoaderFunction = async ({ request }) => {
-  const session = await getSession(request.headers.get('Cookie'));
-  if (session.get('userId')) {
-    return redirect('/');
-  }
-
-  return {};
-};
-
-const action: ActionFunction = async ({ request }) => {
-  const session = await getSession(request.headers.get('Cookie'));
-  const requestBody = await request.text();
-  const body = new URLSearchParams(requestBody);
-
-  const name = body.get('name');
-  const email = body.get('email');
-  const username = body.get('username');
-  const password = body.get('password');
-
-  if (!name || !email || !username || !password) {
-    session.flash(
-      flashTypes.error,
-      JSON.stringify({ message: 'missing required field' })
-    );
-    return redirect('/join', {
-      headers: {
-        'Set-Cookie': await commitSession(session),
-      },
-    });
-  }
-
-  try {
-    const hashedPassword = await hash(password);
-    const newTeamName = generateName();
-
-    const user = await prisma.user.create({
-      select: { id: true },
-      data: {
-        email,
-        name,
-        username,
-        hashedPassword,
-      },
-    });
-
-    await prisma.team.create({
-      data: {
-        name: newTeamName,
-        slug: slugify(newTeamName, { lower: true }),
-        members: {
-          connect: {
-            id: user.id,
-          },
-        },
-        createdBy: {
-          connect: {
-            id: user.id,
-          },
-        },
-      },
-    });
-
-    session.set('userId', user.id);
-
-    return redirect('/', {
-      headers: {
-        'Set-Cookie': await commitSession(session),
-      },
-    });
-  } catch (error) {
-    console.error(error);
-    if (error instanceof Error) {
-      session.flash(flashTypes.error, `Something went wrong`);
-      session.flash(
-        flashTypes.errorDetails,
-        JSON.stringify({ name: error.name, message: error.message }, null, 2)
-      );
+const loader: LoaderFunction = ({ request }) =>
+  withSession(request, session => {
+    if (session.get('userId')) {
+      return redirect('/');
     }
-    return redirect('/join', {
-      headers: {
-        'Set-Cookie': await commitSession(session),
-      },
-    });
-  }
-};
+
+    return {};
+  });
+
+const action: ActionFunction = ({ request }) =>
+  withSession(request, async session => {
+    const requestBody = await request.text();
+    const body = new URLSearchParams(requestBody);
+
+    const name = body.get('name');
+    const email = body.get('email');
+    const username = body.get('username');
+    const password = body.get('password');
+
+    if (!name || !email || !username || !password) {
+      session.flash(
+        flashTypes.error,
+        JSON.stringify({ message: 'missing required field' })
+      );
+      return redirect('/join');
+    }
+
+    try {
+      const hashedPassword = await hash(password);
+      const newTeamName = generateName();
+
+      const user = await prisma.user.create({
+        select: { id: true },
+        data: {
+          email,
+          name,
+          username,
+          hashedPassword,
+        },
+      });
+
+      await prisma.team.create({
+        data: {
+          name: newTeamName,
+          slug: slugify(newTeamName, { lower: true }),
+          members: {
+            connect: {
+              id: user.id,
+            },
+          },
+          createdBy: {
+            connect: {
+              id: user.id,
+            },
+          },
+        },
+      });
+
+      session.set('userId', user.id);
+
+      return redirect('/');
+    } catch (error) {
+      console.error(error);
+      if (error instanceof Error) {
+        session.flash(flashTypes.error, `Something went wrong`);
+        session.flash(
+          flashTypes.errorDetails,
+          JSON.stringify({ name: error.name, message: error.message }, null, 2)
+        );
+      }
+      return redirect('/join');
+    }
+  });
 
 function meta() {
   return {

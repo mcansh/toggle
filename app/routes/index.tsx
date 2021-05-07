@@ -4,7 +4,7 @@ import { Link, useRouteData, redirect } from 'remix';
 import { Prisma } from '@prisma/client';
 import { json } from 'remix-utils';
 
-import { commitSession, getSession } from '../sessions';
+import { withSession } from '../lib/with-session';
 import { prisma } from '../db';
 
 const userTeams = Prisma.validator<Prisma.UserArgs>()({
@@ -26,45 +26,36 @@ interface RouteData {
   user: UserTeams;
 }
 
-const loader: LoaderFunction = async ({ request }) => {
-  const session = await getSession(request.headers.get('Cookie'));
+const loader: LoaderFunction = ({ request }) =>
+  withSession(request, async session => {
+    const userId = session.get('userId');
 
-  const userId = session.get('userId');
+    if (!userId) {
+      session.set('returnTo', '/');
+      return redirect('/login');
+    }
 
-  if (!userId) {
-    session.set('returnTo', '/');
-    return redirect('/login', {
-      headers: {
-        'Set-Cookie': await commitSession(session),
-      },
-    });
-  }
-
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: {
-      teams: {
-        select: {
-          name: true,
-          slug: true,
-          id: true,
-          featureChannels: true,
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        teams: {
+          select: {
+            name: true,
+            slug: true,
+            id: true,
+            featureChannels: true,
+          },
         },
       },
-    },
-  });
-
-  if (!user) {
-    session.unset('userId');
-    return redirect('/login', {
-      headers: {
-        'Set-Cookie': await commitSession(session),
-      },
     });
-  }
 
-  return json<RouteData>({ user });
-};
+    if (!user) {
+      session.unset('userId');
+      return redirect('/login');
+    }
+
+    return json<RouteData>({ user });
+  });
 
 const meta: MetaFunction = () => ({
   title: 'Toggle',

@@ -5,90 +5,66 @@ import type { ActionFunction, LoaderFunction } from 'remix';
 import { flashTypes } from '../lib/flash';
 import { Input } from '../components/input';
 import { Button } from '../components/button';
-import { commitSession, getSession } from '../sessions';
+import { withSession } from '../lib/with-session';
 import { verify } from '../lib/auth';
 import { prisma } from '../db';
 
-const loader: LoaderFunction = async ({ request }) => {
-  const session = await getSession(request.headers.get('Cookie'));
-  if (session.get('userId')) {
-    return redirect('/', {
-      headers: {
-        'Set-Cookie': await commitSession(session),
-      },
-    });
-  }
-
-  return {};
-};
-
-const action: ActionFunction = async ({ request }) => {
-  const session = await getSession(request.headers.get('Cookie'));
-  const requestBody = await request.text();
-
-  const body = new URLSearchParams(requestBody);
-
-  const email = body.get('email') as string;
-  const password = body.get('password') as string;
-
-  try {
-    const user = await prisma.user.findUnique({ where: { email } });
-
-    if (!user) {
-      session.unset('userId');
-      session.flash(flashTypes.error, `Invalid credentials`);
-      return redirect('/login', {
-        headers: {
-          'Set-Cookie': await commitSession(session),
-        },
-      });
+const loader: LoaderFunction = ({ request }) =>
+  withSession(request, session => {
+    if (session.get('userId')) {
+      return redirect('/');
     }
 
-    const valid = await verify(password, user.hashedPassword);
+    return {};
+  });
 
-    if (!valid) {
-      session.flash(flashTypes.error, `Invalid credentials`);
-      return redirect('/login', {
-        headers: {
-          'Set-Cookie': await commitSession(session),
-        },
-      });
+const action: ActionFunction = ({ request }) =>
+  withSession(request, async session => {
+    const requestBody = await request.text();
+
+    const body = new URLSearchParams(requestBody);
+
+    const email = body.get('email') as string;
+    const password = body.get('password') as string;
+
+    try {
+      const user = await prisma.user.findUnique({ where: { email } });
+
+      if (!user) {
+        session.unset('userId');
+        session.flash(flashTypes.error, `Invalid credentials`);
+        return redirect('/login');
+      }
+
+      const valid = await verify(password, user.hashedPassword);
+
+      if (!valid) {
+        session.flash(flashTypes.error, `Invalid credentials`);
+        return redirect('/login');
+      }
+
+      session.set('userId', user.id);
+
+      const returnTo = session.get('returnTo');
+
+      if (returnTo) {
+        session.unset('returnTo');
+        return redirect(returnTo);
+      }
+
+      return redirect('/');
+    } catch (error) {
+      console.error(error);
+      if (error instanceof Error) {
+        session.flash(flashTypes.error, `Something went wrong`);
+        session.flash(
+          flashTypes.errorDetails,
+          JSON.stringify({ name: error.name, message: error.message }, null, 2)
+        );
+      }
+      return redirect('/login');
     }
-
-    session.set('userId', user.id);
-
-    const returnTo = session.get('returnTo');
-
-    if (returnTo) {
-      session.unset('returnTo');
-      return redirect(returnTo, {
-        headers: {
-          'Set-Cookie': await commitSession(session),
-        },
-      });
-    }
-
-    return redirect('/', {
-      headers: {
-        'Set-Cookie': await commitSession(session),
-      },
-    });
-  } catch (error) {
-    console.error(error);
-    if (error instanceof Error) {
-      session.flash(flashTypes.error, `Something went wrong`);
-      session.flash(
-        flashTypes.errorDetails,
-        JSON.stringify({ name: error.name, message: error.message }, null, 2)
-      );
-    }
-    return redirect('/login', {
-      headers: {
-        'Set-Cookie': await commitSession(session),
-      },
-    });
-  }
-};
+  });
 
 function meta() {
   return {

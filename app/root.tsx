@@ -11,7 +11,7 @@ import type { Flash } from './lib/flash';
 import { FlashProvider } from './components/flash-context';
 import { FlashMessages } from './components/flashes';
 import { flashTypes } from './lib/flash';
-import { commitSession, getSession } from './sessions';
+import { withSession } from './lib/with-session';
 
 const links: LinksFunction = () => [
   { rel: 'stylesheet', href: globalCSS },
@@ -41,29 +41,20 @@ interface RouteData {
   OkayWithNoJs: boolean;
 }
 
-const loader: LoaderFunction = async ({ request }) => {
-  const session = await getSession(request.headers.get('Cookie'));
+const loader: LoaderFunction = ({ request }) =>
+  withSession(request, session => {
+    const OkayWithNoJs = session.get('OkayWithNoJs') === 'true';
 
-  const OkayWithNoJs = session.get('OkayWithNoJs') === 'true';
+    const messages = Object.keys(flashTypes)
+      .map(key => {
+        const message = session.get(key);
+        if (!message) return undefined;
+        return { type: key, message, id: uuid() };
+      })
+      .filter((Boolean as unknown) as ExcludesFalse);
 
-  const messages = Object.keys(flashTypes)
-    .map(key => {
-      const message = session.get(key);
-      if (!message) return undefined;
-      return { type: key, message, id: uuid() };
-    })
-    .filter((Boolean as unknown) as ExcludesFalse);
-
-  return json<RouteData>(
-    { flash: messages as any, OkayWithNoJs },
-    {
-      status: 200,
-      headers: {
-        'Set-Cookie': await commitSession(session),
-      },
-    }
-  );
-};
+    return json<RouteData>({ flash: messages as any, OkayWithNoJs });
+  });
 
 function App() {
   const data = useRouteData<RouteData>();
