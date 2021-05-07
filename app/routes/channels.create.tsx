@@ -7,7 +7,7 @@ import type {
 } from 'remix';
 import { redirect, Form, usePendingFormSubmit, useRouteData } from 'remix';
 import slugify from 'slugify';
-import type { Team } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { json } from 'remix-utils';
 
 import { Button } from '../components/button';
@@ -16,11 +16,14 @@ import { generateName } from '../lib/name-generator';
 import { getSession } from '../sessions';
 import { prisma } from '../db';
 
+const teamIdAndName = Prisma.validator<Prisma.TeamArgs>()({
+  select: { name: true, id: true },
+});
+
+type TeamIdAndName = Prisma.FeatureChannelGetPayload<typeof teamIdAndName>;
+
 interface RouteData {
-  teams: Array<{
-    id: Team['id'];
-    name: Team['name'];
-  }>;
+  teams: Array<TeamIdAndName>;
 }
 
 const loader: LoaderFunction = async ({ request }) => {

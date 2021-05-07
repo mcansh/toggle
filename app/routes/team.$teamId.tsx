@@ -2,15 +2,21 @@ import * as React from 'react';
 import type { ActionFunction, LoaderFunction, MetaFunction } from 'remix';
 import { redirect, Form, useRouteData } from 'remix';
 import { json } from 'remix-utils';
+import { Prisma } from '@prisma/client';
 
 import { getSession } from '../sessions';
 import { prisma } from '../db';
 
+const teamWithNameAndAccessToken = Prisma.validator<Prisma.TeamArgs>()({
+  select: { name: true, accessTokens: true },
+});
+
+type TeamWithNameAndAccessToken = Prisma.TeamGetPayload<
+  typeof teamWithNameAndAccessToken
+>;
+
 interface RouteData {
-  team?: {
-    name: string;
-    accessTokens: Array<string>;
-  };
+  team?: TeamWithNameAndAccessToken;
 }
 
 const loader: LoaderFunction = async ({ request, params }) => {

@@ -1,5 +1,6 @@
 import * as React from 'react';
-import type { FeatureChannel, Flag, FlagType, Team } from '@prisma/client';
+import type { FlagType } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import type { ActionFunction, LoaderFunction, MetaFunction } from 'remix';
 import { redirect, Form, usePendingFormSubmit, useRouteData } from 'remix';
 import { Switch } from '@headlessui/react';
@@ -16,18 +17,34 @@ import { prisma } from '../db';
 
 import FourOhFour, { meta as fourOhFourMeta } from './404';
 
-interface RouteData {
-  channel?: FeatureChannel & {
+const channelWithTeamSlug = Prisma.validator<Prisma.FeatureChannelArgs>()({
+  include: {
     team: {
-      slug: Team['slug'];
-    };
-    flags: Array<{
-      feature: Flag['feature'];
-      type: Flag['type'];
-      updated: string;
-      value: Flag['value'];
-      id: Flag['id'];
-    }>;
+      select: {
+        slug: true,
+      },
+    },
+  },
+});
+
+type ChannelWithTeamSlug = Prisma.FeatureChannelGetPayload<
+  typeof channelWithTeamSlug
+>;
+
+const flagSelection = Prisma.validator<Prisma.FlagArgs>()({
+  select: {
+    type: true,
+    feature: true,
+    id: true,
+    value: true,
+  },
+});
+
+type Flag = Prisma.FlagGetPayload<typeof flagSelection>;
+
+interface RouteData {
+  channel?: ChannelWithTeamSlug & {
+    flags: Array<Flag & { updated: string }>;
   };
 }
 

@@ -1,25 +1,20 @@
 import * as React from 'react';
 import { useRouteData } from 'remix';
 import type { LoaderFunction } from 'remix';
+import { json } from 'remix-utils';
 
 import { prisma } from '../db';
+
+interface RouteData {
+  ok: boolean;
+}
 
 const loader: LoaderFunction = async () => {
   try {
     await prisma.flag.count();
-    return new Response(JSON.stringify({ ok: true }), {
-      status: 200,
-      headers: {
-        'content-type': 'application/json',
-      },
-    });
+    return json<RouteData>({ ok: true }, { status: 200 });
   } catch (error) {
-    return new Response(JSON.stringify({ ok: false }), {
-      status: 500,
-      headers: {
-        'content-type': 'application/json',
-      },
-    });
+    return json<RouteData>({ ok: false }, { status: 500 });
   }
 };
 
@@ -29,12 +24,8 @@ function meta() {
   };
 }
 
-interface Data {
-  ok: boolean;
-}
-
 function HealthCheckPage() {
-  const data = useRouteData<Data>();
+  const data = useRouteData<RouteData>();
 
   if (data.ok) {
     return <h1 className="text-lg">Everything is fine</h1>;

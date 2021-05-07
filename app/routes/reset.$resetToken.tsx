@@ -2,6 +2,7 @@ import * as React from 'react';
 import type { LoaderFunction, ActionFunction } from 'remix';
 import { redirect, Form, usePendingFormSubmit, useRouteData } from 'remix';
 import { subHours } from 'date-fns';
+import { json } from 'remix-utils';
 
 import { flashTypes } from '../lib/flash';
 import { Button } from '../components/button';
@@ -10,9 +11,12 @@ import { commitSession, getSession } from '../sessions';
 import { hash } from '../lib/auth';
 import { prisma } from '../db';
 
-const loader: LoaderFunction = ({ params }) => ({
-  resetToken: params.resetToken,
-});
+interface RouteData {
+  resetToken: string;
+}
+
+const loader: LoaderFunction = ({ params }) =>
+  json<RouteData>({ resetToken: params.resetToken });
 
 const action: ActionFunction = async ({ request, params }) => {
   const session = await getSession(request.headers.get('Cookie'));
@@ -104,7 +108,7 @@ function meta() {
 
 const ChangePasswordPage: React.VFC = () => {
   const pendingForm = usePendingFormSubmit();
-  const { resetToken } = useRouteData<{ resetToken: string }>();
+  const { resetToken } = useRouteData<RouteData>();
 
   return (
     <div className="grid h-full place-items-center">

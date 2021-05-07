@@ -1,21 +1,29 @@
 import * as React from 'react';
 import type { MetaFunction, RouteComponent, LoaderFunction } from 'remix';
 import { Link, useRouteData, redirect } from 'remix';
-import type { FeatureChannel, Team } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { json } from 'remix-utils';
 
 import { commitSession, getSession } from '../sessions';
 import { prisma } from '../db';
 
+const userTeams = Prisma.validator<Prisma.UserArgs>()({
+  select: {
+    teams: {
+      select: {
+        name: true,
+        slug: true,
+        id: true,
+        featureChannels: true,
+      },
+    },
+  },
+});
+
+type UserTeams = Prisma.UserGetPayload<typeof userTeams>;
+
 interface RouteData {
-  user: {
-    teams: Array<{
-      id: Team['id'];
-      name: Team['name'];
-      slug: Team['slug'];
-      featureChannels: Array<FeatureChannel>;
-    }>;
-  };
+  user: UserTeams;
 }
 
 const loader: LoaderFunction = async ({ request }) => {
