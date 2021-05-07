@@ -33,7 +33,7 @@ const action: ActionFunction = ({ request }) =>
     try {
       await client.sendEmail({
         From: 'Toggle Team <toggle@mcan.sh>',
-        To: `${user.name} <${user.email}>`,
+        To: `${user.fullName} <${user.email}>`,
         Subject: 'Your Password Reset Token',
         HtmlBody: makeANiceEmail(`Your Password Reset Token is here!
         \n\n
