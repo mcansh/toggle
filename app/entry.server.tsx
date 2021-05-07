@@ -1,9 +1,20 @@
 import ReactDOMServer from 'react-dom/server';
 import type { EntryContext } from 'remix';
 import { RemixServer } from 'remix';
+import * as Sentry from '@sentry/node';
+
+import pkgJSON from '../package.json';
 
 import { getUserChannels } from './api/routes/channels';
 import { getChannel } from './api/routes/channels.$channel';
+
+Sentry.init({
+  dsn: `https://22971c82a0f145d7971e6120cd37ae90@o74198.ingest.sentry.io/5588481`,
+  environment: process.env.NODE_ENV,
+  integrations: [new Sentry.Integrations.Http({ tracing: true })],
+  // @ts-expect-error - Remix provides their own incorrect json type
+  release: `toggle:${pkgJSON.version}`,
+});
 
 export default function handleRequest(
   request: Request,
