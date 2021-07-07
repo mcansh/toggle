@@ -1,6 +1,7 @@
 node_modules
 .ds_store
 .eslintcache
+*.log
 
 # various build directories and artifacts
 .cache
