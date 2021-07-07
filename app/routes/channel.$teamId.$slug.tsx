@@ -1,7 +1,5 @@
 import * as React from 'react';
-import type { FlagType } from '@prisma/client';
 import { Prisma } from '@prisma/client';
-import type { ActionFunction, LoaderFunction, MetaFunction } from 'remix';
 import { redirect, Form, usePendingFormSubmit, useRouteData } from 'remix';
 import { Switch } from '@headlessui/react';
 import clsx from 'clsx';
@@ -16,6 +14,9 @@ import { BaseInput, Input, InputLabel } from '../components/input';
 import { prisma } from '../db';
 
 import FourOhFour, { meta as fourOhFourMeta } from './404';
+
+import type { ActionFunction, LoaderFunction, MetaFunction } from 'remix';
+import type { FlagType } from '@prisma/client';
 
 const channelWithTeamSlug = Prisma.validator<Prisma.FeatureChannelArgs>()({
   include: {
@@ -52,7 +53,7 @@ const loader: LoaderFunction = ({ request, params }) =>
   withSession(request, async session => {
     const { pathname } = new URL(request.url);
 
-    const userId = session.get('userId');
+    const userId = session.get('userId') as string | undefined;
 
     if (!userId) {
       session.set('returnTo', pathname);
@@ -103,7 +104,7 @@ const loader: LoaderFunction = ({ request, params }) =>
 const action: ActionFunction = ({ params, request }) =>
   withSession(request, async session => {
     // verify session
-    const userId = session.get('userId');
+    const userId = session.get('userId') as string | undefined;
 
     const { pathname } = new URL(request.url);
 
@@ -136,9 +137,9 @@ const action: ActionFunction = ({ params, request }) =>
           session.flash(flashTypes.error, "That channel doesn't exist");
           return redirect('/');
         }
-        const featureName = body.get('name') as string;
-        const featureType = body.get('type') as FlagType;
-        const featureValue = body.get('value') as string;
+        const featureName = body.get('name') as string | undefined;
+        const featureType = body.get('type') as FlagType | undefined;
+        const featureValue = body.get('value') as string | undefined;
 
         if (!featureName || !featureType || !featureValue) {
           session.flash(flashTypes.error, 'Missing required feature field');
@@ -172,14 +173,14 @@ const action: ActionFunction = ({ params, request }) =>
 
       session.flash(flashTypes.error, `invalid request method "${method}"`);
       return redirect(pathname);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(error);
 
       session.flash(flashTypes.error, 'Something went wrong');
-      session.flash(
-        flashTypes.errorDetails,
-        JSON.stringify({ name: error.name, message: error.message }, null, 2)
-      );
+      session.flash(flashTypes.errorDetails, {
+        name: error.name,
+        message: error.message,
+      });
       return redirect(pathname);
     }
   });
@@ -362,9 +363,7 @@ const FeatureChannelPage: React.VFC = () => {
             {form.type === 'boolean' ? (
               <>
                 <Switch
-                  checked={
-                    typeof form.value === 'boolean' && form.value === true
-                  }
+                  checked={typeof form.value === 'boolean' && form.value}
                   onChange={checked =>
                     setForm(old => ({
                       ...old,
@@ -374,14 +373,14 @@ const FeatureChannelPage: React.VFC = () => {
                   }
                   className={clsx(
                     'relative items-center inline-flex h-5 rounded-full w-8',
-                    form.value === true ? 'bg-blue-600' : 'bg-gray-200'
+                    form.value ? 'bg-blue-600' : 'bg-gray-200'
                   )}
                 >
                   <span className="sr-only">Enable feature</span>
                   <span
                     className={clsx(
                       'inline-block w-4 h-4 transition-transform ease-in-out duration-100 transform bg-white rounded-full',
-                      form.value === true ? 'translate-x-4' : 'translate-x-0'
+                      form.value ? 'translate-x-4' : 'translate-x-0'
                     )}
                   />
                 </Switch>

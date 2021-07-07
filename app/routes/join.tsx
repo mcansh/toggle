@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { Form, usePendingFormSubmit, redirect, useRouteData } from 'remix';
-import type { ActionFunction, LoaderFunction } from 'remix';
 import slugify from 'slugify';
 import { ValidationError } from 'yup';
 import { json } from 'remix-utils';
@@ -11,10 +10,11 @@ import { withSession } from '../lib/with-session';
 import { generateName } from '../lib/name-generator';
 import { hash } from '../lib/auth';
 import { prisma } from '../db';
-import type { JoinSchema } from '../lib/schemas/join';
 import { joinSchema } from '../lib/schemas/join';
 import { yupToObject } from '../lib/yup-to-object';
-import { safeParse } from '../lib/safe-json-parse';
+
+import type { JoinSchema } from '../lib/schemas/join';
+import type { ActionFunction, LoaderFunction } from 'remix';
 
 interface RouteData {
   joinError?: Partial<JoinSchema> & {
@@ -28,11 +28,9 @@ const loader: LoaderFunction = ({ request }) =>
       return redirect('/');
     }
 
-    const joinError = session.get('joinError');
+    const joinError = session.get('joinError') as RouteData['joinError'];
 
-    const parsed = safeParse<RouteData['joinError']>(joinError);
-
-    return json<RouteData>({ joinError: parsed });
+    return json<RouteData>({ joinError });
   });
 
 const action: ActionFunction = ({ request }) =>
@@ -68,7 +66,7 @@ const action: ActionFunction = ({ request }) =>
           aggregateErrors.username = 'A user with this username already exists';
         }
 
-        session.flash('joinError', JSON.stringify(aggregateErrors));
+        session.flash('joinError', aggregateErrors);
         return redirect('/join');
       }
 
@@ -97,19 +95,16 @@ const action: ActionFunction = ({ request }) =>
       session.set('userId', user.id);
 
       return redirect('/');
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(error);
       if (error instanceof ValidationError) {
         const aggregateErrors = yupToObject<JoinSchema>(error);
 
-        session.flash('joinError', JSON.stringify(aggregateErrors));
+        session.flash('joinError', aggregateErrors);
         return redirect('/join');
       }
 
-      session.flash(
-        'joinError',
-        JSON.stringify({ generic: 'something went wrong' })
-      );
+      session.flash('joinError', { generic: 'something went wrong' });
       return redirect('/join');
     }
   });

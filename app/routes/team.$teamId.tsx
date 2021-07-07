@@ -1,11 +1,12 @@
 import * as React from 'react';
-import type { ActionFunction, LoaderFunction, MetaFunction } from 'remix';
 import { redirect, Form, useRouteData } from 'remix';
 import { json } from 'remix-utils';
 import { Prisma } from '@prisma/client';
 
 import { getSession } from '../sessions';
 import { prisma } from '../db';
+
+import type { ActionFunction, LoaderFunction, MetaFunction } from 'remix';
 
 const teamWithNameAndAccessToken = Prisma.validator<Prisma.TeamArgs>()({
   select: { name: true, accessTokens: true },

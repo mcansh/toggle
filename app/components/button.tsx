@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import * as React from 'react';
+
 import type { Except } from 'type-fest';
 
 type RawButtonProps = React.DetailedHTMLProps<
@@ -13,7 +14,7 @@ interface Props extends ButtonProps {
   /**
    * @default basic
    */
-  variant?: 'primary' | 'danger' | 'basic';
+  variant?: 'basic' | 'danger' | 'primary';
 }
 
 const Button = React.forwardRef<HTMLButtonElement, Props>(

@@ -3,6 +3,8 @@ import Redis from 'ioredis';
 import cuid from 'cuid';
 import { addWeeks, differenceInMilliseconds } from 'date-fns';
 
+import type { SessionData } from 'remix';
+
 function createRedisSessionStorage({
   cookie,
 }: {
@@ -33,7 +35,7 @@ function createRedisSessionStorage({
     async readData(id) {
       const session = await redis.get(id);
       if (!session) return null;
-      const data = JSON.parse(session);
+      const data = JSON.parse(session) as SessionData;
       return data;
     },
     async updateData(id, data, expires) {
@@ -51,6 +53,7 @@ function createRedisSessionStorage({
   });
 }
 
+// eslint-disable-next-line @typescript-eslint/unbound-method
 const { getSession, commitSession, destroySession } = createRedisSessionStorage(
   {
     // This is either a Cookie (or a set of CookieOptions) that

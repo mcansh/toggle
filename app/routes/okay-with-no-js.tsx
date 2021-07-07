@@ -1,8 +1,9 @@
-import type * as React from 'react';
-import type { ActionFunction, LoaderFunction } from 'remix';
 import { redirect } from 'remix';
 
 import { withSession } from '../lib/with-session';
+
+import type * as React from 'react';
+import type { ActionFunction, LoaderFunction } from 'remix';
 
 const loader: LoaderFunction = () => redirect('/');
 

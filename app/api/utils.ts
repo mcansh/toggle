@@ -1,7 +1,9 @@
+import type { Flag } from '.prisma/client';
+
 function parseFeatureValue(
   type: string,
   value: string
-): string | boolean | number {
+): boolean | number | string {
   return type === 'boolean'
     ? JSON.parse(value)
     : type === 'number'
@@ -10,13 +12,13 @@ function parseFeatureValue(
 }
 
 function convertFlagsArrayToObject(
-  flags?: Array<any>,
+  flags?: Array<Flag>,
   options: {
     includeExtraProperties: boolean;
   } = {
     includeExtraProperties: false,
   }
-): any {
+): { [feature: string]: Flag } {
   if (!flags) return {};
 
   if (options.includeExtraProperties) {

@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 async function getUserChannels(request: Request) {
   const session = await getSession(request.headers.get('Cookie'));
-  const userId = session.get('userId');
+  const userId = session.get('userId') as string | undefined;
 
   if (!userId) {
     return new Response(JSON.stringify({ message: 'Unauthorized' }), {
@@ -58,8 +58,12 @@ async function getUserChannels(request: Request) {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
-  } catch (error) {
-    return new Response(error.message, { status: 500 });
+  } catch (error: unknown) {
+    console.error(error);
+    if (error instanceof Error) {
+      return new Response(error.message, { status: 500 });
+    }
+    return new Response('Something went wrong', { status: 500 });
   }
 }
 

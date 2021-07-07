@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { json } from 'remix-utils';
 
 import { getSession } from '../../sessions';
 import { convertFlagsArrayToObject } from '../utils';
@@ -12,7 +13,7 @@ async function getChannel(request: Request, params: { channel: string }) {
   const authHeader = request.headers.get('Authorization');
   const authToken = authHeader ? authHeader.split('Bearer ')[1] : undefined;
   const session = await getSession(request.headers.get('Cookie'));
-  const userId = session.get('userId');
+  const userId = session.get('userId') as string | undefined;
 
   const result = await prisma.featureChannel.findFirst({
     where: {
@@ -42,25 +43,29 @@ async function getChannel(request: Request, params: { channel: string }) {
       createdAt: true,
     },
   });
+
   if (!result) {
-    return new Response(JSON.stringify({ message: 'Channel not found' }), {
-      status: 404,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return json(
+      { message: 'Channel not found' },
+      {
+        status: 404,
+      }
+    );
   }
 
   if (raw) {
-    return new Response(JSON.stringify(result), {
+    return json(result, {
       status: 200,
-      headers: { 'Content-Type': 'application/json' },
     });
   }
 
-  const flagObject = convertFlagsArrayToObject(result.flags);
-  return new Response(JSON.stringify({ ...result, flags: flagObject }), {
-    status: 200,
-    headers: { 'Content-Type': 'application/json' },
-  });
+  const flagObject = convertFlagsArrayToObject(result.flags as Array<any>);
+  return json(
+    { ...result, flags: flagObject },
+    {
+      status: 200,
+    }
+  );
 }
 
 export { getChannel };

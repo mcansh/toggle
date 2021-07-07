@@ -1,10 +1,4 @@
 import * as React from 'react';
-import type {
-  ActionFunction,
-  LoaderFunction,
-  MetaFunction,
-  RouteComponent,
-} from 'remix';
 import { redirect, Form, usePendingFormSubmit, useRouteData } from 'remix';
 import slugify from 'slugify';
 import { Prisma } from '@prisma/client';
@@ -15,6 +9,13 @@ import { Input, InputLabel } from '../components/input';
 import { generateName } from '../lib/name-generator';
 import { getSession } from '../sessions';
 import { prisma } from '../db';
+
+import type {
+  ActionFunction,
+  LoaderFunction,
+  MetaFunction,
+  RouteComponent,
+} from 'remix';
 
 const teamIdAndName = Prisma.validator<Prisma.TeamArgs>()({
   select: { name: true, id: true },

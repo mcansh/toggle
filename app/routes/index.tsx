@@ -1,11 +1,12 @@
 import * as React from 'react';
-import type { MetaFunction, RouteComponent, LoaderFunction } from 'remix';
 import { Link, useRouteData, redirect } from 'remix';
 import { Prisma } from '@prisma/client';
 import { json } from 'remix-utils';
 
 import { withSession } from '../lib/with-session';
 import { prisma } from '../db';
+
+import type { MetaFunction, RouteComponent, LoaderFunction } from 'remix';
 
 const userTeams = Prisma.validator<Prisma.UserArgs>()({
   select: {

@@ -1,8 +1,6 @@
 import * as React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
-import type { Flash } from '../lib/flash';
-
 import { useMessages } from './flash-context';
 import { FlashMessage } from './flash';
 
@@ -16,12 +14,7 @@ const FlashMessages: React.VFC = () => {
     >
       <AnimatePresence>
         {messages.map(({ message, type, id }) => (
-          <FlashMessage
-            key={id}
-            id={id}
-            type={type as Flash}
-            message={message}
-          />
+          <FlashMessage key={id} id={id} type={type} message={message} />
         ))}
       </AnimatePresence>
     </motion.div>

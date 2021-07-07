@@ -1,5 +1,4 @@
 import * as React from 'react';
-import type { ActionFunction } from 'remix';
 import { redirect, Form, usePendingLocation } from 'remix';
 import { addHours } from 'date-fns';
 
@@ -9,6 +8,8 @@ import { Input } from '../components/input';
 import { Button } from '../components/button';
 import { withSession } from '../lib/with-session';
 import { prisma } from '../db';
+
+import type { ActionFunction } from 'remix';
 
 const action: ActionFunction = ({ request }) =>
   withSession(request, async session => {

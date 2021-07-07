@@ -1,5 +1,4 @@
 import * as React from 'react';
-import type { LinksFunction, LoaderFunction } from 'remix';
 import { Form, Meta, Scripts, Links, useRouteData } from 'remix';
 import { v4 as uuid } from '@lukeed/uuid';
 import { Outlet } from 'react-router-dom';
@@ -7,9 +6,11 @@ import { XIcon } from '@heroicons/react/solid';
 import { json } from 'remix-utils';
 
 import globalCSS from './styles/global.css';
-import type { Flash } from './lib/flash';
 import { flashTypes } from './lib/flash';
 import { withSession } from './lib/with-session';
+
+import type { Flash } from './lib/flash';
+import type { LinksFunction, LoaderFunction } from 'remix';
 
 const links: LinksFunction = () => [
   { rel: 'stylesheet', href: globalCSS },
@@ -32,8 +33,6 @@ const links: LinksFunction = () => [
   { rel: 'manifest', href: '/site.webmanifest' },
 ];
 
-type ExcludesFalse = <T>(x: T | false) => x is T;
-
 interface RouteData {
   flash: Array<{ type: Flash; message: string; id: string }>;
   OkayWithNoJs: boolean;
@@ -45,13 +44,13 @@ const loader: LoaderFunction = ({ request }) =>
 
     const messages = Object.keys(flashTypes)
       .map(key => {
-        const message = session.get(key);
+        const message = session.get(key) as string | undefined;
         if (!message) return undefined;
         return { type: key, message, id: uuid() };
       })
-      .filter((Boolean as unknown) as ExcludesFalse);
+      .filter((x): x is RouteData['flash'][number] => !!x);
 
-    return json<RouteData>({ flash: messages as any, OkayWithNoJs });
+    return json<RouteData>({ flash: messages, OkayWithNoJs });
   });
 
 function App() {

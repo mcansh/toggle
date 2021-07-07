@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { useRouteData } from 'remix';
-import type { LoaderFunction } from 'remix';
 import { json } from 'remix-utils';
 
 import { prisma } from '../db';
+
+import type { LoaderFunction } from 'remix';
 
 interface RouteData {
   ok: boolean;
@@ -13,7 +14,7 @@ const loader: LoaderFunction = async () => {
   try {
     await prisma.flag.count();
     return json<RouteData>({ ok: true }, { status: 200 });
-  } catch (error) {
+  } catch (error: unknown) {
     return json<RouteData>({ ok: false }, { status: 500 });
   }
 };

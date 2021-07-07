@@ -1,5 +1,4 @@
 import * as React from 'react';
-import type { LoaderFunction, ActionFunction } from 'remix';
 import { redirect, Form, usePendingFormSubmit, useRouteData } from 'remix';
 import { subHours } from 'date-fns';
 import { json } from 'remix-utils';
@@ -11,6 +10,8 @@ import { withSession } from '../lib/with-session';
 import { hash } from '../lib/auth';
 import { prisma } from '../db';
 
+import type { LoaderFunction, ActionFunction } from 'remix';
+
 interface RouteData {
   resetToken: string;
 }
@@ -21,7 +22,7 @@ const loader: LoaderFunction = ({ params }) =>
 const action: ActionFunction = ({ request, params }) =>
   withSession(request, async session => {
     const { resetToken } = params;
-    const returnTo = session.get('returnTo') as string;
+    const returnTo = session.get('returnTo') as string | null;
 
     const { pathname } = new URL(request.url);
 
@@ -73,13 +74,13 @@ const action: ActionFunction = ({ request, params }) =>
       }
 
       return redirect(returnTo ?? '/');
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(error);
       session.flash(flashTypes.error, `Something went wrong`);
-      session.flash(
-        flashTypes.errorDetails,
-        JSON.stringify({ name: error.name, message: error.message }, null, 2)
-      );
+      session.flash(flashTypes.errorDetails, {
+        name: error.name,
+        message: error.message,
+      });
       return redirect(pathname);
     }
   });

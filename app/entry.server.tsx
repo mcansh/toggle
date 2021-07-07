@@ -1,5 +1,4 @@
 import ReactDOMServer from 'react-dom/server';
-import type { EntryContext } from 'remix';
 import { RemixServer } from 'remix';
 import * as Sentry from '@sentry/node';
 
@@ -7,6 +6,8 @@ import pkgJSON from '../package.json';
 
 import { getUserChannels } from './api/routes/channels';
 import { getChannel } from './api/routes/channels.$channel';
+
+import type { EntryContext } from 'remix';
 
 Sentry.init({
   dsn: `https://22971c82a0f145d7971e6120cd37ae90@o74198.ingest.sentry.io/5588481`,

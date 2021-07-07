@@ -1,12 +1,13 @@
 import * as React from 'react';
 import { motion } from 'framer-motion';
-import type { Except } from 'type-fest';
 import clsx from 'clsx';
 
 import { flashTypes } from '../lib/flash';
 
-import type { Message } from './flash-context';
 import { useMessages } from './flash-context';
+
+import type { Message } from './flash-context';
+import type { Except } from 'type-fest';
 
 class Timer {
   public constructor(callback: VoidFunction, delay: number) {

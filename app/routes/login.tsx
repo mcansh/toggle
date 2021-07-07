@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { Form, Link, usePendingFormSubmit, redirect } from 'remix';
-import type { ActionFunction, LoaderFunction } from 'remix';
 import { FlagIcon } from '@heroicons/react/outline';
 
 import { flashTypes } from '../lib/flash';
@@ -8,6 +7,8 @@ import { withSession } from '../lib/with-session';
 import { verify } from '../lib/auth';
 import { prisma } from '../db';
 import { loginSchema } from '../lib/schemas/login';
+
+import type { ActionFunction, LoaderFunction } from 'remix';
 
 const loader: LoaderFunction = ({ request }) =>
   withSession(request, session => {
@@ -52,7 +53,7 @@ const action: ActionFunction = ({ request }) =>
 
       session.set('userId', user.id);
 
-      const returnTo = session.get('returnTo');
+      const returnTo = session.get('returnTo') as string | null;
 
       if (returnTo) {
         session.unset('returnTo');
@@ -60,14 +61,14 @@ const action: ActionFunction = ({ request }) =>
       }
 
       return redirect('/');
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(error);
       if (error instanceof Error) {
         session.flash(flashTypes.error, `Something went wrong`);
-        session.flash(
-          flashTypes.errorDetails,
-          JSON.stringify({ name: error.name, message: error.message }, null, 2)
-        );
+        session.flash(flashTypes.errorDetails, {
+          name: error.name,
+          message: error.message,
+        });
       }
       return redirect('/login');
     }
